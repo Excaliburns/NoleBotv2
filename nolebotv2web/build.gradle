@@ -8,13 +8,8 @@ group = 'com.tut'
 version = '2.0.0-b1.0.0'
 sourceCompatibility = '14'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
 repositories {
+    jcenter()
     mavenCentral()
 }
 

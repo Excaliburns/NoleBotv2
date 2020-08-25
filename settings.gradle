@@ -1,0 +1,3 @@
+rootProject.name = 'nolebotv2'
+include('nolebotv2core')
+include('nolebotv2web')
