@@ -1,1 +1,7 @@
 /nolebotv2core/.gradle/
+/nolebotv2core/logs
+/nolebotv2core/config
+/nolebotv2core/build
+/nolebotv2web/build
+/config/
+/build/
