@@ -1,3 +1,7 @@
+import commands.guildcommands.HelloWorld;
+import commands.guildcommands.util.GuildMessageCommandListener;
+import commands.util.CommandEvent;
+import commands.util.CommandUtil;
 import enums.PropEnum;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -11,6 +15,9 @@ import java.util.List;
 
 public class NoleBot {
     private static Logger logger = LogManager.getLogger(NoleBot.class);
+    private static final CommandUtil                 commandUtil                 = new CommandUtil();
+    private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
+
 
     public static void main(String[] args) {
         // Enable specific events from discord gateway.
@@ -23,11 +30,17 @@ public class NoleBot {
 
         JDA jda;
 
+        // Add Commands
+        commandUtil.addCommand(new HelloWorld());
+
         try {
             jda = JDABuilder.create(PropertiesUtil.getProperty(PropEnum.TOKEN), INTENT_LIST).build();
 
-            logger.info("JDA Started! End.");
-            jda.shutdown();
+            // Add Listeners to JDA instance
+            jda.addEventListener(
+                    commandUtil,
+                    guildMessageCommandListener
+            );
         } catch (LoginException e) {
             logger.error("Could not initalize bot instance. Was token incorrect? {}", e.getMessage());
         }
