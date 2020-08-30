@@ -37,7 +37,15 @@ public class NoleBot {
         commandUtil.addCommand(new SetPrefix());
 
         try {
-            jda = JDABuilder.create(PropertiesUtil.getProperty(PropEnum.TOKEN), INTENT_LIST)
+            String token = PropertiesUtil.getProperty(PropEnum.TOKEN);
+
+            // For Heroku Deployment
+            if (token == null) {
+                token = System.getenv("TOKEN");
+            }
+
+            // If it's still null, user probably hasn't set it.
+            jda = JDABuilder.create(token, INTENT_LIST)
                     .disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
                     .build();
 
