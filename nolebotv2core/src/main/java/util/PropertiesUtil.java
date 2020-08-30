@@ -27,26 +27,9 @@ public class PropertiesUtil {
         final String DEFAULT_FILE_NAME = "config.properties";
 
         final Path defaultFile     = Paths.get(DEFAULT_FILE_PATH + DEFAULT_FILE_NAME);
-        if (!Files.exists(defaultFile.getParent())) {
-            logger.warn("Properties directory did not exist. Creating from default.");
 
-            try{
-                Files.createDirectory(defaultFile.getParent());
-            }
-            catch (IOException e) {
-                logger.error("Could not create config directory. {}", e.getMessage());
-            }
-        }
+        FilesUtil.createFileIfNotExists(defaultFile);
 
-        if (!Files.exists(defaultFile)) {
-            logger.warn("Properties file did not exist. Creating from default.");
-
-            try {
-                Files.createFile(defaultFile);
-            } catch (IOException e) {
-                logger.error("Could not create config file. {}", e.getMessage());
-            }
-        }
         BufferedInputStream inputStream = null;
 
         try {

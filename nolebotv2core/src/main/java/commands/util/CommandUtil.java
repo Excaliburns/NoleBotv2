@@ -25,11 +25,6 @@ public class CommandUtil extends ListenerAdapter {
         // TODO: Settings
     }
 
-    @Override
-    public void onGenericEvent(@NotNull GenericEvent event) {
-        event.
-    }
-
     public void addCommand(Command command) {
         String name = command.getName();
 

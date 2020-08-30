@@ -1,0 +1,14 @@
+{
+  "prefix":"!",
+  "guildId":"138481681630887936",
+  "roleHelperList":[],
+  "commandPermissionMap":{
+    "help":1000,
+    "ping":200,
+    "tut":0
+  },
+  "conditionalRole":[
+    "447957885540892692",
+    "585615635954925569"
+  ]
+}

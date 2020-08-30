@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import util.settings.Settings;
+import util.settings.SettingsCache;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +18,6 @@ import java.util.List;
 @Getter @Setter
 public class GuildMessageCommandListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageCommandListener.class);
-    // TODO: SETTINGS
 
     /**
      * @param event
@@ -29,9 +30,10 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
         List<String> commandMessage;
         String message = event.getMessage().getContentRaw();
+        final Settings settings = SettingsCache.getSettings(event.getGuild().getId());
 
         // TODO: SETTINGS PREFIX
-        if (message.startsWith("!")) {
+        if (message.startsWith(settings.getPrefix())) {
             // remove prefix
             message = message.substring(1);
             commandMessage = Arrays.asList(message.split("\\s"));
@@ -47,7 +49,7 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
             if (command != null) {
                 // TODO Permissions
-                GuildMessageCommandEvent commandEvent = new GuildMessageCommandEvent(event, commandMessage);
+                GuildMessageCommandEvent commandEvent = new GuildMessageCommandEvent(event, commandMessage, settings);
 
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",

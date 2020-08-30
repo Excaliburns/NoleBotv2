@@ -1,4 +1,5 @@
 import commands.guildcommands.HelloWorld;
+import commands.guildcommands.SetPrefix;
 import commands.guildcommands.util.GuildMessageCommandListener;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
@@ -6,6 +7,7 @@ import enums.PropEnum;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.PropertiesUtil;
@@ -32,9 +34,12 @@ public class NoleBot {
 
         // Add Commands
         commandUtil.addCommand(new HelloWorld());
+        commandUtil.addCommand(new SetPrefix());
 
         try {
-            jda = JDABuilder.create(PropertiesUtil.getProperty(PropEnum.TOKEN), INTENT_LIST).build();
+            jda = JDABuilder.create(PropertiesUtil.getProperty(PropEnum.TOKEN), INTENT_LIST)
+                    .disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
+                    .build();
 
             // Add Listeners to JDA instance
             jda.addEventListener(

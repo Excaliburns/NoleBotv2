@@ -10,9 +10,10 @@ import java.util.List;
 public class HelloWorld extends Command {
 
     public HelloWorld() {
-        name = "hello";
-        description = "Prints Hello World!";
-        helpDescription = "Prints Hello World!";
+        name                    = "hello";
+        description             = "Prints Hello World!";
+        helpDescription         = "Prints Hello World!";
+        requiredPermissionLevel = 0;
     }
 
     @Override
