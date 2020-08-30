@@ -42,6 +42,9 @@ public class NoleBot {
             // For Heroku Deployment
             if (token == null) {
                 token = System.getenv("TOKEN");
+                if (token != null) {
+                    logger.info("Running in Heroku mode - changes will not persist through bot restarts.");
+                }
             }
 
             // If it's still null, user probably hasn't set it.
