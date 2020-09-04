@@ -3,18 +3,19 @@ package util.settings;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import util.permissions.GenericPermission;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 @Getter @Setter
 @NoArgsConstructor
 public class Settings {
-    // TODO: RoleHelper
     private String prefix = "!";
     private String guildId;
-    private List<?>                  roleHelperList; // TODO: RoleHelper
     private HashMap<String, Integer> commandPermissionMap;
+    private TreeSet<GenericPermission> permissionList;
 
     // Roles stored as IDs
     private List<String>             conditionalRole;

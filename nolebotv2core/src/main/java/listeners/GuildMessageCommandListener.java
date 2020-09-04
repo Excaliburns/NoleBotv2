@@ -1,4 +1,4 @@
-package commands.guildcommands.util;
+package listeners;
 
 import commands.util.Command;
 import commands.util.CommandUtil;
@@ -12,8 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import util.settings.Settings;
 import util.settings.SettingsCache;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 public class GuildMessageCommandListener extends ListenerAdapter {
@@ -30,12 +33,11 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
         List<String> commandMessage;
         String message = event.getMessage().getContentRaw();
-        final Settings settings = SettingsCache.getSettings(event.getGuild().getId());
+        final Settings settings = SettingsCache.getSettings(event.getGuild());
 
-        // TODO: SETTINGS PREFIX
         if (message.startsWith(settings.getPrefix())) {
             // remove prefix
-            message = message.substring(1);
+            message = message.substring(settings.getPrefix().length());
             commandMessage = Arrays.asList(message.split("\\s"));
 
             final String commandName = commandMessage.get(0);
@@ -58,9 +60,23 @@ public class GuildMessageCommandListener extends ListenerAdapter {
                         event.getGuild().getName(),
                         event.getGuild().getId());
 
-                command.executeCommand(commandEvent);
-            }
+                try {
+                    command.executeCommand(commandEvent);
+                } catch (Exception e) {
+                    commandEvent.sendErrorResponseToOriginatingChannel("There was an exception while processing your request!");
+                    commandEvent.sendErrorResponseToOriginatingChannel("Check the logs and message the bot author if this seems unexpected.");
 
+                    final StringWriter sw = new StringWriter();
+                    final PrintWriter pw  = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+
+                    final String firstTenLinesOfStackTrace = Arrays .stream((sw.toString() + " ").split("\r?\n"))
+                                                                    .limit(10)
+                                                                    .collect(Collectors.joining("\n"));
+
+                    commandEvent.getChannel().sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
+                }
+            }
         }
     }
 }

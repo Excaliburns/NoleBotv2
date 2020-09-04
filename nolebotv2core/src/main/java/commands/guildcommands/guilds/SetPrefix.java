@@ -1,7 +1,8 @@
-package commands.guildcommands;
+package commands.guildcommands.guilds;
 
 import commands.util.Command;
 import commands.util.CommandEvent;
+import util.settings.Settings;
 import util.settings.SettingsCache;
 
 import java.util.Collections;
@@ -28,7 +29,7 @@ public class SetPrefix extends Command {
         }
         else {
             event.getSettings().setPrefix(newPrefix);
-            SettingsCache.saveSettingsForGuild(event.getGuildId(), event.getSettings());
+            SettingsCache.saveSettingsForGuild(event.getGuild(), event.getSettings());
 
             event.sendSuccessResponseToOriginatingChannel("Successfully set new prefix to **" + newPrefix + "**");
         }

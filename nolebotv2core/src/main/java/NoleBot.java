@@ -1,7 +1,7 @@
 import commands.guildcommands.HelloWorld;
-import commands.guildcommands.SetPrefix;
-import commands.guildcommands.util.GuildMessageCommandListener;
-import commands.util.CommandEvent;
+import commands.guildcommands.guilds.SetPrefix;
+import commands.guildcommands.guilds.permissions.ListGuildPermissions;
+import listeners.GuildMessageCommandListener;
 import commands.util.CommandUtil;
 import enums.PropEnum;
 import net.dv8tion.jda.api.JDA;
@@ -35,6 +35,7 @@ public class NoleBot {
         // Add Commands
         commandUtil.addCommand(new HelloWorld());
         commandUtil.addCommand(new SetPrefix());
+        commandUtil.addCommand(new ListGuildPermissions());
 
         try {
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);

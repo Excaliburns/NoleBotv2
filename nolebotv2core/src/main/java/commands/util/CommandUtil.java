@@ -13,16 +13,16 @@ import java.util.HashMap;
 
 public class CommandUtil extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(CommandUtil.class);
-    public static final ArrayList<Command> commands = new ArrayList<>();
-    public static final HashMap<String, Integer>       commandIndex = new HashMap<>();
+
+    public static final ArrayList<Command>        commands     = new ArrayList<>();
+    public static final HashMap<String, Integer>  commandIndex = new HashMap<>();
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        logger.info("Initializing NoleBotv2...");
-
-        JDA jda = event.getJDA();
-
-        // TODO: Settings
+//        logger.info("Initializing NoleBotv2...");
+//
+//        JDA jda = event.getJDA();
+//
     }
 
     public void addCommand(Command command) {

@@ -1,4 +1,4 @@
-package commands.guildcommands.util;
+package listeners;
 
 import commands.util.CommandEvent;
 import lombok.Getter;

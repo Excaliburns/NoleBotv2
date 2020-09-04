@@ -20,9 +20,9 @@ public abstract class Command {
     protected List<String> usages = new ArrayList<>();
     protected int requiredPermissionLevel = 1000;
 
-    public abstract void onCommandReceived(CommandEvent event);
+    public abstract void onCommandReceived(CommandEvent event) throws Exception;
 
-    public final void executeCommand(CommandEvent event) {
+    public final void executeCommand(CommandEvent event) throws Exception{
         onCommandReceived(event);
     }
 }

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.JUnit4;
+import util.permissions.GenericPermission;
 import util.settings.Settings;
 
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 
@@ -28,7 +30,7 @@ public class SettingsFromJsonTest {
 
         testSettings.setPrefix("!");
         testSettings.setGuildId("138481681630887936");
-        testSettings.setRoleHelperList(new ArrayList<>());
+        testSettings.setPermissionList(new TreeSet<>());
 
         HashMap<String, Integer> testCommandPermissionMap = new HashMap<>(Map.of(
                 "help", 1000,
@@ -71,7 +73,7 @@ public class SettingsFromJsonTest {
         assertEquals(settings.getGuildId             (), testSettings.getGuildId());
         assertEquals(settings.getCommandPermissionMap(), testSettings.getCommandPermissionMap());
         assertEquals(settings.getConditionalRole     (), testSettings.getConditionalRole());
-        assertEquals(settings.getRoleHelperList      (), testSettings.getRoleHelperList());
+        assertEquals(settings.getPermissionList      (), testSettings.getPermissionList());
 
         logger.info("Completed SettingsFromJson Test");
     }
