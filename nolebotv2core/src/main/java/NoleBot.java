@@ -1,3 +1,4 @@
+import commands.general.Help;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.guilds.SetPrefix;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
@@ -33,6 +34,7 @@ public class NoleBot {
         JDA jda;
 
         // Add Commands
+        commandUtil.addCommand(new Help());
         commandUtil.addCommand(new HelloWorld());
         commandUtil.addCommand(new SetPrefix());
         commandUtil.addCommand(new ListGuildPermissions());
