@@ -4,6 +4,7 @@ import commands.util.Command;
 import commands.util.CommandUtil;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.events.emote.EmoteAddedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;

@@ -6,11 +6,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import util.settings.Settings;
 
-import java.util.List;
-
 @Getter @Setter
 public class CommandEvent {
-    private List<String>   messageContent;
     private Guild          guild;
     private String         guildId;
     private MessageChannel channel;
@@ -24,6 +21,4 @@ public class CommandEvent {
     public void sendSuccessResponseToOriginatingChannel(String successMessageContent) {
         channel.sendMessage("\u2705 \u2014 " + successMessageContent).queue();
     }
-
-    // TODO: Permissison Level
 }

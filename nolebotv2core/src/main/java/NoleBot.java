@@ -4,6 +4,7 @@ import commands.guildcommands.guilds.permissions.ListGuildPermissions;
 import listeners.GuildMessageCommandListener;
 import commands.util.CommandUtil;
 import enums.PropEnum;
+import listeners.ReactionListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -19,6 +20,7 @@ public class NoleBot {
     private static Logger logger = LogManager.getLogger(NoleBot.class);
     private static final CommandUtil                 commandUtil                 = new CommandUtil();
     private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
+    private static final ReactionListener            reactionListener            = new ReactionListener();
 
 
     public static void main(String[] args) {
@@ -56,7 +58,8 @@ public class NoleBot {
             // Add Listeners to JDA instance
             jda.addEventListener(
                     commandUtil,
-                    guildMessageCommandListener
+                    guildMessageCommandListener,
+                    reactionListener
             );
         } catch (LoginException e) {
             logger.error("Could not initalize bot instance. Was token incorrect? {}", e.getMessage());
