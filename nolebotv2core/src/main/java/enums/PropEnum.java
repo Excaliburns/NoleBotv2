@@ -7,7 +7,7 @@ public enum PropEnum {
     TOKEN            ("bot.token");
 
     private final String propertyKey;
-    public static final String AVATAR = "https://cdn.discordapp.com/avatars/548200687964520459/ab398fa8cce3195682257ff692b53ecb.webp?size=128";
+
     PropEnum(String propertyKey) {
         this.propertyKey = propertyKey;
         getMappings().put(propertyKey, this);
