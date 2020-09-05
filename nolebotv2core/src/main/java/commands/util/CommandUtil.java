@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class CommandUtil extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(CommandUtil.class);
@@ -34,5 +36,13 @@ public class CommandUtil extends ListenerAdapter {
         }
 
         commands.add(command);
+    }
+
+    public static Optional<Command> getCommandFromMap(String commandName) {
+        try {
+            return Optional.of(commands.get(commandIndex.get(commandName)));
+        } catch (NullPointerException e) {
+            return Optional.empty();
+        }
     }
 }
