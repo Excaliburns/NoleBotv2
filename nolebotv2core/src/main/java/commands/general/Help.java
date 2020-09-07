@@ -64,10 +64,10 @@ public class Help extends Command {
             fieldList.add(new MessageEmbed.Field("Description: ",                 calledCommand.getHelpDescription(),                          false));
             fieldList.add(new MessageEmbed.Field("Usages <required> [optional]:", usages.toString(),                                           false));
 
-            return EmbedHelper.buildDefaultMessageEmbed(fieldList);
+            return EmbedHelper.buildDefaultMessageEmbed(event.getOriginatingJDAEvent(), fieldList);
         } else {
             final MessageEmbed.Field field = new MessageEmbed.Field("Error!", "No command with that name found!", false);
-            return EmbedHelper.buildDefaultMessageEmbed(field);
+            return EmbedHelper.buildDefaultMessageEmbed(event.getOriginatingJDAEvent(), field);
         }
     }
 
@@ -96,6 +96,6 @@ public class Help extends Command {
 
             fields.add(new MessageEmbed.Field(info1, info2, false));
         }
-        return EmbedHelper.buildDefaultMessageEmbed(fields);
+        return EmbedHelper.buildDefaultMessageEmbed(event.getOriginatingJDAEvent(), fields);
     }
 }
