@@ -38,4 +38,6 @@ public class CommandEvent {
     public void sendSuccessResponseToOriginatingChannel(String successMessageContent) {
         channel.sendMessage("\u2705 \u2014 " + successMessageContent).queue();
     }
+
+    // TODO: Permissison Level
 }

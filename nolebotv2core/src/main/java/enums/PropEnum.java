@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public enum PropEnum {
     // TOKEN ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BOT_AVATAR_URL   ("bot.avatar.url"),
     TOKEN            ("bot.token");
 
     private final String propertyKey;
