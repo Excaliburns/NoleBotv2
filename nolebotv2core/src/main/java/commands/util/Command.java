@@ -22,7 +22,7 @@ public abstract class Command {
 
     public abstract void onCommandReceived(CommandEvent event) throws Exception;
 
-    public final void executeCommand(CommandEvent event) throws Exception{
+    public final void executeCommand(CommandEvent event) throws Exception {
         onCommandReceived(event);
     }
 }

@@ -1,6 +1,7 @@
 package listeners;
 
 import commands.util.Command;
+import commands.util.CommandEvent;
 import commands.util.CommandUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +53,7 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
             if (command != null) {
                 // TODO Permissions
-                GuildMessageCommandEvent commandEvent = new GuildMessageCommandEvent(event, commandMessage, settings);
+                final CommandEvent commandEvent = new CommandEvent(event, commandMessage, settings, command);
 
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",
