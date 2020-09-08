@@ -67,15 +67,7 @@ public class GuildMessageCommandListener extends ListenerAdapter {
                     commandEvent.sendErrorResponseToOriginatingChannel("There was an exception while processing your request!");
                     commandEvent.sendErrorResponseToOriginatingChannel("Check the logs and message the bot author if this seems unexpected.");
 
-                    final StringWriter sw = new StringWriter();
-                    final PrintWriter pw  = new PrintWriter(sw);
-                    e.printStackTrace(pw);
-
-                    final String firstTenLinesOfStackTrace = Arrays .stream((sw.toString() + " ").split("\r?\n"))
-                                                                    .limit(10)
-                                                                    .collect(Collectors.joining("\n"));
-
-                    commandEvent.getChannel().sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
+                    commandEvent.printStackTraceToChannelFromThrowable(event.getChannel(), e);
                 }
             }
         }

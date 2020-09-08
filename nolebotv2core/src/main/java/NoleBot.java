@@ -5,8 +5,10 @@ import commands.guildcommands.guilds.permissions.ListGuildPermissions;
 import listeners.GuildMessageCommandListener;
 import commands.util.CommandUtil;
 import enums.PropEnum;
+import listeners.GuildMessageReactionListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +22,7 @@ public class NoleBot {
     private static Logger logger = LogManager.getLogger(NoleBot.class);
     private static final CommandUtil                 commandUtil                 = new CommandUtil();
     private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
-
+    private static final GuildMessageReactionListener guildMessageReactionListener = new GuildMessageReactionListener();
 
     public static void main(String[] args) {
         // Enable specific events from discord gateway.
@@ -58,7 +60,8 @@ public class NoleBot {
             // Add Listeners to JDA instance
             jda.addEventListener(
                     commandUtil,
-                    guildMessageCommandListener
+                    guildMessageCommandListener,
+                    guildMessageReactionListener
             );
         } catch (LoginException e) {
             logger.error("Could not initalize bot instance. Was token incorrect? {}", e.getMessage());

@@ -1,16 +1,25 @@
 package commands.general;
 
 import com.google.common.primitives.Ints;
+import commands.guildcommands.HelloWorld;
 import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageReaction;
 import util.chat.EmbedHelper;
+import util.reactions.ReactionMessage;
+import util.reactions.ReactionMessageCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class Help extends Command {
 
@@ -32,7 +41,7 @@ public class Help extends Command {
 
         if (isGenericHelpCommand) {
             try {
-                event.getChannel().sendMessage(displayGenericHelpMenu(event)).queue();
+                displayGenericHelpMenu(event);
             }
             catch (IndexOutOfBoundsException e) {
                 //Not sure if its necessary to make this error message into a MessageEmbed
@@ -59,10 +68,10 @@ public class Help extends Command {
             calledCommand.getUsages().forEach( usage -> usages.append(prefix).append(usage).append("\n"));
 
             List<MessageEmbed.Field> fieldList = new ArrayList<>();
-            fieldList.add(new MessageEmbed.Field("Command Name: ",               commandString,                                                true));
-            fieldList.add(new MessageEmbed.Field("Permission Level Required: ",    String.valueOf(calledCommand.getRequiredPermissionLevel()), true));
-            fieldList.add(new MessageEmbed.Field("Description: ",                 calledCommand.getHelpDescription(),                          false));
-            fieldList.add(new MessageEmbed.Field("Usages <required> [optional]:", usages.toString(),                                           false));
+            fieldList.add(new MessageEmbed.Field("Command Name: ",                commandString,                                                true));
+            fieldList.add(new MessageEmbed.Field("Permission Level Required: ",   String.valueOf(calledCommand.getRequiredPermissionLevel()),   true));
+            fieldList.add(new MessageEmbed.Field("Description: ",                 calledCommand.getHelpDescription(),                           false));
+            fieldList.add(new MessageEmbed.Field("Usages <required> [optional]:", usages.toString(),                                            false));
 
             return EmbedHelper.buildDefaultMessageEmbed(fieldList);
         } else {
@@ -71,31 +80,63 @@ public class Help extends Command {
         }
     }
 
-    private MessageEmbed displayGenericHelpMenu(CommandEvent event) {
-        final ArrayList<Command> commands = CommandUtil.commands;
-        final String prefix               = event.getSettings().getPrefix();
-        final int pageNum                 = event.getMessageContent().size() == 1 ? 1 : Integer.parseInt(event.getMessageContent().get(1));
-        final int numPages                = (commands.size() % 10 == 0) ? commands.size() / 10 : (commands.size() / 10) + 1;
+    private void displayGenericHelpMenu(CommandEvent event) {
+        final ArrayList<MessageEmbed> commandHelpPages = new ArrayList<>();
+        final ArrayList<Command> commands              = new ArrayList<>(CommandUtil.commands);
 
-        if (pageNum > numPages) {
-            throw new IndexOutOfBoundsException();
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+        commands.add(new HelloWorld());
+
+        final String prefix                            = event.getSettings().getPrefix();
+        final int numPages                             = (commands.size() % 10 == 0) ? commands.size() / 10 : (commands.size() / 10) + 1;
+
+        for (int i = 1; i <= numPages; i++) {
+            final int startIndex = ( i - 1 ) * 10;
+            final int endIndex   = commands.size() < 10 ? commands.size() : Math.min(i * 10, commands.size());
+
+            // creat sublist of commands for each page
+            final List<Command> commandPageSubList = commands.subList(startIndex, endIndex);
+            final List<MessageEmbed.Field> fields = new ArrayList<>();
+
+            // For each command in the sublist, append some info about it and add that to the pages list
+            commandPageSubList.forEach( c -> {
+                final String info1 = prefix + c.getName() + ": ";
+                final String info2 = c.getDescription();
+
+                fields.add(new MessageEmbed.Field(info1, info2, false));
+            });
+
+            commandHelpPages.add(EmbedHelper.buildDefaultMessageEmbed(fields));
         }
+        final List<String> helpReactions = Arrays.asList(
+                // cross mark
+                "U+274C",
+                // right arrow
+                "U+2B05",
+                // left arrow
+                "U+27A1");
 
-        //Starting index of the loop
-        final int startIndex                  = (pageNum - 1) * 10;
-        //End index of the loop. If there are less than 10 commands, loop through them all. Otherwise, only loop through 10 commands
-        final int endIndex                    = commands.size() < 10 ? commands.size() : startIndex + 10;
+        // Create ReactionMessage from sent messageEmbed
+        final ReactionMessage reactionMessage = new ReactionMessage(
+                event.getChannel(),
+                event.getOriginatingJDAEvent().getAuthor().getId(),
+                event.getOriginatingJDAEvent().getMessageId(),
+                0,
+                commandHelpPages
+        );
 
-        // Starts at the startIndex command, then creates a field with the command name and the description.
-        // Adds it to the list of fields, then loops for 10 commands (or less if there aren't 10 commands registered).
-        final List<MessageEmbed.Field> fields = new ArrayList<>();
-
-        for (int i = startIndex; i < endIndex; i++) {
-            final String info1 = prefix + commands.get( i+((pageNum-1)*10) ).getName() + ": ";
-            final String info2 = commands.get(i).getDescription();
-
-            fields.add(new MessageEmbed.Field(info1, info2, false));
-        }
-        return EmbedHelper.buildDefaultMessageEmbed(fields);
+        // Always send the first page when creating the display. Use the callback to populate the cache. Index is 0.
+        event.getChannel().sendMessage(commandHelpPages.get(0))
+                .queue(message -> {
+                    helpReactions.forEach(e-> message.addReaction(e).queue());
+                    ReactionMessageCache.addReactionMessageToCache(message.getId(), reactionMessage);
+                });
     }
 }

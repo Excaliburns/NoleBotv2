@@ -4,16 +4,19 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.settings.Settings;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 public class CommandEvent {
-    private Event          originatingJDAEvent;
-    private Command        command;
+    private GuildMessageReceivedEvent originatingJDAEvent;
+    private Command                   command;
 
     private List<String>   messageContent;
     private Guild          guild;
@@ -37,6 +40,18 @@ public class CommandEvent {
 
     public void sendSuccessResponseToOriginatingChannel(String successMessageContent) {
         channel.sendMessage("\u2705 \u2014 " + successMessageContent).queue();
+    }
+
+    public void printStackTraceToChannelFromThrowable(MessageChannel channel, Throwable e) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw  = new PrintWriter(sw);
+        e.printStackTrace(pw);
+
+        final String firstTenLinesOfStackTrace = Arrays.stream((sw.toString() + " ").split("\r?\n"))
+                .limit(10)
+                .collect(Collectors.joining("\n"));
+
+        channel.sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
     }
 
     // TODO: Permissison Level

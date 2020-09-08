@@ -4,8 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.JUnit4;
-import util.permissions.GenericPermission;
 import util.settings.Settings;
 
 import java.io.BufferedReader;
