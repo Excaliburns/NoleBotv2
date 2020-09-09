@@ -5,21 +5,17 @@ import commands.guildcommands.HelloWorld;
 import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.MessageReaction;
 import util.chat.EmbedHelper;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
+import util.reactions.ReactionMessageType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 public class Help extends Command {
 
@@ -125,18 +121,20 @@ public class Help extends Command {
 
         // Create ReactionMessage from sent messageEmbed
         final ReactionMessage reactionMessage = new ReactionMessage(
+                ReactionMessageType.HELP_COMMAND,
                 event.getChannel(),
                 event.getOriginatingJDAEvent().getAuthor().getId(),
                 event.getOriginatingJDAEvent().getMessageId(),
                 0,
-                commandHelpPages
+                commandHelpPages,
+                helpReactions
         );
 
         // Always send the first page when creating the display. Use the callback to populate the cache. Index is 0.
         event.getChannel().sendMessage(commandHelpPages.get(0))
                 .queue(message -> {
                     helpReactions.forEach(e-> message.addReaction(e).queue());
-                    ReactionMessageCache.addReactionMessageToCache(message.getId(), reactionMessage);
+                    ReactionMessageCache.setReactionMessage(message.getId(), reactionMessage);
                 });
     }
 }

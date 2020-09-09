@@ -12,9 +12,11 @@ import java.util.List;
 @Getter @Setter
 @AllArgsConstructor
 public class ReactionMessage {
+    private ReactionMessageType   type;
     private MessageChannel        originatingMessageChannel;
     private String                userInitiatedId;
     private String                messageId;
     private int                   currentEmbedPage;
     private List<MessageEmbed>    embedList;
+    private List<String>          reactionsUsed;
 }

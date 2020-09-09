@@ -19,18 +19,20 @@ public class ReactionMessageCache {
 
     // MessageId, ReactionMessage
     private static final Cache<String, ReactionMessage> reactionMessageCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(30, TimeUnit.SECONDS)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
             .removalListener(new RemovalListener<Object, Object>() {
                 @Override
                 public void onRemoval(@NotNull RemovalNotification<Object, Object> notification) {
-                    if (notification.getCause() == RemovalCause.EXPIRED || notification.getCause() == RemovalCause.EXPLICIT) {
+                    if (notification.getCause() == RemovalCause.EXPIRED
+                            || notification.getCause() == RemovalCause.EXPLICIT
+                            || notification.getCause() == RemovalCause.COLLECTED) {
                         final String          originalMessageId = (String) notification.getKey();
                         final ReactionMessage messageContents   = (ReactionMessage) notification.getValue();
 
                         messageContents.getOriginatingMessageChannel().editMessageById(
                                 originalMessageId,
                                 EmbedHelper.getDefaultExpiryReactionMessage()
-                        ).complete();
+                        ).queue(andAfter -> andAfter.clearReactions().queue());
                     }
                 }
             })
@@ -41,7 +43,7 @@ public class ReactionMessageCache {
         return Optional.ofNullable(reactionMessageCache.getIfPresent(message));
     }
 
-    public static void addReactionMessageToCache (String message, ReactionMessage reactionMessage) {
+    public static void setReactionMessage(String message, ReactionMessage reactionMessage) {
         synchronized (reactionMessageCache) {
             reactionMessageCache.put(message, reactionMessage);
         }
@@ -51,5 +53,9 @@ public class ReactionMessageCache {
         synchronized (reactionMessageCache) {
             reactionMessageCache.invalidate(message);
         }
+    }
+
+    public static void cleanUpCache() {
+        reactionMessageCache.cleanUp();
     }
 }
