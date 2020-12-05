@@ -14,7 +14,6 @@ public enum PropEnum {
         getMappings().put(propertyKey, this);
     }
 
-
     private static HashMap<String, PropEnum> mappings;
     private static HashMap<String, PropEnum> getMappings() {
         if (mappings == null) {

@@ -1,5 +1,6 @@
 package util.chat;
 
+import enums.EmojiCodes;
 import enums.PropEnum;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -46,6 +47,12 @@ public class EmbedHelper {
         return embedBuilder.build();
     }
 
+    public static MessageEmbed getDefaultExitMessage() {
+        return EmbedHelper.buildDefaultMessageEmbed(
+                new MessageEmbed.Field(EmojiCodes.WAVING_HAND.unicodeValue + " Bye!", "Thank you for your inquiry " + EmojiCodes.HEART.unicodeValue + "!", false)
+        );
+    }
+
     /**
      * Get default expiry message for reactionMessage events.
      * @return default MessageEmbed page that states their query has expired.
@@ -53,6 +60,20 @@ public class EmbedHelper {
     public static MessageEmbed getDefaultExpiryReactionMessage() {
         return EmbedHelper.buildDefaultMessageEmbed(
                 new MessageEmbed.Field("Uh oh!", "Your query has timed out. Please use your command again.", false)
+        );
+    }
+
+    /**
+     * Get default message for when an exception is raised
+     * @param e - Exception that occurred during execution
+     * @return default MessageEmbed page with information with the exception's message
+     */
+    public static MessageEmbed getDefaultExceptionReactionMessage(Exception e) {
+        return EmbedHelper.buildDefaultMessageEmbed(
+                new MessageEmbed.Field(
+                        EmojiCodes.WARNING_ARROW.unicodeValue + " Error! " + EmojiCodes.WARNING_ARROW.unicodeValue,
+                        e.getMessage(),
+                        false)
         );
     }
 }

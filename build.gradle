@@ -3,7 +3,10 @@ plugins {
     id 'eclipse'
 }
 
-version '2.0b1.0.0'
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+version 'b1.1.0'
 
 task stage(dependsOn: ['build', 'clean'])
 build.mustRunAfter clean

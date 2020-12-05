@@ -1,11 +1,14 @@
 package commands.general;
 
 import com.google.common.primitives.Ints;
-import commands.guildcommands.HelloWorld;
 import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
+import commands.util.ReactionCommand;
+import enums.EmojiCodes;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import util.chat.EmbedHelper;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
@@ -17,8 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class Help extends Command {
-
+public class Help extends ReactionCommand {
     public Help() {
         name                    = "help";
         description             = "Sends the help message. Also used to ask for help on other commands.";
@@ -80,16 +82,6 @@ public class Help extends Command {
         final ArrayList<MessageEmbed> commandHelpPages = new ArrayList<>();
         final ArrayList<Command> commands              = new ArrayList<>(CommandUtil.commands);
 
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-        commands.add(new HelloWorld());
-
         final String prefix                            = event.getSettings().getPrefix();
         final int numPages                             = (commands.size() % 10 == 0) ? commands.size() / 10 : (commands.size() / 10) + 1;
 
@@ -111,13 +103,10 @@ public class Help extends Command {
 
             commandHelpPages.add(EmbedHelper.buildDefaultMessageEmbed(fields));
         }
-        final List<String> helpReactions = Arrays.asList(
-                // cross mark
-                "U+274C",
-                // right arrow
-                "U+2B05",
-                // left arrow
-                "U+27A1");
+        final List<EmojiCodes> helpReactions = Arrays.asList(
+                EmojiCodes.EXIT,
+                EmojiCodes.PREVIOUS_ARROW,
+                EmojiCodes.NEXT_ARROW);
 
         // Create ReactionMessage from sent messageEmbed
         final ReactionMessage reactionMessage = new ReactionMessage(
@@ -133,8 +122,42 @@ public class Help extends Command {
         // Always send the first page when creating the display. Use the callback to populate the cache. Index is 0.
         event.getChannel().sendMessage(commandHelpPages.get(0))
                 .queue(message -> {
-                    helpReactions.forEach(e-> message.addReaction(e).queue());
-                    ReactionMessageCache.setReactionMessage(message.getId(), reactionMessage);
+                    if (commandHelpPages.size() > 1) {
+                        helpReactions.forEach(e-> message.addReaction(e.unicodeValue).queue());
+                        ReactionMessageCache.setReactionMessage(message.getId(), reactionMessage);
+                    }
                 });
+    }
+
+    @Override
+    public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
+        int nextPage;
+
+        // if left arrow
+        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.PREVIOUS_ARROW.unicodeValue)) {
+            nextPage = message.getCurrentEmbedPage() - 1;
+        }
+        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.NEXT_ARROW.unicodeValue)) {
+            nextPage = message.getCurrentEmbedPage() + 1;
+        }
+        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
+            retrievedDiscordMessage.editMessage(EmbedHelper.getDefaultExitMessage()).queue();
+            retrievedDiscordMessage.clearReactions().queue();
+            ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
+            return;
+        }
+        else {
+            return;
+        }
+
+        if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
+            message.setCurrentEmbedPage(nextPage);
+
+            retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
+                editDone.clearReactions().queue();
+                message.getReactionsUsed().forEach(reaction -> editDone.addReaction(reaction.unicodeValue).queue());
+                ReactionMessageCache.setReactionMessage(message.getMessageId(), message);
+            });
+        }
     }
 }

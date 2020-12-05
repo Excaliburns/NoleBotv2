@@ -8,7 +8,6 @@ import enums.PropEnum;
 import listeners.GuildMessageReactionListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.logging.log4j.LogManager;
@@ -19,9 +18,10 @@ import javax.security.auth.login.LoginException;
 import java.util.List;
 
 public class NoleBot {
-    private static Logger logger = LogManager.getLogger(NoleBot.class);
-    private static final CommandUtil                 commandUtil                 = new CommandUtil();
-    private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
+    private static final Logger logger = LogManager.getLogger(NoleBot.class);
+
+    private static final CommandUtil                  commandUtil                  = new CommandUtil();
+    private static final GuildMessageCommandListener  guildMessageCommandListener  = new GuildMessageCommandListener();
     private static final GuildMessageReactionListener guildMessageReactionListener = new GuildMessageReactionListener();
 
     public static void main(String[] args) {
@@ -53,21 +53,18 @@ public class NoleBot {
             }
 
             // If it's still null, user probably hasn't set it.
+            //noinspection UnusedAssignment
             jda = JDABuilder.create(token, INTENT_LIST)
                     .disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
+                    // Add Listeners to JDA instance
+                    .addEventListeners(
+                            commandUtil,
+                            guildMessageCommandListener,
+                            guildMessageReactionListener
+                    )
                     .build();
-
-            // Add Listeners to JDA instance
-            jda.addEventListener(
-                    commandUtil,
-                    guildMessageCommandListener,
-                    guildMessageReactionListener
-            );
         } catch (LoginException e) {
             logger.error("Could not initalize bot instance. Was token incorrect? {}", e.getMessage());
         }
-
-
-        // Create bot instance.
     }
 }

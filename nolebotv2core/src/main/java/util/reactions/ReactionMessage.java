@@ -1,5 +1,6 @@
 package util.reactions;
 
+import enums.EmojiCodes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,5 +19,5 @@ public class ReactionMessage {
     private String                messageId;
     private int                   currentEmbedPage;
     private List<MessageEmbed>    embedList;
-    private List<String>          reactionsUsed;
+    private List<EmojiCodes>      reactionsUsed;
 }
