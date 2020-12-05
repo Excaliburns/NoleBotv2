@@ -1,6 +1,7 @@
 package commands.general;
 
 import com.google.common.primitives.Ints;
+import commands.guildcommands.HelloWorld;
 import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
@@ -101,6 +102,7 @@ public class Help extends ReactionCommand {
                 fields.add(new MessageEmbed.Field(info1, info2, false));
             });
 
+            fields.add(new MessageEmbed.Field("Page " + i + " of " + numPages, "", false));
             commandHelpPages.add(EmbedHelper.buildDefaultMessageEmbed(fields));
         }
         final List<EmojiCodes> helpReactions = Arrays.asList(
@@ -123,7 +125,11 @@ public class Help extends ReactionCommand {
         event.getChannel().sendMessage(commandHelpPages.get(0))
                 .queue(message -> {
                     if (commandHelpPages.size() > 1) {
-                        helpReactions.forEach(e-> message.addReaction(e.unicodeValue).queue());
+                        for (EmojiCodes helpReaction : helpReactions) {
+                            if (helpReaction != EmojiCodes.PREVIOUS_ARROW) {
+                                message.addReaction(helpReaction.unicodeValue).queue();
+                            }
+                        }
                         ReactionMessageCache.setReactionMessage(message.getId(), reactionMessage);
                     }
                 });
@@ -155,7 +161,16 @@ public class Help extends ReactionCommand {
 
             retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
                 editDone.clearReactions().queue();
-                message.getReactionsUsed().forEach(reaction -> editDone.addReaction(reaction.unicodeValue).queue());
+
+                for (EmojiCodes emojiCodes : message.getReactionsUsed()) {
+                    boolean isLastPage = emojiCodes == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
+                    boolean isFirstPage = emojiCodes == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
+
+                    if (!isLastPage && !isFirstPage) {
+                        editDone.addReaction(emojiCodes.unicodeValue).queue();
+                    }
+                }
+
                 ReactionMessageCache.setReactionMessage(message.getMessageId(), message);
             });
         }

@@ -20,7 +20,7 @@ public class ReactionMessageCache {
     // MessageId, ReactionMessage
     @SuppressWarnings({"Convert2Lambda", "Convert2Diamond"})
     private static final Cache<String, ReactionMessage> reactionMessageCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .expireAfterWrite(1, TimeUnit.MINUTES)
             .removalListener(new RemovalListener<Object, Object>() {
                 @Override
                 public void onRemoval(@NotNull RemovalNotification<Object, Object> notification) {
