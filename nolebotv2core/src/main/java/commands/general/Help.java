@@ -34,7 +34,7 @@ public class Help extends ReactionCommand {
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public void onCommandReceived(CommandEvent event) throws Exception {
+    public void onCommandReceived(CommandEvent event) {
         final boolean isGenericHelpCommand = event.getMessageContent().size() == 1 ||
                                              Objects.nonNull(Ints.tryParse(event.getMessageContent().get(1)));
 
@@ -49,6 +49,47 @@ public class Help extends ReactionCommand {
         }
         else if (event.getMessageContent().size() == 2) {
             event.getChannel().sendMessage(sendSpecificCommandHelp(event)).queue();
+        }
+    }
+
+    @Override
+    public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
+        int nextPage;
+
+        // if left arrow
+        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.PREVIOUS_ARROW.unicodeValue)) {
+            nextPage = message.getCurrentEmbedPage() - 1;
+        }
+        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.NEXT_ARROW.unicodeValue)) {
+            nextPage = message.getCurrentEmbedPage() + 1;
+        }
+        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
+            retrievedDiscordMessage.editMessage(EmbedHelper.getDefaultExitMessage()).queue();
+            retrievedDiscordMessage.clearReactions().queue();
+            ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
+            return;
+        }
+        else {
+            return;
+        }
+
+        if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
+            message.setCurrentEmbedPage(nextPage);
+
+            retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
+                editDone.clearReactions().queue();
+
+                for (EmojiCodes emojiCodes : message.getReactionsUsed()) {
+                    boolean isLastPage = emojiCodes == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
+                    boolean isFirstPage = emojiCodes == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
+
+                    if (!isLastPage && !isFirstPage) {
+                        editDone.addReaction(emojiCodes.unicodeValue).queue();
+                    }
+                }
+
+                ReactionMessageCache.setReactionMessage(message.getMessageId(), message);
+            });
         }
     }
 
@@ -133,46 +174,5 @@ public class Help extends ReactionCommand {
                         ReactionMessageCache.setReactionMessage(message.getId(), reactionMessage);
                     }
                 });
-    }
-
-    @Override
-    public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
-        int nextPage;
-
-        // if left arrow
-        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.PREVIOUS_ARROW.unicodeValue)) {
-            nextPage = message.getCurrentEmbedPage() - 1;
-        }
-        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.NEXT_ARROW.unicodeValue)) {
-            nextPage = message.getCurrentEmbedPage() + 1;
-        }
-        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
-            retrievedDiscordMessage.editMessage(EmbedHelper.getDefaultExitMessage()).queue();
-            retrievedDiscordMessage.clearReactions().queue();
-            ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
-            return;
-        }
-        else {
-            return;
-        }
-
-        if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
-            message.setCurrentEmbedPage(nextPage);
-
-            retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
-                editDone.clearReactions().queue();
-
-                for (EmojiCodes emojiCodes : message.getReactionsUsed()) {
-                    boolean isLastPage = emojiCodes == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
-                    boolean isFirstPage = emojiCodes == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
-
-                    if (!isLastPage && !isFirstPage) {
-                        editDone.addReaction(emojiCodes.unicodeValue).queue();
-                    }
-                }
-
-                ReactionMessageCache.setReactionMessage(message.getMessageId(), message);
-            });
-        }
     }
 }

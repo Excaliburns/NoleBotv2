@@ -23,10 +23,6 @@ import java.util.stream.Collectors;
 public class GuildMessageCommandListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageCommandListener.class);
 
-    /**
-     * @param event
-     * Author: Kevin Patlis
-     */
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot())
@@ -64,8 +60,9 @@ public class GuildMessageCommandListener extends ListenerAdapter {
                 try {
                     command.executeCommand(commandEvent);
                 } catch (Exception e) {
-                    commandEvent.sendErrorResponseToOriginatingChannel("There was an exception while processing your request!");
-                    commandEvent.sendErrorResponseToOriginatingChannel("Check the logs and message the bot author if this seems unexpected.");
+                    commandEvent.sendErrorResponseToOriginatingChannel(
+                            "There was an exception while processing your request!",
+                            "Check the logs and message the bot author if this seems unexpected.");
 
                     commandEvent.printStackTraceToChannelFromThrowable(event.getChannel(), e);
                 }

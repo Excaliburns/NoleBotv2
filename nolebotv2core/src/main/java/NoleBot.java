@@ -1,4 +1,5 @@
 import commands.general.Help;
+import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.guilds.SetPrefix;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
@@ -40,6 +41,7 @@ public class NoleBot {
         commandUtil.addCommand(new HelloWorld());
         commandUtil.addCommand(new SetPrefix());
         commandUtil.addCommand(new ListGuildPermissions());
+        commandUtil.addCommand(new Attendance());
 
         try {
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);

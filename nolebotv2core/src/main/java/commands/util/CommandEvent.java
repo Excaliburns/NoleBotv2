@@ -1,9 +1,13 @@
 package commands.util;
 
+import enums.EmojiCodes;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import util.settings.Settings;
 
@@ -35,11 +39,31 @@ public class CommandEvent {
     }
 
     public void sendErrorResponseToOriginatingChannel(String errorMessageContent) {
-        channel.sendMessage("\u203C     " + errorMessageContent + "     \u203C").queue();
+        channel.sendMessage(EmojiCodes.DOUBLE_BANG.unicodeValue + "     " + errorMessageContent + "     " + EmojiCodes.DOUBLE_BANG.unicodeValue)
+                .queue();
+    }
+
+    public void sendErrorResponseToOriginatingChannel(String ...errorMessages) {
+        sendErrorResponseToOriginatingChannel(Arrays.asList(errorMessages));
+    }
+
+    public void sendErrorResponseToOriginatingChannel(List<String> errorMessageContent) {
+        MessageBuilder builder = new MessageBuilder();
+
+        for (String s : errorMessageContent) {
+            if (builder.length() > 1500) {
+                channel.sendMessage(builder.build()).queue();
+                builder = new MessageBuilder();
+            }
+
+            builder.append(s);
+        }
+
+        channel.sendMessage(builder.build()).queue();
     }
 
     public void sendSuccessResponseToOriginatingChannel(String successMessageContent) {
-        channel.sendMessage("\u2705 \u2014 " + successMessageContent).queue();
+        channel.sendMessage(EmojiCodes.CHECK_MARK.unicodeValue + " " + EmojiCodes.DASH.unicodeValue + " " + successMessageContent).queue();
     }
 
     public void printStackTraceToChannelFromThrowable(MessageChannel channel, Throwable e) {
@@ -54,5 +78,11 @@ public class CommandEvent {
         channel.sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
     }
 
-    // TODO: Permissison Level
+    public void sendMessageToOriginatingChannel(Message message) {
+        this.originatingJDAEvent.getChannel().sendMessage(message).queue();
+    }
+
+    public void sendMessageToOriginatingChannel(MessageEmbed embed) {
+        this.originatingJDAEvent.getChannel().sendMessage(embed).queue();
+    }
 }

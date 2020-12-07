@@ -52,7 +52,7 @@ public class SettingsFactory {
 
     /**
      * Initialize default settings object for guild
-     * @param guild
+     * @param guild Admin roles from this guild will be initialized with permission level 1000
      * @return settings with default permissions and prefix
      */
     private static Settings initDefaultPermissionListForGuild(Guild guild) {
@@ -65,7 +65,7 @@ public class SettingsFactory {
                                                      .map(role -> new GenericPermission(PermissionType.ROLE, role.getName(), role.getId(), 1000))
                                                      .collect(Collectors.toCollection(TreeSet::new));
 
-        Settings settings = new Settings();
+        Settings settings = new Settings(guild.getId());
         settings.setPermissionList(defaultPermissions);
 
         logger.info("Successfully created settings");
