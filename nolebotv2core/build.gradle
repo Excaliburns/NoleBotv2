@@ -58,6 +58,9 @@ dependencies {
 
     // Guava
     implementation "com.google.guava:guava:29.0-jre"
+
+    // Mysql Connector
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
 }
 
 mainClassName = 'NoleBot'

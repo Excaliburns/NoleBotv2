@@ -5,6 +5,11 @@ import java.util.HashMap;
 public enum PropEnum {
     // TOKEN ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     BOT_AVATAR_URL   ("bot.avatar.url"),
+    DB_NAME          ("db.name"),
+    DB_ADDR          ("db.addr"),
+    DB_USER          ("db.user"),
+    DB_PASS          ("db.pass"),
+    DB_PORT          ("db.port"),
     TOKEN            ("bot.token");
 
     private final String propertyKey;

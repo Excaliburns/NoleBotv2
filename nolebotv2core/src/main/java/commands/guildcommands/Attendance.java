@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import util.NoleBotUtil;
 import util.chat.EmbedHelper;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -76,14 +78,28 @@ public class Attendance extends ReactionCommand {
 
     @Override
     public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
-        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.CHECK_MARK.unicodeValue)) {
-            final List<Member> memberList = countedMembers.containsKey(event.getGuild()) ? countedMembers.get(event.getGuild()) : new ArrayList<>();
+        final Member originalMember = event.getGuild().getMemberById(message.getUserInitiatedId());
+        if (originalMember != null && Objects.nonNull(originalMember.getVoiceState()) && originalMember.getVoiceState().inVoiceChannel()) {
+            final VoiceChannel voiceChannel = originalMember.getVoiceState().getChannel();
 
-            if (!memberList.contains(event.getMember())) {
-                memberList.add(event.getMember());
+            // If they are in the same voice channel as the original sender
+            if (Objects.nonNull(event.getMember().getVoiceState()) && event.getMember().getVoiceState().getChannel() == voiceChannel) {
+                if (event.getReactionEmote().getEmoji().equals(EmojiCodes.CHECK_MARK.unicodeValue)) {
+                    final List<Member> memberList = countedMembers.containsKey(event.getGuild()) ? countedMembers.get(event.getGuild()) : new ArrayList<>();
+
+                    if (!memberList.contains(event.getMember())) {
+                        memberList.add(event.getMember());
+                    }
+
+                    countedMembers.put(event.getGuild(), memberList);
+                }
             }
-
-            countedMembers.put(event.getGuild(), memberList);
+            else {
+                event.getUser().openPrivateChannel().queue(callback -> callback.sendMessage("It seems that you aren't in the same voice channel as the person taking attendance. Make sure you join their voice channel in order to be counted!").queue());
+            }
+        }
+        else {
+            message.getOriginatingMessageChannel().sendMessage("It seems like the person who is taking attendance is currently not in a voice channel. Please tell them to join one so we can verify that you are in the meeting with them!").queue();
         }
     }
 
@@ -102,7 +118,6 @@ public class Attendance extends ReactionCommand {
                     sentMessage.addReaction(EmojiCodes.CHECK_MARK.unicodeValue).queue();
                     ReactionMessageCache.setReactionMessage(sentMessage.getId(), message);
                     attendanceMessageCache.put(guild, sentMessage);
-
 
                     Timer timer  = new Timer();
                     timer.scheduleAtFixedRate(new TimerTask() {
@@ -223,5 +238,9 @@ public class Attendance extends ReactionCommand {
         }
 
         return embedBuilder;
+    }
+
+    private boolean insertAttendanceList(Guild guild) {
+
     }
 }
