@@ -239,8 +239,8 @@ public class Attendance extends ReactionCommand {
 
         return embedBuilder;
     }
-
-    private boolean insertAttendanceList(Guild guild) {
-
-    }
+//
+//    private boolean insertAttendanceList(Guild guild) {
+//
+//    }
 }
