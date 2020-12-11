@@ -1,14 +1,13 @@
 package util.db.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
-
 @Getter @Setter
+@AllArgsConstructor
 public class Attendance {
-    private Timestamp dateEntered;
     private String userID;
     private String serverID;
-    private String discordTag;
+    private String nickname;
 }

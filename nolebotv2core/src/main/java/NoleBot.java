@@ -31,7 +31,12 @@ public class NoleBot {
 
     public static void main(String[] args) {
         // Enable specific events from discord gateway.
-        final List<GatewayIntent> INTENT_LIST = List.of(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_REACTIONS);
+        final List<GatewayIntent> INTENT_LIST = List.of(
+                GatewayIntent.GUILD_MESSAGES,
+                GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                GatewayIntent.GUILD_VOICE_STATES,
+                GatewayIntent.DIRECT_MESSAGES,
+                GatewayIntent.DIRECT_MESSAGE_REACTIONS);
 
         JDA jda;
 
@@ -55,12 +60,16 @@ public class NoleBot {
 
             // If it's still null, user probably hasn't set it.
             //noinspection UnusedAssignment
-            jda = JDABuilder.create(token, INTENT_LIST).disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
+            jda = JDABuilder.create(token, INTENT_LIST)
                     // Add Listeners to JDA instance
                     .addEventListeners(commandUtil, guildMessageCommandListener, guildMessageReactionListener).build();
 
             // TODO: Support multiple dbs? DBConnection should store variations of initializing them.
             dbconnection = DBConnection.getMysqlConnection();
+
+            if (dbconnection == null) {
+                logger.warn("Database connection couldn't be established.");
+            }
 
         } catch (LoginException e) {
             logger.fatal("Could not initalize bot instance. Was token incorrect? {}", e.getMessage());

@@ -25,6 +25,7 @@ public class DBConnection {
             final String dbPort = PropertiesUtil.getProperty(PropEnum.DB_PORT);
 
             conn = DriverManager.getConnection("jdbc:mysql://" + dbAddr + ":" + dbPort + "/" + dbName, dbUser, dbPass);
+            logger.info("Successfully initialized database connection: MySQL");
 
         } catch (ClassNotFoundException e) {
             logger.error("MySQL driver could not be instantiated. Commands that require a database connection will work, but will error. {}", e.getMessage());

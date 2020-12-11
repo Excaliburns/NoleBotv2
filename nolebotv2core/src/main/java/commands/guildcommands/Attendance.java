@@ -12,14 +12,19 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import util.NoleBotUtil;
 import util.chat.EmbedHelper;
+import util.db.statements.AttendanceStatements;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
 import util.reactions.ReactionMessageType;
 
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Attendance extends ReactionCommand {
+    private static final Logger logger = LogManager.getLogger(Attendance.class);
+    private final AttendanceStatements statements = new AttendanceStatements();
+
     private final ConcurrentHashMap<Guild, Duration> timeLeft    = new ConcurrentHashMap<>();
     private final HashMap<Guild, List<Member>> countedMembers    = new HashMap<>();
     private final HashMap<Guild, Message> attendanceMessageCache = new HashMap<>();
@@ -129,15 +137,29 @@ public class Attendance extends ReactionCommand {
                                 timer.cancel();
 
                                 EmbedBuilder finalEmbed = EmbedHelper.getDefaultEmbedBuilder();
-                                finalEmbed.addField("Final count! These names have also been added to the database", "", false);
 
-                                //noinspection ConstantConditions
-                                finalEmbed = addAttendanceToMessageEmbed(getAttendanceAsEmbedFieldList(guild), finalEmbed);
+                                try {
 
-                                channel.sendMessage(finalEmbed.build()).queue();
-                                attendanceMessageCache.remove(guild);
-                                timeLeft.remove(guild);
-                                countedMembers.remove(guild);
+                                    if (insertAttendanceList(guild)) {
+                                        finalEmbed.addField("Final count! These names have also been added to the database", "", false);
+                                    }
+                                }
+                                catch (SQLException e) {
+                                    logger.error(e);
+                                    channel.sendMessage("Couldn't update the database!").queue();
+                                    channel.sendMessage(EmbedHelper.getDefaultExceptionReactionMessage(e)).queue();
+
+                                    finalEmbed.addField("Final count! As there was an error, these names have not been added to the database", "", false);
+                                }
+                                finally {
+                                    //noinspection ConstantConditions
+                                    finalEmbed = addAttendanceToMessageEmbed(getAttendanceAsEmbedFieldList(guild), finalEmbed);
+
+                                    channel.sendMessage(finalEmbed.build()).queue();
+                                    attendanceMessageCache.remove(guild);
+                                    timeLeft.remove(guild);
+                                    countedMembers.remove(guild);
+                                }
                             }
                         }
                     }, 0, Duration.ofSeconds(2).toMillis());
@@ -239,8 +261,17 @@ public class Attendance extends ReactionCommand {
 
         return embedBuilder;
     }
-//
-//    private boolean insertAttendanceList(Guild guild) {
-//
-//    }
+
+    private boolean insertAttendanceList(Guild guild) throws SQLException {
+        if (countedMembers.containsKey(guild)) {
+            final List<util.db.entities.Attendance> attendanceList = countedMembers.get(guild).stream()
+                    .map( member -> new util.db.entities.Attendance(member.getId(), guild.getId(), member.getNickname()))
+                    .collect(Collectors.toList());
+
+            return Arrays.stream(statements.insertAttendanceList(attendanceList)).noneMatch(pred -> pred == -1);
+        }
+        else {
+            return false;
+        }
+    }
 }
