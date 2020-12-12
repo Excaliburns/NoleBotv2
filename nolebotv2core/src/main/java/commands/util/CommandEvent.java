@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -78,7 +77,7 @@ public class CommandEvent {
         channel.sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
     }
 
-    public void sendMessageToOriginatingChannel(Message message) {
+    public void sendMessageToOriginatingChannel(String message) {
         this.originatingJDAEvent.getChannel().sendMessage(message).queue();
     }
 
