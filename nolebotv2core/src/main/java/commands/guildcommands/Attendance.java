@@ -1,6 +1,5 @@
 package commands.guildcommands;
 
-import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.ReactionCommand;
 import enums.EmojiCodes;
@@ -20,8 +19,12 @@ import util.db.statements.AttendanceStatements;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
 import util.reactions.ReactionMessageType;
+import util.settings.Settings;
+import util.settings.SettingsCache;
+import util.settings.SettingsFactory;
 
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,7 +71,64 @@ public class Attendance extends ReactionCommand {
                         event.sendErrorResponseToOriginatingChannel("Can not start two attendance counters at the same time in one guild");
                     }
                 }
-                case "timer" -> event.sendErrorResponseToOriginatingChannel("This functionality hasn't been implemented yet. " + EmojiCodes.PLEADING.unicodeValue);
+                case "timer" -> {
+                    if (messages.size() > 2) {
+                        int durationNum;
+                        final String potentialContainsSecondsOrMinute = messages.get(2);
+                        final Settings guildSettings = event.getSettings();
+
+                        if (potentialContainsSecondsOrMinute.toLowerCase().contains("m")) {
+                            final String durationString = potentialContainsSecondsOrMinute.substring(0, potentialContainsSecondsOrMinute.toLowerCase().indexOf("m"));
+
+                            durationNum = getTimerInteger(durationString, event);
+                            if (durationNum == -1) return;
+
+                            guildSettings.setAttendanceTimer(Duration.ofSeconds(durationNum));
+                            SettingsCache.saveSettingsForGuild(event.getGuild(), guildSettings);
+                            event.sendSuccessResponseToOriginatingChannel("Your new attendance timer is: " + durationNum + " minutes.");
+
+                        }
+                        else if (potentialContainsSecondsOrMinute.toLowerCase().contains("s")) {
+                            final String durationString = potentialContainsSecondsOrMinute.substring(0, potentialContainsSecondsOrMinute.toLowerCase().indexOf("s"));
+
+                            durationNum = getTimerInteger(durationString, event);
+                            if (durationNum == -1) return;
+
+                            guildSettings.setAttendanceTimer(Duration.ofSeconds(durationNum));
+                            SettingsCache.saveSettingsForGuild(event.getGuild(), guildSettings);
+                            event.sendSuccessResponseToOriginatingChannel("Your new attendance timer is: " + durationNum + " seconds.");
+                        }
+                        else {
+                            if (messages.size() > 3) {
+
+                                durationNum = getTimerInteger(messages.get(2), event);
+                                if (durationNum == -1) return;
+
+                                final String probableMOrSChar = messages.get(3);
+
+                                if (probableMOrSChar.equalsIgnoreCase("m")) {
+                                    guildSettings.setAttendanceTimer(Duration.ofMinutes(durationNum));
+                                    SettingsCache.saveSettingsForGuild(event.getGuild(), guildSettings);
+                                    event.sendSuccessResponseToOriginatingChannel("Your new attendance timer is: " + durationNum + " minutes.");
+                                }
+                                else if (probableMOrSChar.equalsIgnoreCase("s")) {
+                                    guildSettings.setAttendanceTimer(Duration.ofSeconds(durationNum));
+                                    SettingsCache.saveSettingsForGuild(event.getGuild(), guildSettings);
+                                    event.sendSuccessResponseToOriginatingChannel("Your new attendance timer is: " + durationNum + " seconds.");
+                                }
+                                else {
+                                    event.sendErrorResponseToOriginatingChannel("You didn't specify minutes or seconds. Please use 'm' or 's' to denote the time scale you would like.");
+                                }
+                            }
+                            else {
+                                event.sendErrorResponseToOriginatingChannel("Your message is improperly formatted. Use !help attendance to see more detailed usage information.");
+                            }
+                        }
+                    }
+                    else {
+                        event.sendErrorResponseToOriginatingChannel("You didn't specify a time! Use !help attendance");
+                    }
+                }
                 case "stop" -> {
                     if (attendanceMessageCache.containsKey(event.getGuild())) {
                         timeLeft.put(event.getGuild(), Duration.ZERO);
@@ -273,5 +333,19 @@ public class Attendance extends ReactionCommand {
         else {
             return false;
         }
+    }
+
+    private int getTimerInteger(String possibleTimerInput, CommandEvent event) {
+        int durationNum;
+
+        try {
+            durationNum = Integer.parseInt(possibleTimerInput);
+            if (durationNum < 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            event.sendErrorResponseToOriginatingChannel("Your second parameter is not a valid number!");
+            return -1;
+        }
+
+        return durationNum;
     }
 }

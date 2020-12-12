@@ -16,7 +16,7 @@ public class AttendanceStatements {
 
 
     public int[] insertAttendanceList(final List<Attendance> attendanceList) throws SQLException {
-        final PreparedStatement preparedStatement = DBConnection.getMysqlConnection().prepareStatement(INSERT_ATTENDANCE);
+        final PreparedStatement preparedStatement = DBConnection.getConnection().prepareStatement(INSERT_ATTENDANCE);
 
         for (Attendance attendance : attendanceList) {
             preparedStatement.setString(1, attendance.getUserID());

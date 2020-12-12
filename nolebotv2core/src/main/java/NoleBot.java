@@ -10,7 +10,6 @@ import listeners.GuildMessageReactionListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.PropertiesUtil;
@@ -65,18 +64,16 @@ public class NoleBot {
                     .addEventListeners(commandUtil, guildMessageCommandListener, guildMessageReactionListener).build();
 
             // TODO: Support multiple dbs? DBConnection should store variations of initializing them.
-            dbconnection = DBConnection.getMysqlConnection();
+            // maybe some property like, switch (property) case mysql: initMysql, case postgreSql: initPostgre
+            DBConnection.initMySqlConnection();
+            dbconnection = DBConnection.getConnection();
 
             if (dbconnection == null) {
                 logger.warn("Database connection couldn't be established.");
             }
 
         } catch (LoginException e) {
-            logger.fatal("Could not initalize bot instance. Was token incorrect? {}", e.getMessage());
+            logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());
         }
-    }
-
-    public static Connection getDbconnection() {
-        return dbconnection;
     }
 }
