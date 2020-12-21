@@ -4,25 +4,18 @@ import commands.util.CommandEvent;
 import commands.util.ReactionCommand;
 import enums.EmojiCodes;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.PermissionOverride;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.managers.ChannelManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.NoleBotUtil;
 import util.chat.EmbedHelper;
 import util.db.statements.AttendanceStatements;
-import util.permissions.GenericPermission;
-import util.permissions.GenericPermissionsFactory;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
 import util.reactions.ReactionMessageType;
@@ -39,7 +32,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -54,7 +46,6 @@ public class Attendance extends ReactionCommand {
     private final HashMap<Guild, List<Member>> countedMembers = new HashMap<>();
     private final HashMap<Guild, Message> attendanceMessageCache = new HashMap<>();
 
-    private final HashMap<Guild, List<PermissionOverride>> guildTextChannelPermissionOverrideListTempStorage = new HashMap<>();
 
     public Attendance() {
         name = "attendance";
@@ -127,11 +118,11 @@ public class Attendance extends ReactionCommand {
                                     saveNewAttendanceTimer(event, guildSettings, durationNum, false);
                                 }
                                 else {
-                                    event.sendErrorResponseToOriginatingChannel("You didn't specify minutes or " + "seconds. Please use 'm' or 's' to denote the time scale you would like.");
+                                    event.sendErrorResponseToOriginatingChannel("You didn't specify minutes or seconds. Please use 'm' or 's' to denote the time scale you would like.");
                                 }
                             }
                             else {
-                                event.sendErrorResponseToOriginatingChannel("Your message is improperly formatted. " + "Use !help attendance to see more detailed usage information.");
+                                event.sendErrorResponseToOriginatingChannel("Your message is improperly formatted. Use !help attendance to see more detailed usage information.");
                             }
                         }
                     }
@@ -150,7 +141,7 @@ public class Attendance extends ReactionCommand {
             }
         }
         else {
-            event.sendErrorResponseToOriginatingChannel("Please start, stop, or modify the timer. Use !help " + "attendance");
+            event.sendErrorResponseToOriginatingChannel("Please start, stop, or modify the timer. Use !help attendance");
         }
     }
 
@@ -173,25 +164,21 @@ public class Attendance extends ReactionCommand {
                 }
             }
             else {
-                event.getUser().openPrivateChannel().queue(callback -> callback.sendMessage("It seems that you aren't" + " in the same voice channel as the person taking attendance. Make sure you join their voice " + "channel in order to be counted!").queue());
+                event.getUser().openPrivateChannel().queue(callback -> callback.sendMessage("It seems that you aren't in the same voice channel as the person taking attendance. Make sure you join their voice channel in order to be counted!").queue());
             }
         }
         else {
-            message.getOriginatingMessageChannel().sendMessage("It seems like the person who is taking attendance is " + "currently not in a voice channel. Please tell them to join one so we can verify that you are in " + "the meeting with them!").queue();
+            event.getUser().openPrivateChannel().queue(callback -> callback.sendMessage("It seems like the person who is taking attendance is currently not in a voice channel. Please tell them to join one so we can verify that you are in the meeting with them!").queue());
         }
     }
 
     private void handleStartAttendance(CommandEvent event) {
         final Guild guild = event.getGuild();
         final MessageChannel channel = event.getChannel();
-        final TextChannel textChannel = event.getOriginatingJDAEvent().getChannel();
         final String authorId = event.getOriginatingJDAEvent().getAuthor().getId();
         final String messageId = event.getOriginatingJDAEvent().getMessageId();
 
         timeLeft.put(guild, event.getSettings().getAttendanceTimer());
-
-        event.sendMessageToOriginatingChannel("Muting chat for all with lower permission level than: " + event.getOriginatingJDAEvent().getAuthor().getAsMention());
-        muteChannelUntilAttendanceEnds(event, authorId, guild, textChannel);
 
         final ReactionMessage message = getReactionMessageForAttendance(guild, channel, authorId, messageId);
 
@@ -208,19 +195,6 @@ public class Attendance extends ReactionCommand {
 
                     if (timeLeft.get(guild).toSeconds() <= 0) {
                         timer.cancel();
-
-                        event.getOriginatingJDAEvent().getChannel().getManager().reset(ChannelManager.PERMISSION).queue( resetComplete -> {
-                            List<PermissionOverride> permissionOverrides = guildTextChannelPermissionOverrideListTempStorage.get(guild);
-                            permissionOverrides.forEach( override -> {
-                                if (override.getPermissionHolder() == null) {
-                                    event.sendErrorResponseToOriginatingChannel("Now that's wacky! It seems a role that had permission on your channel was deleted during attendance. Skipping!");
-                                }
-                                else {
-                                    event.getOriginatingJDAEvent().getChannel().getManager().putPermissionOverride(override.getPermissionHolder(), override.getAllowed(), override.getDenied()).queue();
-                                }
-                            });
-                        });
-
                         EmbedBuilder finalEmbed = EmbedHelper.getDefaultEmbedBuilder();
 
                         try {
@@ -361,26 +335,35 @@ public class Attendance extends ReactionCommand {
         SettingsCache.saveSettingsForGuild(event.getGuild(), settings);
     }
 
-    private void muteChannelUntilAttendanceEnds(
-            final CommandEvent event,
-            final String authorId,
-            final Guild guild,
-            final TextChannel textChannel
-    ) {
-        final GenericPermission highestUserPermission = GenericPermissionsFactory.getHighestPermissionObjectForUser(authorId, guild);
-        List<String> highestGuildPermissionIds = GenericPermissionsFactory.getPermissionsHigherOrEqualToGivenPermission(guild, highestUserPermission)
-                                                                          .stream()
-                                                                          .map(GenericPermission::getSnowflakeId)
-                                                                          .collect(Collectors.toList());
-        List<Role> roleList = event.getGuild().getRoles().stream().filter( each -> highestGuildPermissionIds.contains(each.getId())).collect(Collectors.toList());
-        guildTextChannelPermissionOverrideListTempStorage.put(guild, textChannel.getPermissionOverrides());
-        textChannel.getManager().reset(ChannelManager.PERMISSION).queue( afterResetComplete ->
-                textChannel.upsertPermissionOverride(guild.getPublicRole())
-                           .setDeny(Permission.MESSAGE_WRITE).reason("Automatic Attendance command permission removal")
-                           .queue( afterSendMessageRemoved ->
-                                   roleList.forEach( role -> textChannel.putPermissionOverride(role)
-                                                                        .setAllow(Permission.MESSAGE_WRITE)
-                                                                        .reason("Automatic attendance command permission addition.")
-                                                                        .queue())));
-    }
+//    private void muteChannelUntilAttendanceEnds(
+//            final CommandEvent event,
+//            final String authorId,
+//            final Guild guild,
+//            final TextChannel textChannel
+//    ) {
+//        final GenericPermission highestUserPermission = GenericPermissionsFactory.getHighestPermissionObjectForUser(authorId, guild);
+//        List<String> highestGuildPermissionIds = GenericPermissionsFactory.getPermissionsHigherOrEqualToGivenPermission(guild, highestUserPermission)
+//                                                                          .stream()
+//                                                                          .map(GenericPermission::getSnowflakeId)
+//                                                                          .collect(Collectors.toList());
+//        List<Role> roleList = event.getGuild().getRoles().stream().filter( each -> highestGuildPermissionIds.contains(each.getId())).collect(Collectors.toList())
+//
+//        textChannel.upsertPermissionOverride(guild.getPublicRole())
+//                   .setDeny(Permission.MESSAGE_WRITE).reason("Automatic Attendance command permission removal")
+//                   .queue();
+//    }
+//
+//    private void removeAllPermissionsFromChannel(TextChannel channel) {
+//        final ChannelManager manager = channel.getManager();
+//        channel.getPermissionOverrides().forEach( override -> {
+//            if (override.getPermissionHolder() != null) {
+//                manager.removePermissionOverride(override.getPermissionHolder());
+//            }
+//            else {
+//                MessageUtil.sendErrorResponseToChannel("Permission holder was null for role: " + override.getId(), channel);
+//            }
+//        });
+//
+//        manager.complete();
+//    }
 }
