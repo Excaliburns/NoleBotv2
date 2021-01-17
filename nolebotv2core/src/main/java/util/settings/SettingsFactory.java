@@ -18,31 +18,24 @@ import java.util.stream.Collectors;
 public class SettingsFactory {
     private static final Logger logger = LogManager.getLogger(SettingsFactory.class);
 
+    public static Settings getSettings(Guild guild) {
+        return SettingsCache.settingsCache.getUnchecked(guild.getId());
+    }
+
     /**
      * Get settings for guild by ID
-     * @param guild will be used as file path for guild & initalizing settings if needed
+     * @param guildId will be used as file path for guild
      * @return Settings object
      */
-    public static Settings getSettingsForGuildFromFile(Guild guild) {
-        final String guildId = guild.getId();
-        Settings settings;
-
-        final Path settingsPath = getSettingsPathForGuild(guildId);
-        final String guildSettingsJsonString = FilesUtil.getFileContentsAsStringAndCreateIfNotExists(settingsPath);
-
-        if (guildSettingsJsonString.isEmpty()) {
-            logger.info("Settings was empty, creating new Settings for guild with id {}.", guildId);
-            settings = initDefaultPermissionListForGuild(guild);
-
-            // Write new settings to file
-            FilesUtil.writeStringToFile(settingsPath, FilesUtil.GSON_INSTANCE.toJson(settings));
+    public static Settings getSettingsForGuildFromFile(String guildId) {
+        if (SettingsManager.doesSettingsExistForGuild(guildId)) {
+            logger.error("Settings was empty for guild {}, throwing exception. Create guild settings before trying to get them next time.", guildId);
+            throw new NullPointerException(String.format("Guild settings do not exist for guild %s!", guildId));
         }
         else {
             logger.info("Found settings for guild with id {}", guildId);
-            settings = FilesUtil.GSON_INSTANCE.fromJson(guildSettingsJsonString, Settings.class);
+            return FilesUtil.GSON_INSTANCE.fromJson(FilesUtil.getFileContentsAsString(getSettingsPathForGuild(guildId)), Settings.class);
         }
-
-        return settings;
     }
 
 
@@ -55,7 +48,7 @@ public class SettingsFactory {
      * @param guild Admin roles from this guild will be initialized with permission level 1000
      * @return settings with default permissions and prefix
      */
-    private static Settings initDefaultPermissionListForGuild(Guild guild) {
+    public static Settings initDefaultPermissionListForGuild(Guild guild) {
         List<Role> defaultAdminRoles = guild.getRoles()
                                             .stream()
                                             .filter(role -> role.hasPermission(Permission.ADMINISTRATOR))

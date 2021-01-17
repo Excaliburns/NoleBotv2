@@ -7,6 +7,7 @@ import listeners.GuildMessageCommandListener;
 import commands.util.CommandUtil;
 import enums.PropEnum;
 import listeners.GuildMessageReactionListener;
+import listeners.OnReadyListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -23,6 +24,7 @@ public class NoleBot {
     private static final Logger logger = LogManager.getLogger(NoleBot.class);
 
     private static final CommandUtil commandUtil = new CommandUtil();
+    private static final OnReadyListener onReadyListener = new OnReadyListener();
     private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
     private static final GuildMessageReactionListener guildMessageReactionListener = new GuildMessageReactionListener();
 
@@ -61,7 +63,12 @@ public class NoleBot {
             //noinspection UnusedAssignment
             jda = JDABuilder.create(token, INTENT_LIST)
                     // Add Listeners to JDA instance
-                    .addEventListeners(commandUtil, guildMessageCommandListener, guildMessageReactionListener).build();
+                    .addEventListeners(
+                            commandUtil,
+                            onReadyListener,
+                            guildMessageCommandListener,
+                            guildMessageReactionListener
+                    ).build();
 
             // TODO: Support multiple dbs? DBConnection should store variations of initializing them.
             // maybe some property like, switch (property) case mysql: initMysql, case postgreSql: initPostgre

@@ -20,7 +20,7 @@ public class GenericPermissionsFactory {
     private static final Logger logger = LogManager.getLogger(GenericPermissionsFactory.class);
 
     public static TreeSet<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(Guild guild, GenericPermission permission) {
-        final Settings settings = SettingsCache.getSettings(guild);
+        final Settings settings = SettingsFactory.getSettings(guild);
 
         return settings.getPermissionList()
                        .stream()
@@ -37,7 +37,7 @@ public class GenericPermissionsFactory {
     }
 
     public static TreeSet<GenericPermission> getPermissionsForUser(String userId, Guild guild) {
-        final Settings settings = SettingsCache.getSettings(guild);
+        final Settings settings = SettingsFactory.getSettings(guild);
         final Optional<Member> member = Optional.ofNullable(guild.getMemberById(userId));
 
         if (member.isPresent()) {

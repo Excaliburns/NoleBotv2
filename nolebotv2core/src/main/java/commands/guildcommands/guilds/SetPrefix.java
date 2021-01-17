@@ -2,7 +2,6 @@ package commands.guildcommands.guilds;
 
 import commands.util.Command;
 import commands.util.CommandEvent;
-import util.settings.Settings;
 import util.settings.SettingsCache;
 
 import java.util.Collections;

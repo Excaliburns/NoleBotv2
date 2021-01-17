@@ -11,13 +11,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import util.settings.Settings;
-import util.settings.SettingsCache;
+import util.settings.SettingsFactory;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter @Setter
 public class GuildMessageCommandListener extends ListenerAdapter {
@@ -30,7 +27,7 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
         List<String> commandMessage;
         String message = event.getMessage().getContentRaw();
-        final Settings settings = SettingsCache.getSettings(event.getGuild());
+        final Settings settings = SettingsFactory.getSettings(event.getGuild());
 
         if (message.startsWith(settings.getPrefix())) {
             // remove prefix

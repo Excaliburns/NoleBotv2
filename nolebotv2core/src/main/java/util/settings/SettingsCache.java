@@ -15,20 +15,16 @@ import java.util.concurrent.TimeUnit;
 public class SettingsCache {
     private static final Logger logger = LogManager.getLogger(SettingsCache.class);
 
-    private static final LoadingCache<Guild, Settings> settingsCache = CacheBuilder.newBuilder()
+    public static final LoadingCache<String, Settings> settingsCache = CacheBuilder.newBuilder()
             .maximumSize(10)
             .expireAfterAccess(4, TimeUnit.HOURS)
             .build(new CacheLoader<>() {
                 @Override
-                public Settings load(@NotNull Guild key) throws Exception {
+                public Settings load(@NotNull String key) {
                     logger.info("Settings not in cache for guild {} - loading from disk.", key);
                     return SettingsFactory.getSettingsForGuildFromFile(key);
                 }
             });
-
-    public static Settings getSettings(Guild guild) {
-        return settingsCache.getUnchecked(guild);
-    }
 
     /**
      * Save guild settings to file
@@ -39,6 +35,6 @@ public class SettingsCache {
         final Path settingsPath = SettingsFactory.getSettingsPathForGuild(guild.getId());
 
         FilesUtil.writeStringToFile(settingsPath, FilesUtil.GSON_INSTANCE.toJson(settings));
-        settingsCache.put(guild, settings);
+        settingsCache.put(guild.getId(), settings);
     }
 }
