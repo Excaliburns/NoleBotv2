@@ -28,7 +28,7 @@ public class SettingsFactory {
      * @return Settings object
      */
     public static Settings getSettingsForGuildFromFile(String guildId) {
-        if (SettingsManager.doesSettingsExistForGuild(guildId)) {
+        if (!SettingsManager.doesSettingsExistForGuild(guildId)) {
             logger.error("Settings was empty for guild {}, throwing exception. Create guild settings before trying to get them next time.", guildId);
             throw new NullPointerException(String.format("Guild settings do not exist for guild %s!", guildId));
         }

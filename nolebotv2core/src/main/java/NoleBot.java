@@ -1,8 +1,10 @@
 import commands.general.Help;
 import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
+import commands.guildcommands.ShadowBan;
 import commands.guildcommands.guilds.SetPrefix;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
+import listeners.BanListListener;
 import listeners.GuildMessageCommandListener;
 import commands.util.CommandUtil;
 import enums.PropEnum;
@@ -27,6 +29,7 @@ public class NoleBot {
     private static final OnReadyListener onReadyListener = new OnReadyListener();
     private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
     private static final GuildMessageReactionListener guildMessageReactionListener = new GuildMessageReactionListener();
+    private static final BanListListener              banListListener              = new BanListListener();
 
     private static Connection dbconnection;
 
@@ -47,6 +50,7 @@ public class NoleBot {
         commandUtil.addCommand(new SetPrefix());
         commandUtil.addCommand(new ListGuildPermissions());
         commandUtil.addCommand(new Attendance());
+        commandUtil.addCommand(new ShadowBan());
 
         try {
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);
@@ -67,7 +71,8 @@ public class NoleBot {
                             commandUtil,
                             onReadyListener,
                             guildMessageCommandListener,
-                            guildMessageReactionListener
+                            guildMessageReactionListener,
+                            banListListener
                     ).build();
 
             // TODO: Support multiple dbs? DBConnection should store variations of initializing them.

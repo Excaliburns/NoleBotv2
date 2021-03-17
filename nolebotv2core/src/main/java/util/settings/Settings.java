@@ -6,6 +6,7 @@ import lombok.Setter;
 import util.permissions.GenericPermission;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
@@ -17,18 +18,32 @@ public class Settings {
     private Duration attendanceTimer;
     private HashMap<String, Integer> commandPermissionMap;
     private TreeSet<GenericPermission> permissionList;
+    private List<String> bannedUserIds;
+
     // Roles stored as IDs
     private List<String>             conditionalRole;
     // TODO: Name Verification
 
-    public Settings() {
-        this.prefix = "!";
+    private void initDefaults() {
+        this.prefix          = "!";
         this.attendanceTimer = Duration.ofMinutes(5);
+        bannedUserIds        = new ArrayList<>();
+    }
+
+    public Settings() {
+        initDefaults();
     }
 
     public Settings(String guildID) {
         this.guildId = guildID;
-        this.prefix = "!";
-        this.attendanceTimer = Duration.ofMinutes(5);
+        initDefaults();
+    }
+
+    public void banUser(final String userToBanId) {
+        this.bannedUserIds.add(userToBanId);
+    }
+
+    public void unbanUser(final String userToUnbanId) {
+        this.bannedUserIds.remove(userToUnbanId);
     }
 }
