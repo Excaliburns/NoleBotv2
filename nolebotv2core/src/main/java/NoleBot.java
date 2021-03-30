@@ -1,3 +1,4 @@
+import commands.admin.RoleAdd;
 import commands.general.Help;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.guilds.SetPrefix;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.PropertiesUtil;
+import util.roles.RoleUtil;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
@@ -21,6 +23,7 @@ public class NoleBot {
     private static final Logger logger = LogManager.getLogger(NoleBot.class);
 
     private static final CommandUtil                  commandUtil                  = new CommandUtil();
+    private static final RoleUtil                     roleUtil                     = new RoleUtil();
     private static final GuildMessageCommandListener  guildMessageCommandListener  = new GuildMessageCommandListener();
     private static final GuildMessageReactionListener guildMessageReactionListener = new GuildMessageReactionListener();
 
@@ -40,7 +43,7 @@ public class NoleBot {
         commandUtil.addCommand(new HelloWorld());
         commandUtil.addCommand(new SetPrefix());
         commandUtil.addCommand(new ListGuildPermissions());
-
+        commandUtil.addCommand(new RoleAdd(roleUtil));
         try {
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);
 
@@ -59,6 +62,7 @@ public class NoleBot {
                     // Add Listeners to JDA instance
                     .addEventListeners(
                             commandUtil,
+                            roleUtil,
                             guildMessageCommandListener,
                             guildMessageReactionListener
                     )
