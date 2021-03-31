@@ -1,4 +1,5 @@
 import commands.general.GetRoleID;
+import commands.general.GetUserID;
 import commands.general.Help;
 import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
@@ -6,10 +7,10 @@ import commands.guildcommands.ShadowBan;
 import commands.guildcommands.guilds.AddRole;
 import commands.guildcommands.guilds.SetPrefix;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
-import listeners.BanListListener;
-import listeners.GuildMessageCommandListener;
 import commands.util.CommandUtil;
 import enums.PropEnum;
+import listeners.BanListListener;
+import listeners.GuildMessageCommandListener;
 import listeners.GuildMessageReactionListener;
 import listeners.OnReadyListener;
 import net.dv8tion.jda.api.JDA;
@@ -55,6 +56,7 @@ public class NoleBot {
         commandUtil.addCommand(new ShadowBan());
         commandUtil.addCommand(new AddRole());
         commandUtil.addCommand(new GetRoleID());
+        commandUtil.addCommand(new GetUserID());
 
         try {
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);

@@ -24,6 +24,9 @@ public class Settings {
     private Map<String, List<String>> roleOverrides;
     private boolean overrideRolePerms;
     private List<String> addableRoles;
+    private boolean giveDevRole;
+    private int devRolePosition;
+    private int botRolePosition;
     // TODO: Name Verification
 
     private void initDefaults() {
@@ -33,7 +36,9 @@ public class Settings {
         bannedUserIds        = new ArrayList<>();
         roleOverrides        = new HashMap<String, List<String>>();
         addableRoles = new ArrayList<String>();
-
+        giveDevRole = true;
+        botRolePosition = 1;
+        devRolePosition = botRolePosition - 1;
     }
 
     public Settings() {

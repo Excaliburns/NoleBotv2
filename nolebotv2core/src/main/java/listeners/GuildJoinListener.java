@@ -2,9 +2,12 @@ package listeners;
 
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public class GuildJoinListener extends ListenerAdapter {
+    private static final Logger logger = LogManager.getLogger(GuildJoinListener.class);
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         super.onGuildJoin(event);
