@@ -38,13 +38,6 @@ public class SettingsFromJsonTest {
 
 
         testSettings.setCommandPermissionMap(testCommandPermissionMap);
-
-        List<String> testConditionalRoleList = new ArrayList<>(List.of(
-                "447957885540892692",
-                "585615635954925569"
-        ));
-
-        testSettings.setConditionalRole(testConditionalRoleList);
     }
 
     @Test
@@ -70,7 +63,6 @@ public class SettingsFromJsonTest {
         assertEquals(settings.getPrefix              (), testSettings.getPrefix());
         assertEquals(settings.getGuildId             (), testSettings.getGuildId());
         assertEquals(settings.getCommandPermissionMap(), testSettings.getCommandPermissionMap());
-        assertEquals(settings.getConditionalRole     (), testSettings.getConditionalRole());
         assertEquals(settings.getPermissionList      (), testSettings.getPermissionList());
 
         logger.info("Completed SettingsFromJson Test");

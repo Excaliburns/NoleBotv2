@@ -36,11 +36,32 @@ public class MessageUtil {
         channel.sendMessage(builder.build()).queue();
     }
 
-    public static void sendSuccessResponseToChannel(String successMessageContent, MessageChannel channel) {
+    public static void sendSuccessResponseToChannel(final String successMessageContent, final MessageChannel channel) {
         channel.sendMessage(EmojiCodes.CHECK_MARK.unicodeValue + " " + EmojiCodes.DASH.unicodeValue + " " + successMessageContent).queue();
     }
 
-    public static void printStackTraceToChannelFromThrowable(MessageChannel channel, Throwable e) {
+    public static void sendSuccessResponseToChannel(final MessageChannel channel, final List<String> successMessageContent) {
+        MessageBuilder builder = new MessageBuilder();
+
+        builder.append(EmojiCodes.CHECK_MARK.unicodeValue)
+               .append(" ")
+               .append(EmojiCodes.DASH.unicodeValue)
+               .append(" ")
+               .append("Successfully executed the following events:\n");
+
+        for (String s : successMessageContent) {
+            if (builder.length() > 1500) {
+                channel.sendMessage(builder.build()).queue();
+                builder = new MessageBuilder();
+            }
+
+            builder.append(s);
+        }
+
+        channel.sendMessage(builder.build()).queue();
+    }
+
+    public static void printStackTraceToChannelFromThrowable(final MessageChannel channel, final Throwable e) {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw  = new PrintWriter(sw);
         e.printStackTrace(pw);
@@ -52,11 +73,11 @@ public class MessageUtil {
         channel.sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
     }
 
-    public static void sendMessageToChannel(String message, MessageChannel channel) {
+    public static void sendMessageToChannel(final String message, final MessageChannel channel) {
         channel.sendMessage(message).queue();
     }
 
-    public static void sendMessageToChannel(MessageEmbed embed, MessageChannel channel) {
+    public static void sendMessageToChannel(final MessageEmbed embed, final MessageChannel channel) {
         channel.sendMessage(embed).queue();
     }
 }

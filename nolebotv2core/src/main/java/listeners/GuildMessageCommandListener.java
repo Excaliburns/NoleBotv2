@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import util.permissions.PermissionCache;
 import util.settings.Settings;
 import util.settings.SettingsFactory;
 
@@ -44,9 +45,7 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
 
             if (command != null) {
-                // TODO Permissions
                 final CommandEvent commandEvent = new CommandEvent(event, commandMessage, settings, command);
-
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",
                         command.getName(),

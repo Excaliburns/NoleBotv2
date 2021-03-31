@@ -2,6 +2,7 @@ package util.settings;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Role;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +54,6 @@ public class SettingsFactory {
         Settings settings = new Settings(guild.getId());
         initDefaultPermissionListForGuild(guild, settings);
         initDefaultAssignableRoleListForGuild(guild, settings);
-        initDefaultRoleOverrides(guild, settings);
         return settings;
     }
     /**
@@ -80,49 +80,8 @@ public class SettingsFactory {
      */
     private static void initDefaultAssignableRoleListForGuild(Guild guild, Settings s) {
         List<Role> serverRoles = guild.getRoles();
-        List<String> listOfRoleIDs = new ArrayList<String>();
-        serverRoles.stream().forEach((role) -> {
-            listOfRoleIDs.add(role.getId());
-        });
+        List<String> listOfRoleIDs = new ArrayList<>();
+        serverRoles.forEach((role) -> listOfRoleIDs.add(role.getId()));
         s.setAddableRoles(listOfRoleIDs);
-    }
-    // This method is absolutely atrocious and is in need of significant reworks
-    // It defaults the map of role overrides to allow every role to be assigned by a role with an equal or greater permission level
-    // The main issue is that it is difficult to determine the integer representation of a roles permission level
-    // Right now, I accomplish this by looping through every element of the permissionList Set in the Settings object, and comparing the snowflakeID to the roles currently being checked in the loops
-    // Basically, this method gets a list of every role in the current guild, then checks every role against every role to determine if the permission level is greater or equal
-    // I think to make this better we need a way to get a permLevel for a given RoleID.
-    // That would at least take out the need for the forEach stream that loops through the PermissionList
-    // Though to be fair, this method doesn't need to be extremely performant, considering how rarely it will be run
-    private static void initDefaultRoleOverrides(Guild guild, Settings s) {
-        HashMap<String, List<String>> settingsMap = new HashMap<String, List<String>>();
-        List<String> allRoles = new ArrayList<String>();
-        guild.getRoles().stream().forEach(role -> {
-            allRoles.add(role.getId());
-        });
-        for (int i = 0; i < allRoles.size(); i++) {
-            List<String> roleIDsThatCanExcecute = new ArrayList<String>();
-            for (int k = 0; k < allRoles.size(); k++) {
-                String roleIDOfI = allRoles.get(i);
-                String roleIDOfK = allRoles.get(k);
-                int finalK = k;
-                s.getPermissionList().stream().forEach(genericPermission -> {
-                    Integer permLevelOfRoleI = null;
-                    Integer permLevelOfRoleK = null;
-                    if (genericPermission.getSnowflakeId().equals(roleIDOfI)){
-                        permLevelOfRoleI = genericPermission.getPermissionLevel();
-                    }
-                    if (genericPermission.getSnowflakeId().equals(roleIDOfK)) {
-                        permLevelOfRoleK = genericPermission.getPermissionLevel();
-                    }
-                    if (permLevelOfRoleI != null && permLevelOfRoleK != null && permLevelOfRoleK >= permLevelOfRoleI) {
-                        roleIDsThatCanExcecute.add(allRoles.get(finalK));
-                    }
-                });
-
-            }
-            settingsMap.put(allRoles.get(i), roleIDsThatCanExcecute);
-        }
-        s.setRoleOverrides(settingsMap);
     }
 }

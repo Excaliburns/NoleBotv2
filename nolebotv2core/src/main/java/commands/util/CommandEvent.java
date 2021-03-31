@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import util.permissions.PermissionCache;
 import util.settings.Settings;
 
 import java.util.Arrays;
@@ -22,14 +23,20 @@ public class CommandEvent {
     private MessageChannel channel;
     private Settings       settings;
 
+    private int            userInitiatedPermissionLevel;
+
     public CommandEvent(GuildMessageReceivedEvent event, List<String> message, Settings settings, Command command) {
-        this.originatingJDAEvent = event;
-        this.command             = command;
-        this.messageContent      = message;
-        this.guild               = event.getGuild();
-        this.guildId             = event.getGuild().getId();
-        this.channel             = event.getChannel();
-        this.settings            = settings;
+        this.originatingJDAEvent          = event;
+        this.command                      = command;
+        this.messageContent               = message;
+        this.guild                        = event.getGuild();
+        this.guildId                      = event.getGuild().getId();
+        this.channel                      = event.getChannel();
+        this.settings                     = settings;
+        this.userInitiatedPermissionLevel = PermissionCache.getPermissionForUser(
+                event.getAuthor().getId(),
+                event.getGuild()
+        ).getPermissionLevel();
     }
 
     public void sendErrorResponseToOriginatingChannel(String errorMessageContent) {
@@ -46,6 +53,14 @@ public class CommandEvent {
 
     public void sendSuccessResponseToOriginatingChannel(String successMessageContent) {
         MessageUtil.sendSuccessResponseToChannel(successMessageContent, this.channel);
+    }
+
+    public void sendSuccessResponseToOriginatingChannel(String ...successMessageContent) {
+        MessageUtil.sendSuccessResponseToChannel(this.channel, Arrays.asList(successMessageContent));
+    }
+
+    public void sendSuccessResponseToOriginatingChannel(List<String> successMessageContent) {
+        MessageUtil.sendSuccessResponseToChannel(this.channel, successMessageContent);
     }
 
     public void printStackTraceToChannelFromThrowable(MessageChannel channel, Throwable e) {

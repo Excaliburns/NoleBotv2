@@ -2,10 +2,14 @@ package commands.guildcommands.guilds;
 
 import commands.util.Command;
 import commands.util.CommandEvent;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import util.settings.Settings;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AddRole extends Command {
     public AddRole()
@@ -13,53 +17,76 @@ public class AddRole extends Command {
         name = "addrole";
         description = "Assigns a role to a user";
         helpDescription = "Assigns a pingable role to a given user";
-        usages.add("roleadd @Role @User");
-        usages.add("roleadd @Role @User @User @User..@User");
+        usages.add("roleadd <List of @Role> <List of @User>");
         requiredPermissionLevel = 1000;
     }
 
     @Override
     public boolean doesUserHavePermission(CommandEvent event) {
-        Settings s = event.getSettings();
-        boolean result = false;
-        String roleIDToAssign = event.getOriginatingJDAEvent().getMessage().getMentionedRoles().get(0).getId();
-        if (s.isOverrideRolePerms())
-        {
-            if (s.getRoleOverrides().containsKey(roleIDToAssign))
-            {
-                List<String> rolesThatCanAssign = s.getRoleOverrides().get(roleIDToAssign);
-                List<Role> authorRoles = event.getOriginatingJDAEvent().getMember().getRoles();
-                for (int i = 0; i < authorRoles.size() && !result; i++)
-                {
-                    Role roleToCheck = authorRoles.get(i);
-                    if (rolesThatCanAssign.contains(roleToCheck.getId()))
-                    {
-                        result = true;
+        final Settings guildSettings = event.getSettings();
+
+        final List<Role> mentionedRolesList = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
+        final boolean guildHasRoleOverrides = !guildSettings.getRoleOverrides().isEmpty();
+        final HashMap<String, List<String>> guildOverrides = guildSettings.getRoleOverrides();
+
+        if (event.getOriginatingJDAEvent().getMember() == null ) { throw new NullPointerException("Couldn't find user executing command in guild!"); }
+
+        final List<String> authorsRoleIds = event.getOriginatingJDAEvent().getMember().getRoles()
+                                                 .stream()
+                                                 .map(Role::getId)
+                                                 .collect(Collectors.toList());
+
+        for (final Role mentionedRole : mentionedRolesList) {
+            if (guildHasRoleOverrides) {
+                if (guildOverrides.containsKey(mentionedRole.getId())) {
+                    final List<String> roleIdsToCheck = guildOverrides.get(mentionedRole.getId());
+
+                    for (final String roleId : roleIdsToCheck) {
+                        if (authorsRoleIds.contains(roleId)) {
+                            return true;
+                        }
                     }
+
+                    return false;
                 }
-                if (!result) {
-                    event.sendErrorResponseToOriginatingChannel("You don't have permission to send this command!");
+                else {
+                    return super.doesUserHavePermission(event);
                 }
             }
+            else {
+                return super.doesUserHavePermission(event);
+            }
         }
-        else
-        {
-            result = super.doesUserHavePermission(event);
-        }
-        return result;
+
+        return false;
     }
 
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
-        if (event.getOriginatingJDAEvent().getMessage().getMentionedRoles().size() > 1)
-        {
-            event.sendErrorResponseToOriginatingChannel("Please only mention 1 role!");
-            throw new IllegalStateException();
-        }
+        final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
+        final List<Member> mentionedMembers = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
+
         //Gets the mentioned members, then loops through and adds the role mentioned
-        event.getOriginatingJDAEvent().getMessage().getMentionedMembers().stream().forEach((member -> {
-            event.getGuild().addRoleToMember(member, event.getOriginatingJDAEvent().getMessage().getMentionedRoles().get(0)).queue();
-        }));
-        event.sendSuccessResponseToOriginatingChannel("Role successfully added!");
+        for (final Member member : mentionedMembers) {
+            for (final Role role : mentionedRoles) {
+                event.getGuild().addRoleToMember(member, role).queue();
+            }
+        }
+
+        sendSuccessMessageAfterAddingRoles(mentionedMembers, mentionedRoles, event);
+    }
+
+    private void sendSuccessMessageAfterAddingRoles(final List<Member> memberList, final List<Role> rolesList, final CommandEvent event) {
+        final StringBuilder successMessageBeforeMember = new StringBuilder();
+        successMessageBeforeMember.append("Successfully added ");
+
+        successMessageBeforeMember.append("(");
+        rolesList.forEach( role -> successMessageBeforeMember.append(String.format("[%s], ", role.getName())));
+        successMessageBeforeMember.append(")");
+
+        List<String> successMessages = new ArrayList<>();
+        memberList.forEach( member -> successMessages.add(successMessageBeforeMember.toString() + " to " + member.getEffectiveName()));
+
+        event.sendSuccessResponseToOriginatingChannel(successMessages);
     }
 }
