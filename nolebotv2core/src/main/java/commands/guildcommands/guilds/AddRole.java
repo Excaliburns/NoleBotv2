@@ -37,6 +37,9 @@ public class AddRole extends Command {
                         result = true;
                     }
                 }
+                if (!result) {
+                    event.sendErrorResponseToOriginatingChannel("You don't have permission to send this command!");
+                }
             }
         }
         else
@@ -50,11 +53,13 @@ public class AddRole extends Command {
     public void onCommandReceived(CommandEvent event) throws Exception {
         if (event.getOriginatingJDAEvent().getMessage().getMentionedRoles().size() > 1)
         {
+            event.sendErrorResponseToOriginatingChannel("Please only mention 1 role!");
             throw new IllegalStateException();
         }
         //Gets the mentioned members, then loops through and adds the role mentioned
         event.getOriginatingJDAEvent().getMessage().getMentionedMembers().stream().forEach((member -> {
             event.getGuild().addRoleToMember(member, event.getOriginatingJDAEvent().getMessage().getMentionedRoles().get(0)).queue();
         }));
+        event.sendSuccessResponseToOriginatingChannel("Role successfully added!");
     }
 }

@@ -23,6 +23,7 @@ public class Settings {
     // String List = roleIDs that can assign the role
     private Map<String, List<String>> roleOverrides;
     private boolean overrideRolePerms;
+    private List<String> addableRoles;
     // TODO: Name Verification
 
     private void initDefaults() {
@@ -31,9 +32,8 @@ public class Settings {
         overrideRolePerms    = false;
         bannedUserIds        = new ArrayList<>();
         roleOverrides        = new HashMap<String, List<String>>();
-        ArrayList<String> testArray = new ArrayList<String>();
-        testArray.add("826563872042647615");
-        roleOverrides.put("826563872042647615", testArray);
+        addableRoles = new ArrayList<String>();
+
     }
 
     public Settings() {

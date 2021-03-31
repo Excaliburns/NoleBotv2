@@ -22,4 +22,5 @@ public class GenericPermission implements Comparable<GenericPermission> {
                 .compare(name, o.getName())
                 .result();
     }
+
 }
