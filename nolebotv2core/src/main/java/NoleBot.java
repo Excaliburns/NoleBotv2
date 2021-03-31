@@ -1,7 +1,9 @@
+import commands.general.GetRoleID;
 import commands.general.Help;
 import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.ShadowBan;
+import commands.guildcommands.guilds.AddRole;
 import commands.guildcommands.guilds.SetPrefix;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
 import listeners.BanListListener;
@@ -51,6 +53,8 @@ public class NoleBot {
         commandUtil.addCommand(new ListGuildPermissions());
         commandUtil.addCommand(new Attendance());
         commandUtil.addCommand(new ShadowBan());
+        commandUtil.addCommand(new AddRole());
+        commandUtil.addCommand(new GetRoleID());
 
         try {
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);

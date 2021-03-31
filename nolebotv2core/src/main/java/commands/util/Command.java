@@ -2,6 +2,7 @@ package commands.util;
 
 import lombok.Getter;
 import lombok.Setter;
+import util.permissions.PermissionCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,21 @@ public abstract class Command {
     protected int requiredPermissionLevel = 1000;
 
     public abstract void onCommandReceived(CommandEvent event) throws Exception;
-
+    public boolean doesUserHavePermission(CommandEvent event) {
+        int permLevelOfUser = PermissionCache.getPermissionForUser(
+                event.getOriginatingJDAEvent().getAuthor().getId(),
+                event.getGuild())
+                .getPermissionLevel();
+        return permLevelOfUser >= event.getCommand().getRequiredPermissionLevel();
+    }
     public final void executeCommand(CommandEvent event) throws Exception {
-        onCommandReceived(event);
+        if (doesUserHavePermission(event))
+        {
+            onCommandReceived(event);
+        }
+        else
+        {
+            event.sendErrorResponseToOriginatingChannel("You don't have permission to excecute that command!");
+        }
     }
 }

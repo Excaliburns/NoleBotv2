@@ -6,10 +6,7 @@ import lombok.Setter;
 import util.permissions.GenericPermission;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 @Getter @Setter
 public class Settings {
@@ -22,12 +19,21 @@ public class Settings {
 
     // Roles stored as IDs
     private List<String>             conditionalRole;
+    // First String = roleID id to be assigned.
+    // String List = roleIDs that can assign the role
+    private Map<String, List<String>> roleOverrides;
+    private boolean overrideRolePerms;
     // TODO: Name Verification
 
     private void initDefaults() {
         this.prefix          = "!";
         this.attendanceTimer = Duration.ofMinutes(5);
+        overrideRolePerms    = false;
         bannedUserIds        = new ArrayList<>();
+        roleOverrides        = new HashMap<String, List<String>>();
+        ArrayList<String> testArray = new ArrayList<String>();
+        testArray.add("826563872042647615");
+        roleOverrides.put("826563872042647615", testArray);
     }
 
     public Settings() {
