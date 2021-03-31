@@ -48,12 +48,11 @@ public class AddRole extends Command {
 
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
-        System.out.println("We are here");
-        final List<String> messageContent = event.getMessageContent();
         if (event.getOriginatingJDAEvent().getMessage().getMentionedRoles().size() > 1)
         {
             throw new IllegalStateException();
         }
+        //Gets the mentioned members, then loops through and adds the role mentioned
         event.getOriginatingJDAEvent().getMessage().getMentionedMembers().stream().forEach((member -> {
             event.getGuild().addRoleToMember(member, event.getOriginatingJDAEvent().getMessage().getMentionedRoles().get(0)).queue();
         }));
