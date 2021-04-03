@@ -15,6 +15,7 @@ import java.util.Properties;
 
 public class PropertiesUtil {
     private static final Logger logger = LogManager.getLogger(PropertiesUtil.class);
+    //
     private static final HashMap<PropEnum, String> propertyMap;
 
     /*
