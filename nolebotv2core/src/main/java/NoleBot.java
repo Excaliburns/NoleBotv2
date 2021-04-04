@@ -5,7 +5,9 @@ import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.ShadowBan;
 import commands.guildcommands.guilds.AddRole;
+import commands.guildcommands.guilds.LockRole;
 import commands.guildcommands.guilds.SetPrefix;
+import commands.guildcommands.guilds.UnlockRole;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
 import commands.util.CommandUtil;
 import enums.PropEnum;
@@ -57,6 +59,8 @@ public class NoleBot {
         commandUtil.addCommand(new AddRole());
         commandUtil.addCommand(new GetRoleID());
         commandUtil.addCommand(new GetUserID());
+        commandUtil.addCommand(new LockRole());
+        commandUtil.addCommand(new UnlockRole());
 
         try {
             //Bot token from properties file
