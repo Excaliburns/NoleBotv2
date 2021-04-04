@@ -36,7 +36,7 @@ public class OnReadyListener extends ListenerAdapter {
             final String guildId = guild.getId();
             if (!SettingsManager.doesSettingsExistForGuild(guildId)){
                 logger.info("Settings was empty, creating new Settings for guild with id {}.", guildId);
-                Settings settings = SettingsFactory.initComplexDefaults(guild);
+                Settings settings = SettingsFactory.createDefaultSetting(guild);
                 final Path settingsPath = SettingsFactory.getSettingsPathForGuild(guild.getId());
                 FilesUtil.createFileIfNotExists(settingsPath);
 

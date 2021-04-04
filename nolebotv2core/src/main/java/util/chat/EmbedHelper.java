@@ -15,8 +15,10 @@ public class EmbedHelper {
      * @return a populated template EmbedBuilder. Must be converted to MessageEmbed.
      */
     public static EmbedBuilder getDefaultEmbedBuilder() {
+        //Reads Avatar URL from properties file
         final String BOT_AVATAR_URL     = PropertiesUtil.getProperty(PropEnum.BOT_AVATAR_URL);
         final EmbedBuilder embedBuilder = new EmbedBuilder();
+        //Set global fields for all embeds
         embedBuilder.setAuthor("NoleBot", "https://github.com/Excaliburns/NoleBotv2", BOT_AVATAR_URL);
         embedBuilder.setFooter("NoleBot, a bot from Esports at Florida State", BOT_AVATAR_URL);
         embedBuilder.setColor(new Color(198, 77, 105));
@@ -46,7 +48,10 @@ public class EmbedHelper {
 
         return embedBuilder.build();
     }
-
+    /**
+     * Builds the default exit message embed
+     * @return MessageEmbed with the message "Bye! Thank you for your inquiry
+     */
     public static MessageEmbed getDefaultExitMessage() {
         return EmbedHelper.buildDefaultMessageEmbed(
                 new MessageEmbed.Field(EmojiCodes.WAVING_HAND.unicodeValue + " Bye!", "Thank you for your inquiry " + EmojiCodes.HEART.unicodeValue + "!", false)

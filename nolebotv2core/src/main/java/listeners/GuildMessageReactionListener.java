@@ -13,15 +13,19 @@ import java.util.Optional;
 
 public class GuildMessageReactionListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageReactionListener.class);
-
+    //Fire when someone reacts to a message
     @Override
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+        //If the user reacting is a bot, do nothing
         if (event.getUser().isBot()) {
             return;
         }
 
         // If the message can be retrieved, do some stuff.
         event.retrieveMessage().queue(callback -> {
+            //If the author of the message reacted to is the bot
+            //Clean up the ReactionMessageCache
+            //If the message is a reaction message, execute the corresponding command
             if (callback.getAuthor() == event.getJDA().getSelfUser()) {
                 ReactionMessageCache.cleanUpCache();
                 final Optional<ReactionMessage> reactionMessageOptional = ReactionMessageCache.getReactionMessage(callback.getId());
