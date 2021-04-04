@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SettingsCache {
     private static final Logger logger = LogManager.getLogger(SettingsCache.class);
-
+    //A cache that matches GuildIDs to Settings objects
     public static final LoadingCache<String, Settings> settingsCache = CacheBuilder.newBuilder()
             .maximumSize(10)
             .expireAfterAccess(4, TimeUnit.HOURS)
