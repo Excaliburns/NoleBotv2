@@ -35,7 +35,7 @@ public class CommandEvent {
         this.settings                     = settings;
         this.userInitiatedPermissionLevel = PermissionCache.getPermissionForUser(
                 event.getAuthor().getId(),
-                event.getGuild()
+                event.getGuild().getId()
         ).getPermissionLevel();
     }
 
