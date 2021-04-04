@@ -16,7 +16,7 @@ public class GetRoleID extends Command {
     }
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
-        List<Role> roles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
-        roles.forEach((role -> event.getChannel().sendMessage(role.getId()).queue()));
+        List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
+        mentionedRoles.forEach((role -> event.getChannel().sendMessage(role.getId()).queue()));
     }
 }

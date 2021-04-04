@@ -17,6 +17,8 @@ public class ListGuildPermissions extends Command {
     }
 
     @Override
+
+    //Should probably make this output a MessageEmbed, if possible
     public void onCommandReceived(CommandEvent event) {
         final TreeSet<GenericPermission> permissionList  = event.getSettings().getPermissionList();
 
