@@ -9,10 +9,12 @@ import java.util.Comparator;
 
 @AllArgsConstructor @Getter
 public class GenericPermission implements Comparable<GenericPermission> {
+    //Type of permission, USER, GROUP, or ROLE
     private final PermissionType type;
-
     private final String name;
+    //The UserID, GroupID, or RoleID for the holder of thr permission
     private final String snowflakeId;
+    //The permissionLevel of the User, Group, or Role
     private final int permissionLevel;
 
     @Override

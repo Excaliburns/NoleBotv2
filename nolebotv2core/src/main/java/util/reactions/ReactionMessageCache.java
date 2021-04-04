@@ -19,10 +19,13 @@ public class ReactionMessageCache {
 
     // MessageId, ReactionMessage
     @SuppressWarnings({"Convert2Lambda", "Convert2Diamond"})
+    //A cache of message contents to Reaction Messages
     private static final Cache<String, ReactionMessage> reactionMessageCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .removalListener(new RemovalListener<Object, Object>() {
                 @Override
+                //Edits the original message when the cache expires to show that Reactions are no longer being listened to
+                //Also clears reactions from the original message.
                 public void onRemoval(@NotNull RemovalNotification<Object, Object> notification) {
                     if (notification.getCause() == RemovalCause.EXPIRED
                             || notification.getCause() == RemovalCause.COLLECTED) {

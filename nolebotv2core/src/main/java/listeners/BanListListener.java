@@ -10,7 +10,7 @@ import util.chat.EmbedHelper;
 import util.settings.SettingsCache;
 
 import java.util.concurrent.ExecutionException;
-
+//Checks whether a member is shadow-banned when members try to join a voice channel or send a message
 public class BanListListener extends ListenerAdapter {
     @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {

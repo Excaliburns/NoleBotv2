@@ -59,6 +59,7 @@ public class NoleBot {
         commandUtil.addCommand(new GetUserID());
 
         try {
+            //Bot token from properties file
             String token = PropertiesUtil.getProperty(PropEnum.TOKEN);
 
             // For Heroku Deployment
