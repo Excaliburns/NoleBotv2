@@ -1,4 +1,4 @@
-package commands.guildcommands.guilds;
+package commands.guildcommands.guilds.roles;
 
 import commands.util.Command;
 import commands.util.CommandEvent;
