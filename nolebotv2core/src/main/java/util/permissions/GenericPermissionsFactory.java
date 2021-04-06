@@ -48,7 +48,7 @@ public class GenericPermissionsFactory {
      * @return The GenericPermission for the specified user in the specified guild
      */
     public static GenericPermission getHighestPermissionObjectForUser(String userId, Guild guild) {
-        return PermissionCache.getPermissionForUser(userId, guild);
+        return PermissionCache.getPermissionForUser(userId, guild.getId());
     }
     /**
      * Gets the set of permissions for the user in the current guild, if there is one
