@@ -1,4 +1,4 @@
-package commands.guildcommands.guilds;
+package commands.guildcommands.guilds.roles;
 
 import commands.util.Command;
 import commands.util.CommandEvent;
@@ -69,7 +69,7 @@ public class AddRole extends Command {
         final List<Member> mentionedMembers = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
         final int mentionedRolesSize = mentionedRoles.size();
         final int mentionedMembersSize = mentionedMembers.size();
-        if (mentionedRolesSize > 0 || mentionedMembersSize > 0) {
+        if (mentionedRolesSize > 0 && mentionedMembersSize > 0) {
             HashSet<Role> addedRoles = new HashSet<Role>();
             HashSet<Member> addedMembers = new HashSet<Member>();
             //Gets the mentioned roles, then loops through and adds the members mentioned

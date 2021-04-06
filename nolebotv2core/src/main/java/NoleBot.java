@@ -4,10 +4,11 @@ import commands.general.Help;
 import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.ShadowBan;
-import commands.guildcommands.guilds.AddRole;
-import commands.guildcommands.guilds.LockRole;
+import commands.guildcommands.guilds.roles.AddRole;
+import commands.guildcommands.guilds.roles.GivePerms;
+import commands.guildcommands.guilds.roles.LockRole;
 import commands.guildcommands.guilds.SetPrefix;
-import commands.guildcommands.guilds.UnlockRole;
+import commands.guildcommands.guilds.roles.UnlockRole;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
 import commands.util.CommandUtil;
 import enums.PropEnum;
@@ -15,7 +16,6 @@ import listeners.BanListListener;
 import listeners.GuildMessageCommandListener;
 import listeners.GuildMessageReactionListener;
 import listeners.OnReadyListener;
-import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -61,6 +61,7 @@ public class NoleBot {
         commandUtil.addCommand(new GetUserID());
         commandUtil.addCommand(new LockRole());
         commandUtil.addCommand(new UnlockRole());
+        commandUtil.addCommand(new GivePerms());
 
         try {
             //Bot token from properties file

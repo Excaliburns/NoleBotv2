@@ -58,4 +58,7 @@ public class Settings {
     public void unlockRole(String roleID) {
         lockedRoles.remove(roleID);
     }
+    public void addPermission(GenericPermission p) {
+        permissionList.add(p);
+    }
 }
