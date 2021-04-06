@@ -15,11 +15,13 @@ import listeners.BanListListener;
 import listeners.GuildMessageCommandListener;
 import listeners.GuildMessageReactionListener;
 import listeners.OnReadyListener;
+import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.NoleBotUtil;
 import util.PropertiesUtil;
 import util.db.DBConnection;
 
@@ -46,8 +48,6 @@ public class NoleBot {
                 GatewayIntent.GUILD_VOICE_STATES,
                 GatewayIntent.DIRECT_MESSAGES,
                 GatewayIntent.DIRECT_MESSAGE_REACTIONS);
-
-        JDA jda;
 
         // Add Commands
         commandUtil.addCommand(new Help());
@@ -76,7 +76,7 @@ public class NoleBot {
 
             // If it's still null, user probably hasn't set it.
             //noinspection UnusedAssignment
-            jda = JDABuilder.create(token, INTENT_LIST)
+            final JDA jda = JDABuilder.create(token, INTENT_LIST)
                     // Add Listeners to JDA instance
                     .addEventListeners(
                             commandUtil,
@@ -95,6 +95,7 @@ public class NoleBot {
                 logger.warn("Database connection couldn't be established.");
             }
 
+            NoleBotUtil.setJda(jda);
         } catch (LoginException e) {
             logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());
         }

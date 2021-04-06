@@ -1,8 +1,15 @@
 package util;
 
+import lombok.Getter;
+import lombok.Setter;
+import net.dv8tion.jda.api.JDA;
+
 import java.time.Duration;
 
 public class NoleBotUtil {
+    @Getter @Setter
+    private static JDA jda;
+
     public static String getFormattedDurationString(Duration duration) {
         String durationString = null;
 
