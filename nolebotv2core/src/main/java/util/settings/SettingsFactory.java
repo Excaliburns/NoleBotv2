@@ -65,7 +65,7 @@ public class SettingsFactory {
                                             .collect(Collectors.toList());
 
         TreeSet<GenericPermission> defaultPermissions = defaultAdminRoles.stream()
-                                                     .map(role -> new GenericPermission(PermissionType.ROLE, role.getName(), role.getId(), 1000))
+                                                     .map((role) -> new GenericPermission(role, 1000))
                                                      .collect(Collectors.toCollection(TreeSet::new));
         s.setPermissionList(defaultPermissions);
         logger.info("Successfully created settings");
