@@ -20,8 +20,11 @@ jar {
     }
 }
 repositories {
-    jcenter()
     mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 compileJava.options.encoding = "UTF-8"
@@ -32,7 +35,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     // JDA
-    implementation 'net.dv8tion:JDA:4.2.0_198'
+    implementation 'net.dv8tion:JDA:4.2.1_265'
 
     // Log4J
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
