@@ -1,10 +1,14 @@
-import { Link, Route, Router, Switch } from "react-router-dom";
+import { BrowserRouter, Link, Route, Router, Switch } from "react-router-dom";
 import MainPage from "./MainPage";
 import OauthRedirect from "./OauthRedirect";
+import React from "react";
+import { DiscordUser } from "./entities/DiscordUser";
 
 function App() {
+    const [user, setUser] = React.useState<DiscordUser | undefined>(undefined);
+
     return (
-        <Router>
+        <BrowserRouter>
             <div>
                 <nav>
                     <ul>
@@ -18,14 +22,14 @@ function App() {
             renders the first one that matches the current URL. */}
                 <Switch>
                     <Route path="/auth/redirect">
-                        <OauthRedirect />
+                        <OauthRedirect setUserData={setUser}/>
                     </Route>
                     <Route path="/">
-                        <MainPage />
+                        <MainPage user={user}/>
                     </Route>
                 </Switch>
             </div>
-        </Router>
+        </BrowserRouter>
     )
 }
 

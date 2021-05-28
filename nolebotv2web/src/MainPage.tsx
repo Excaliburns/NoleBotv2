@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import styled from "styled-components";
+import { DiscordUser } from "./entities/DiscordUser";
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,9 +29,12 @@ const DiscordButton = styled.button`
   color: white;
 `
 
-function MainPage() {
+interface MainPageProps {
+    readonly user: DiscordUser | undefined;
+}
+
+function MainPage({user}: MainPageProps) {
     const discordOauthUri = 'https://discord.com/oauth2/authorize?client_id=548200687964520459&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fredirect&response_type=code&scope=identify%20guilds';
-    const [userStuff, setUserStuff] = React.useState<any>();
 
     return (
         <Wrapper>
@@ -43,7 +47,7 @@ function MainPage() {
             </div>
 
             <pre>
-                {userStuff}
+                {JSON.stringify(user, null, 2)}
             </pre>
         </Wrapper>
     );
