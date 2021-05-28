@@ -9,7 +9,8 @@ version '2.0b1.0.0'
 jar {
     manifest {
         attributes(
-                "Main-Class": 'NoleBot')
+                "Main-Class": 'NoleBot'
+        )
     }
 
     from {
@@ -31,8 +32,6 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 dependencies {
-
-    testCompile group: 'junit', name: 'junit', version: '4.12'
 
     // JDA
     implementation 'net.dv8tion:JDA:4.2.1_265'

@@ -1,0 +1,9 @@
+micronaut:
+  application:
+    name: nolebotv2webapi
+  security:
+    oauth2:
+      clients:
+        discord:
+          client-id: null
+          client-secret: null
