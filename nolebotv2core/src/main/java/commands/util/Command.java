@@ -19,6 +19,7 @@ public abstract class Command {
     protected String description = "No data available";
     protected String helpDescription = "No data available";
     protected List<String> usages = new ArrayList<>();
+    protected List<String> examples = new ArrayList<>();
     protected int requiredPermissionLevel = 1000;
 
     // Default constructor uses reflection to assign name.
