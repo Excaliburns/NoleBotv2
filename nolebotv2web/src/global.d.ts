@@ -1,9 +1,11 @@
 import 'little-state-machine';
-import { DiscordUser } from "./entities/DiscordUser";
+import { AccessToken } from "./entities/AccessToken";
+import { APIUser } from "discord-api-types";
 
 // little state machine state
 declare module 'little-state-machine' {
     interface GlobalState {
-        userDetails?: DiscordUser
+        userToken?: AccessToken,
+        userDetails?: APIUser
     }
 }

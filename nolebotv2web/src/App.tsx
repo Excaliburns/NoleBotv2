@@ -1,8 +1,8 @@
 import { BrowserRouter, Link, Route, Router, Switch } from "react-router-dom";
-import MainPage from "./MainPage";
+import MainPage from "./MainPage/MainPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
-import { DiscordUser } from "./entities/DiscordUser";
+import { AccessToken } from "./entities/AccessToken";
 import { createStore, GlobalState, StateMachineProvider, useStateMachine } from "little-state-machine";
 
 

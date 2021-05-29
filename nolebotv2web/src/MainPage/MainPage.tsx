@@ -1,9 +1,10 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import logo from '../logo.svg';
+import '../App.css';
 import styled from "styled-components";
-import { DiscordUser } from "./entities/DiscordUser";
+import { AccessToken } from "../entities/AccessToken";
 import { useStateMachine } from "little-state-machine";
+import GuildListing from "./GuildListing";
 
 const Wrapper = styled.div`
   display: flex;
@@ -43,9 +44,10 @@ function MainPage() {
                 Hi, Nolebot user!
             </div>
 
-            <pre>
-                {JSON.stringify(state.userDetails, null, 2)}
-            </pre>
+            {
+                state?.userToken?.access_token ? <GuildListing />
+                    : null
+            }
         </Wrapper>
     );
 }
