@@ -2,12 +2,21 @@ import React, { Dispatch, SetStateAction } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import axiosInstance from "./util/AxiosInstance";
 import { DiscordUser } from "./entities/DiscordUser";
+import { GlobalState, useStateMachine } from "little-state-machine";
 
-interface OauthRedirectProps {
-    readonly setUserData: Dispatch<SetStateAction<DiscordUser | undefined>>
-}
+const updateUserDetails = (state: GlobalState, payload: DiscordUser) => ({
+    ...state,
+    userDetails: {
+        ...state.userDetails,
+        ...payload
+    }
+});
 
-function OauthRedirect({setUserData}: OauthRedirectProps) {
+function OauthRedirect() {
+    const { actions, state } = useStateMachine({
+        updateUserDetails
+    });
+
     const location = useLocation();
     const history = useHistory();
 
@@ -36,7 +45,12 @@ function OauthRedirect({setUserData}: OauthRedirectProps) {
                         token_type: data.token_type
                     }
 
-                    setUserData(user);
+                    console.log(state);
+
+                    actions.updateUserDetails(user)
+
+                    console.log(state);
+
                     history.push("/");
                 })
         }

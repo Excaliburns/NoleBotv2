@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import styled from "styled-components";
 import { DiscordUser } from "./entities/DiscordUser";
+import { useStateMachine } from "little-state-machine";
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,12 +29,8 @@ const DiscordButton = styled.button`
   background-color: #7289DA;
   color: white;
 `
-
-interface MainPageProps {
-    readonly user: DiscordUser | undefined;
-}
-
-function MainPage({user}: MainPageProps) {
+function MainPage() {
+    const {state} = useStateMachine();
     const discordOauthUri = 'https://discord.com/oauth2/authorize?client_id=548200687964520459&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fredirect&response_type=code&scope=identify%20guilds';
 
     return (
@@ -47,7 +44,7 @@ function MainPage({user}: MainPageProps) {
             </div>
 
             <pre>
-                {JSON.stringify(user, null, 2)}
+                {JSON.stringify(state.userDetails, null, 2)}
             </pre>
         </Wrapper>
     );
