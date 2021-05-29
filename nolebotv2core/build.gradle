@@ -2,9 +2,12 @@ plugins {
     id 'java'
     id 'application'
     id 'eclipse'
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("io.micronaut.application") version "1.5.0"
 }
 
 version '2.0b1.0.0'
+group = "nolebotv2core"
 
 jar {
     manifest {
@@ -25,6 +28,15 @@ repositories {
     maven {
         name 'm2-dv8tion'
         url 'https://m2.dv8tion.net/releases'
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("nolebotv2core.*")
     }
 }
 
@@ -63,6 +75,17 @@ dependencies {
 
     // Mysql Connector
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+    //Micronaut
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-runtime")
+    //runtimeOnly("ch.qos.logback:logback-classic")
+    implementation("io.micronaut:micronaut-validation")
 }
-
-mainClassName = 'NoleBot'
+application {
+    mainClass.set("NoleBot")
+}
+//mainClassName = 'NoleBot'
+java {
+    sourceCompatibility = JavaVersion.toVersion("14")
+    targetCompatibility = JavaVersion.toVersion("14")
+}
