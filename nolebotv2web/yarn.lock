@@ -4329,6 +4329,11 @@
   dependencies:
     "path-type" "^4.0.0"
 
+"discord-api-types@^0.18.1":
+  "integrity" "sha512-hNC38R9ZF4uaujaZQtQfm5CdQO58uhdkoHQAVvMfIL0LgOSZeW575W8H6upngQOuoxWd8tiRII3LLJm9zuQKYg=="
+  "resolved" "https://registry.npmjs.org/discord-api-types/-/discord-api-types-0.18.1.tgz"
+  "version" "0.18.1"
+
 "dns-equal@^1.0.0":
   "integrity" "sha1-s55/HabrCnW6nBcySzR1PEfgZU0="
   "resolved" "https://registry.yarnpkg.com/dns-equal/-/dns-equal-1.0.0.tgz"
