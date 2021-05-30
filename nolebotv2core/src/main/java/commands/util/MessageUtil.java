@@ -2,6 +2,7 @@ package commands.util;
 
 import enums.EmojiCodes;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -9,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class MessageUtil {
@@ -71,6 +73,15 @@ public class MessageUtil {
                                                        .collect(Collectors.joining("\n"));
 
         channel.sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
+    }
+
+    public static void sendMessageToChannel(Queue<Message> message, final MessageChannel channel) {
+        while (message.peek() != null) {
+            channel.sendMessage(message.poll()).queue();
+        }
+    }
+    public static void sendMessageToChannel(final Message message, final MessageChannel channel) {
+        channel.sendMessage(message).queue();
     }
 
     public static void sendMessageToChannel(final String message, final MessageChannel channel) {

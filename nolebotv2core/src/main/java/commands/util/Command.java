@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /*
 Command Message Content:
@@ -14,11 +15,21 @@ index 1-n: space separated list of words
 @Getter
 @Setter
 public abstract class Command {
-    protected String name = "";
+    protected String name;
     protected String description = "No data available";
     protected String helpDescription = "No data available";
     protected List<String> usages = new ArrayList<>();
     protected int requiredPermissionLevel = 1000;
+
+    // Default constructor uses reflection to assign name.
+    public Command() {
+        if (this.getClass() != null) {
+            this.name = this.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        }
+        else {
+            throw new RuntimeException("Can't instantiate a Command object with no name!");
+        }
+    }
 
     public abstract void onCommandReceived(CommandEvent event) throws Exception;
 
