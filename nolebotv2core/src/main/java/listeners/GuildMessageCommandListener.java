@@ -27,14 +27,15 @@ public class GuildMessageCommandListener extends ListenerAdapter {
             return;
 
         List<String> commandMessage;
-        String message = event.getMessage().getContentRaw();
+        final String message = event.getMessage().getContentRaw();
         final Settings settings = SettingsFactory.getSettings(event.getGuild());
 
         if (message.startsWith(settings.getPrefix())) {
             // remove prefix
-            message = message.substring(settings.getPrefix().length());
-            commandMessage = Arrays.asList(message.split("\\s"));
+            final String noPrefixMessage = message.substring(settings.getPrefix().length());
+            commandMessage = Arrays.asList(noPrefixMessage.split("\\s"));
 
+            // after getting the command name, remove it.
             final String commandName = commandMessage.get(0);
             final Command command;
 
@@ -45,7 +46,7 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
 
             if (command != null) {
-                final CommandEvent commandEvent = new CommandEvent(event, commandMessage, settings, command);
+                final CommandEvent commandEvent = new CommandEvent(event, noPrefixMessage, commandMessage, settings, command);
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",
                         command.getName(),

@@ -3,6 +3,7 @@ package util.permissions;
 import com.google.common.collect.ComparisonChain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.Role;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -17,11 +18,18 @@ public class GenericPermission implements Comparable<GenericPermission> {
     //The permissionLevel of the User, Group, or Role
     private final int permissionLevel;
 
+    public GenericPermission(final Role role, final int permissionLevel) {
+        this.type = PermissionType.ROLE;
+        this.name = role.getName();
+        this.snowflakeId = role.getId();
+        this.permissionLevel = permissionLevel;
+    }
+
     @Override
     public int compareTo(@NotNull GenericPermission o) {
         return ComparisonChain.start()
-                .compare(permissionLevel, o.permissionLevel)
-                .compare(name, o.getName())
+                .compare(o.permissionLevel, permissionLevel)
+                .compare(o.getName(), name)
                 .result();
     }
 

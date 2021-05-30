@@ -1,0 +1,14 @@
+micronaut:
+  server:
+    cors:
+      enabled: true
+  application:
+    name: nolebotv2webapi
+    base-ui-url: http://localhost:3000/auth/redirect
+  security:
+    oauth2:
+      clients:
+        discord:
+          client-id:
+          client-secret:
+    enabled: false

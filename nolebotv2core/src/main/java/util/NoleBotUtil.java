@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.JDA;
 
 import java.time.Duration;
+import java.util.List;
 
 public class NoleBotUtil {
     @Getter @Setter
@@ -37,5 +38,24 @@ public class NoleBotUtil {
         }
 
         return durationString;
+    }
+
+    public static String getFormattedStringFromList(List<?> list) {
+        return getFormattedStringFromListSeparatedByDelimiter(",", list);
+    }
+
+    public static String getFormattedStringFromListSeparatedByDelimiter(final String delimiter, List<?> list) {
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+
+        for (Object o : list) {
+            stringBuilder.append(o.toString());
+            stringBuilder.append(",");
+        }
+
+        stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
+        stringBuilder.append("]");
+
+        return stringBuilder.toString();
     }
 }
