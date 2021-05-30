@@ -7,6 +7,7 @@ import util.permissions.GenericPermission;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -23,16 +24,15 @@ public class Settings {
     // First String = roleID id to be assigned.
     // String List = roleIDs that can assign the role
     private HashMap<String, List<String>> roleOverrides;
-    private List<String> lockedRoles;
+    private HashSet<String> lockedRoles;
     // TODO: Name Verification
     //Initializes defaults that don't need to read anything from the server
-    // TODO: Read banned userIDs from server
     private void initDefaults() {
         this.prefix          = "!";
         this.attendanceTimer = Duration.ofMinutes(5);
-        bannedUserIds        = new ArrayList<>();
+        bannedUserIds        = new ArrayList<String>();
         roleOverrides        = new HashMap<>();
-        lockedRoles         = new ArrayList<>();
+        lockedRoles         = new HashSet<>();
     }
 
     public Settings() {
@@ -50,5 +50,15 @@ public class Settings {
     //Removes a userID from the bannedUserIds list
     public void unbanUser(final String userToUnbanId) {
         this.bannedUserIds.remove(userToUnbanId);
+    }
+    //Locks a role so it can't be assigned
+    public void lockRole(String roleID) {
+        lockedRoles.add(roleID);
+    }
+    public void unlockRole(String roleID) {
+        lockedRoles.remove(roleID);
+    }
+    public void addPermission(GenericPermission p) {
+        permissionList.add(p);
     }
 }

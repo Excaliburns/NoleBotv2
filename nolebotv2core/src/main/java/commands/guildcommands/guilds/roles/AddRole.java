@@ -8,7 +8,9 @@ import util.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AddRole extends Command {
@@ -65,18 +67,37 @@ public class AddRole extends Command {
     public void onCommandReceived(CommandEvent event) throws Exception {
         final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final List<Member> mentionedMembers = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
-
-        //Gets the mentioned members, then loops through and adds the role mentioned
-        for (final Member member : mentionedMembers) {
+        final int mentionedRolesSize = mentionedRoles.size();
+        final int mentionedMembersSize = mentionedMembers.size();
+        if (mentionedRolesSize > 0 && mentionedMembersSize > 0) {
+            HashSet<Role> addedRoles = new HashSet<Role>();
+            HashSet<Member> addedMembers = new HashSet<Member>();
+            //Gets the mentioned roles, then loops through and adds the members mentioned
             for (final Role role : mentionedRoles) {
-                event.getGuild().addRoleToMember(member, role).queue();
+                if (!event.getSettings().getLockedRoles().contains(role.getId())) {
+                    for (final Member member : mentionedMembers) {
+                        event.getGuild().addRoleToMember(member, role).queue();
+                        addedMembers.add(member);
+                    }
+                    addedRoles.add(role);
+                }
+                else {
+                    event.sendErrorResponseToOriginatingChannel(String.format("Role [%s] is locked, and cannot be assigned", role.getName()));
+                }
+            }
+            sendSuccessMessageAfterAddingRoles(addedMembers, addedRoles, event);
+        }
+        else {
+            if (mentionedMembersSize == 0) {
+                event.sendErrorResponseToOriginatingChannel("Please mention at least one person!");
+            }
+            if (mentionedRolesSize == 0) {
+                event.sendErrorResponseToOriginatingChannel("Please mention at least one role!");
             }
         }
-
-        sendSuccessMessageAfterAddingRoles(mentionedMembers, mentionedRoles, event);
     }
 
-    private void sendSuccessMessageAfterAddingRoles(final List<Member> memberList, final List<Role> rolesList, final CommandEvent event) {
+    private void sendSuccessMessageAfterAddingRoles(final Set<Member> memberList, final Set<Role> rolesList, final CommandEvent event) {
         final StringBuilder successMessageBeforeMember = new StringBuilder();
         successMessageBeforeMember.append("Successfully added ");
 

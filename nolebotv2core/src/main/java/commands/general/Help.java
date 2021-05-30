@@ -35,7 +35,9 @@ public class Help extends ReactionCommand {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onCommandReceived(CommandEvent event) {
+        //Whether or not to execute the generic help command or to get a specific help page
         final boolean isGenericHelpCommand = event.getMessageContent().size() == 1 ||
+                                             //If the 2nd word can be parsed to an int
                                              Objects.nonNull(Ints.tryParse(event.getMessageContent().get(1)));
 
         if (isGenericHelpCommand) {
@@ -60,6 +62,7 @@ public class Help extends ReactionCommand {
         if (event.getReactionEmote().getEmoji().equals(EmojiCodes.PREVIOUS_ARROW.unicodeValue)) {
             nextPage = message.getCurrentEmbedPage() - 1;
         }
+        // if right arrow
         else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.NEXT_ARROW.unicodeValue)) {
             nextPage = message.getCurrentEmbedPage() + 1;
         }
@@ -69,22 +72,29 @@ public class Help extends ReactionCommand {
             ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
             return;
         }
+        // if other reaction
         else {
             return;
         }
-
+        // If the next page is between 0 and the number of help pages
         if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
+            //Set the help message to the next page
             message.setCurrentEmbedPage(nextPage);
-
+            //Clear previous reactions
             retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
                 editDone.clearReactions().queue();
 
-                for (EmojiCodes emojiCodes : message.getReactionsUsed()) {
-                    boolean isLastPage = emojiCodes == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
-                    boolean isFirstPage = emojiCodes == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
-
+                for (EmojiCodes emojiCode : message.getReactionsUsed()) {
+                    // If the last embed page had a next arrow and we are on the last embed page
+                    // Is checking the emojiCode necessary here?
+                    boolean isLastPage = emojiCode == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
+                    // If the last embed page had a next arrow and we are on the first embed page
+                    // Is checking the emojiCode necessary here?
+                    boolean isFirstPage = emojiCode == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
+                    //If we aren't on the first page or last page, add the reaction we are checking
+                    //I think it would make more sense to check emojiCodes here.
                     if (!isLastPage && !isFirstPage) {
-                        editDone.addReaction(emojiCodes.unicodeValue).queue();
+                        editDone.addReaction(emojiCode.unicodeValue).queue();
                     }
                 }
 
@@ -98,12 +108,14 @@ public class Help extends ReactionCommand {
         // event.getCommand() doesn't work here
         final String calledCommandName          = event.getMessageContent().get(1);
         final Optional<Command> commandOptional = CommandUtil.getCommandFromMap(calledCommandName);
-
+        //If the command exists
         if (commandOptional.isPresent()) {
             final Command calledCommand = commandOptional.get();
             final String prefix         = event.getSettings().getPrefix();
+            //The exact string that would be entered to call the command
             final String commandString  = prefix + calledCommand.getName();
 
+            //Make a string of usages, with each usage on its own line
             final StringBuilder usages = new StringBuilder();
             calledCommand.getUsages().forEach( usage -> usages.append(prefix).append(usage).append("\n"));
 
@@ -125,6 +137,7 @@ public class Help extends ReactionCommand {
         final ArrayList<Command> commands              = new ArrayList<>(CommandUtil.commands);
 
         final String prefix                            = event.getSettings().getPrefix();
+        //Divide help command into pages of ten commands
         final int numPages                             = (commands.size() % 10 == 0) ? commands.size() / 10 : (commands.size() / 10) + 1;
 
         for (int i = 1; i <= numPages; i++) {
