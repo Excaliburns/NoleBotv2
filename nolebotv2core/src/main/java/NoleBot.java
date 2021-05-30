@@ -1,3 +1,4 @@
+import apiconnect.ApiWebSocketConnector;
 import commands.general.GetRoleID;
 import commands.general.GetUserID;
 import commands.general.Help;
@@ -25,6 +26,7 @@ import util.PropertiesUtil;
 import util.db.DBConnection;
 
 import javax.security.auth.login.LoginException;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.util.List;
 
@@ -95,8 +97,19 @@ public class NoleBot {
                 logger.warn("Database connection couldn't be established.");
             }
 
+            final boolean WEBSOCKET_ENABLED = Boolean.parseBoolean(PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENABLED));
+            logger.info("Websocket enabled? {}", WEBSOCKET_ENABLED);
+            if (WEBSOCKET_ENABLED) {
+                ApiWebSocketConnector connector = new ApiWebSocketConnector(13037);
+                connector.start();
+            }
+
             NoleBotUtil.setJda(jda);
-        } catch (LoginException e) {
+        }
+        catch (UnknownHostException e) {
+            logger.error("Could not initialize API websocket server. {}", e.getMessage());
+        }
+        catch (LoginException e) {
             logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());
         }
     }
