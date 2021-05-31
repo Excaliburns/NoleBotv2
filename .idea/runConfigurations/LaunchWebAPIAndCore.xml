@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="LaunchWebAPIAndCore" type="CompoundRunConfigurationType">
+    <toRun name="LaunchAPI" type="GradleRunConfiguration" />
+    <toRun name="LaunchCore" type="GradleRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

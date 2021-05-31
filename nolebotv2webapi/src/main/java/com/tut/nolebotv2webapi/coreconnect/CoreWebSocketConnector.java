@@ -7,9 +7,11 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.ConnectException;
 import java.net.URI;
+import java.nio.ByteBuffer;
 
 public class CoreWebSocketConnector extends WebSocketClient {
     private static final Logger logger = LogManager.getLogger();
+    private final WebSocketHandler handler = new WebSocketHandler();
     /**
      * Constructs a WebSocketClient instance and sets it to the connect to the
      * specified URI. The channel does not attampt to connect automatically. The connection
@@ -31,15 +33,14 @@ public class CoreWebSocketConnector extends WebSocketClient {
         logger.info("API websocket client connection opened");
     }
 
-    /**
-     * Callback for string messages received from the remote host
-     *
-     * @param message The UTF-8 decoded message that was received.
-     * @see #onMessage(ByteBuffer)
-     **/
     @Override
     public void onMessage(String message) {
+        logger.info(String.format("Received message from server [%s] : %s", this.getConnection().getLocalSocketAddress(), message));
+    }
 
+    @Override
+    public void onMessage(ByteBuffer bytes) {
+        super.onMessage(bytes);
     }
 
     /**

@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Core &amp; API" type="CompoundRunConfigurationType">
-    <toRun name="NoleBotv2Core" type="Application" />
-    <toRun name="NoleBotWebApi" type="MicronautRunConfigurationType" />
-    <method v="2" />
-  </configuration>
-</component>
