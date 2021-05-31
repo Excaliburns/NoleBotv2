@@ -2,8 +2,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import util.settings.Settings;
 
 import java.io.BufferedReader;
@@ -16,13 +17,14 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.Assert.*;
+
 public class SettingsFromJsonTest {
     static Logger logger = LogManager.getLogger(SettingsFromJsonTest.class);
     Settings testSettings;
 
-    @Before
+    @BeforeEach
     public void setupTestSettings() {
         testSettings = new Settings();
 

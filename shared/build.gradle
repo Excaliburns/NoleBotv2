@@ -1,0 +1,11 @@
+plugins {
+    id 'nolebotv2.common-dependencies'
+    id 'java-library'
+}
+
+version 'a0.1'
+group = 'com.tut.shared'
+
+dependencies {
+
+}

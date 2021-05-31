@@ -1,29 +1,13 @@
 plugins {
-    id 'java'
+    id 'nolebotv2.common-dependencies'
     id 'application'
-    id 'eclipse'
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id 'com.github.johnrengelman.shadow' version "7.0.0"
 }
 
-version '2.0b1.0.0'
-group = "nolebotv2core"
+version 'a0.1'
+group = 'com.tut.nolebotv2core'
 
-jar {
-    manifest {
-        attributes(
-                "Main-Class": 'NoleBot'
-        )
-    }
-
-    from {
-        configurations
-                .compile
-                .findAll { !it.name.endsWith('pom') }
-                .collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
 repositories {
-    mavenCentral()
     maven {
         name 'm2-dv8tion'
         url 'https://m2.dv8tion.net/releases'
@@ -34,46 +18,23 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 dependencies {
+    implementation project(':shared')
 
     // JDA
     implementation 'net.dv8tion:JDA:4.2.1_265'
-
-    // Log4J
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
-    testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
-    testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-
-    // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.12'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
-
-    // Gson
-    implementation 'com.google.code.gson:gson:2.8.6'
-    testImplementation 'com.google.code.gson:gson:2.8.6'
 
     // Guava
     implementation "com.google.guava:guava:29.0-jre"
 
     // Mysql Connector
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
-
-    // Websocket for connecting with API
-    implementation 'org.java-websocket:Java-WebSocket:1.5.1'
 }
+
 application {
     mainClass.set("NoleBot")
 }
-//mainClassName = 'NoleBot'
+
 java {
-    sourceCompatibility = JavaVersion.toVersion("14")
-    targetCompatibility = JavaVersion.toVersion("14")
+    sourceCompatibility = JavaVersion.toVersion("15")
+    targetCompatibility = JavaVersion.toVersion("15")
 }

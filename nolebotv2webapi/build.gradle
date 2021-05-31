@@ -1,14 +1,12 @@
 plugins {
+    id 'application'
+    id 'nolebotv2.common-dependencies'
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("io.micronaut.application") version "1.5.0"
 }
 
-version = "0.1"
-group = "com.tut.nolebotv2webapi"
-
-repositories {
-    mavenCentral()
-}
+version 'a0.1'
+group = 'com.tut.nolebotv2webapi'
 
 micronaut {
     runtime("netty")
@@ -20,6 +18,8 @@ micronaut {
 }
 
 dependencies {
+    implementation project(':shared')
+
     implementation("io.micronaut.security:micronaut-security-oauth2")
     implementation("io.micronaut.security:micronaut-security-jwt")
 
@@ -28,30 +28,14 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api")
 
     implementation("io.micronaut:micronaut-validation")
-
-    annotationProcessor 'org.projectlombok:lombok:1.18.18'
-    implementation 'org.projectlombok:lombok:1.18.18'
-
-    // Websocket for connecting with core
-    implementation 'org.java-websocket:Java-WebSocket:1.5.1'
-
-    // Log4J
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    testImplementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
-    testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
-    testImplementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 }
 
 
 application {
     mainClass.set("com.tut.nolebotv2webapi.Application")
 }
+
 java {
-    sourceCompatibility = JavaVersion.toVersion("14")
-    targetCompatibility = JavaVersion.toVersion("14")
+    sourceCompatibility = JavaVersion.toVersion("15")
+    targetCompatibility = JavaVersion.toVersion("15")
 }

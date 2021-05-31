@@ -3,12 +3,12 @@ package apiconnect;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.java_websocket.WebSocket;
-import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 
 public class ApiWebSocketConnector extends WebSocketServer {
 
@@ -50,7 +50,12 @@ public class ApiWebSocketConnector extends WebSocketServer {
      **/
     @Override
     public void onMessage(WebSocket conn, String message) {
+        logger.info(String.format("Received message from client [%s] : %s", conn.getLocalSocketAddress(), message));
+    }
 
+    @Override
+    public void onMessage(WebSocket conn, ByteBuffer message) {
+        super.onMessage(conn, message);
     }
 
     /**
