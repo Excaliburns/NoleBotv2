@@ -26,7 +26,11 @@ public class DBConnection {
             final String dbPass = PropertiesUtil.getProperty(PropEnum.DB_PASS);
             final String dbPort = PropertiesUtil.getProperty(PropEnum.DB_PORT);
 
-            connection = DriverManager.getConnection("jdbc:mysql://" + dbAddr + ":" + dbPort + "/" + dbName, dbUser, dbPass);
+            connection = DriverManager.getConnection(
+                    "jdbc:mysql://" + dbAddr + ":" + dbPort + "/" + dbName + "?autoReconnect=true",
+                    dbUser,
+                    dbPass)
+            ;
             logger.info("Successfully initialized database connection: MySQL");
 
         } catch (ClassNotFoundException e) {
