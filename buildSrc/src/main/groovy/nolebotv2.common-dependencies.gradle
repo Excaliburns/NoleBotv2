@@ -27,8 +27,8 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 
     // Gson
-    implementation 'com.google.code.gson:gson:2.8.7'
-    testImplementation 'com.google.code.gson:gson:2.8.7'
+    implementation 'com.google.code.gson:gson:2.8.8'
+    testImplementation 'com.google.code.gson:gson:2.8.8'
 
     // Websocket
     implementation 'org.java-websocket:Java-WebSocket:1.5.1'
