@@ -1,9 +1,10 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { useHistory, useLocation } from "react-router-dom";
 import { axiosDiscordInstance, axiosNolebotInstance } from "./util/AxiosNolebotInstance";
 import { AccessToken } from "./entities/AccessToken";
 import { GlobalState, useStateMachine } from "little-state-machine";
 import { APIUser } from "discord-api-types";
+import { useLocation, useNavigate } from "react-router";
+import Spinner from "./shared/components/Spinner";
 
 const updateUserToken = (state: GlobalState, payload: AccessToken) => ({
     ...state,
@@ -30,7 +31,7 @@ function OauthRedirect() {
         updateUserDetails
     });
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     React.useEffect( () => {
         if (clientCode) {
@@ -71,13 +72,15 @@ function OauthRedirect() {
                 actions.updateUserDetails(response.data)
             })
 
-            history.push("/");
+            navigate('/');
         }
     }, [state?.userToken])
 
 
     return (
         <div>
+            <Spinner />
+            Doing some stuff.... You will be redirected shortly.
         </div>
     )
 }

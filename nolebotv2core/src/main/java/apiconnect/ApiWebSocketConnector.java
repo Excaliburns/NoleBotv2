@@ -1,7 +1,10 @@
 package apiconnect;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import shared.entities.BroadcastPackage;
+import shared.enums.MessageType;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
@@ -11,7 +14,11 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
+import java.nio.ByteBuffer;
 
+/**
+ * This class handles incoming connections from the Nolebot Webserver
+ */
 @ClientEndpoint
 public class ApiWebSocketConnector {
     private static final Logger logger = LogManager.getLogger(ApiWebSocketConnector.class);
@@ -41,15 +48,12 @@ public class ApiWebSocketConnector {
 
     @OnMessage
     public void onMessage(byte[] message) {
+        messageHandler.handleMessage((BroadcastPackage) SerializationUtils.deserialize(message));
     }
 
-    public void sendMessage(String message) {
-        this.userSession.getAsyncRemote().sendText(message);
-    }
-
-    @OnMessage
-    public void onMessage(String message) {
-        messageHandler.handleMessage(message);
+    public void sendMessage(BroadcastPackage broadcastPackage) {
+        broadcastPackage.setMessageType(MessageType.RESPONSE);
+        this.userSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(SerializationUtils.serialize(broadcastPackage)));
     }
 
     public void addMessageHandler(MessageHandler messageHandler) {
@@ -58,10 +62,8 @@ public class ApiWebSocketConnector {
 
     /**
      * Message handler.
-     *
-     * @author Jiji_Sasidharan
      */
     public interface MessageHandler {
-        void handleMessage(String message);
+        void handleMessage(BroadcastPackage message);
     }
 }

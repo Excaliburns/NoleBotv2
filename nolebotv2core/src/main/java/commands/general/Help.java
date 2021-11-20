@@ -36,10 +36,6 @@ public class Help extends ReactionCommand {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onCommandReceived(CommandEvent event) {
-        NoleBotUtil.getApiWebSocketConnector().sendMessage(
-                "sending some bullshit"
-        );
-
         final boolean isGenericHelpCommand = event.getMessageContent().size() == 1 ||
                                              Objects.nonNull(Ints.tryParse(event.getMessageContent().get(1)));
 

@@ -30,23 +30,23 @@ const DiscordButton = styled.button`
   background-color: #7289DA;
   color: white;
 `
+const discordOauthUri = process.env.REACT_APP_DISCORD_OAUTH_URI
+
 function MainPage() {
     const {state} = useStateMachine();
-    const discordOauthUri = 'https://discord.com/oauth2/authorize?client_id=548200687964520459&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fredirect&response_type=code&scope=identify%20guilds';
+
+    console.log(process.env);
 
     return (
         <Wrapper>
-            <a href={discordOauthUri}>
-                <DiscordButton>Log in with Discord</DiscordButton>
-            </a>
-
-            <div>
-                Hi, Nolebot user!
-            </div>
-
             {
                 state?.userToken?.access_token ? <GuildListing />
-                    : null
+                :
+                <>
+                    <a href={discordOauthUri}>
+                        <DiscordButton>Log in with Discord</DiscordButton>
+                    </a>
+                </>
             }
         </Wrapper>
     );

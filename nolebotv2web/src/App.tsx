@@ -1,13 +1,16 @@
-import { BrowserRouter, Link, Route, Router, Switch } from "react-router-dom";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import MainPage from "./MainPage/MainPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
-import { AccessToken } from "./entities/AccessToken";
-import { createStore, GlobalState, StateMachineProvider, useStateMachine } from "little-state-machine";
+import { createStore, StateMachineProvider } from "little-state-machine";
 
 
 createStore({
-    userDetails: undefined
+    userDetails: undefined,
+    userToken: undefined
+},{
+    name: 'nolebot-lsm-store',
+    storageType: sessionStorage
 })
 function App() {
     return (
@@ -24,14 +27,10 @@ function App() {
 
                     {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
-                    <Switch>
-                        <Route path="/auth/redirect">
-                            <OauthRedirect />
-                        </Route>
-                        <Route path="/">
-                            <MainPage />
-                        </Route>
-                    </Switch>
+                    <Routes>
+                        <Route path="/auth/redirect" element={<OauthRedirect />} />
+                        <Route path="/" element={<MainPage />} />
+                    </Routes>
                 </div>
             </BrowserRouter>
         </StateMachineProvider>
