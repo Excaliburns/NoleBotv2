@@ -1,5 +1,6 @@
 package util;
 
+import apiconnect.ApiWebSocketConnector;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.JDA;
@@ -10,6 +11,9 @@ import java.util.List;
 public class NoleBotUtil {
     @Getter @Setter
     private static JDA jda;
+
+    @Getter @Setter
+    private static ApiWebSocketConnector apiWebSocketConnector;
 
     public static String getFormattedDurationString(Duration duration) {
         String durationString = null;

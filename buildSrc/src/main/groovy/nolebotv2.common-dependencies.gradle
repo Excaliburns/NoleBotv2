@@ -30,9 +30,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.8'
     testImplementation 'com.google.code.gson:gson:2.8.8'
 
-    // Websocket
-    implementation 'org.java-websocket:Java-WebSocket:1.5.1'
-
     // Junit Testing
     testImplementation(platform('org.junit:junit-bom:5.7.2'))
     testImplementation('org.junit.jupiter:junit-jupiter')

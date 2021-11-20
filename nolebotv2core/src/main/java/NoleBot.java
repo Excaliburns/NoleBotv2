@@ -26,7 +26,7 @@ import util.PropertiesUtil;
 import util.db.DBConnection;
 
 import javax.security.auth.login.LoginException;
-import java.net.UnknownHostException;
+import java.net.URI;
 import java.sql.Connection;
 import java.util.List;
 
@@ -76,7 +76,6 @@ public class NoleBot {
             }
 
             // If it's still null, user probably hasn't set it.
-            //noinspection UnusedAssignment
             final JDA jda = JDABuilder.create(token, INTENT_LIST)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     // Add Listeners to JDA instance
@@ -100,14 +99,17 @@ public class NoleBot {
             final boolean WEBSOCKET_ENABLED = Boolean.parseBoolean(PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENABLED));
             logger.info("Websocket enabled? {}", WEBSOCKET_ENABLED);
             if (WEBSOCKET_ENABLED) {
-                ApiWebSocketConnector connector = new ApiWebSocketConnector(13037);
-                connector.start();
+                final ApiWebSocketConnector webSocketConnector = new ApiWebSocketConnector(
+                        URI.create("ws://localhost:8080/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET))
+                );
+                webSocketConnector.addMessageHandler(message -> {
+                    System.out.println("handling");
+                    System.out.println("message: " + message);
+                });
+                NoleBotUtil.setApiWebSocketConnector( webSocketConnector );
             }
 
             NoleBotUtil.setJda(jda);
-        }
-        catch (UnknownHostException e) {
-            logger.error("Could not initialize API websocket server. {}", e.getMessage());
         }
         catch (LoginException e) {
             logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());

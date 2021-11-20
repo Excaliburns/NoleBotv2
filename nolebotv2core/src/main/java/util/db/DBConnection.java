@@ -1,6 +1,7 @@
 package util.db;
 
 import enums.PropEnum;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.PropertiesUtil;
@@ -13,7 +14,14 @@ public class DBConnection {
     private static final Logger logger = LogManager.getLogger(DBConnection.class);
     private static Connection connection;
 
+
+    @SneakyThrows
     public static Connection getConnection() {
+        // Exception is only thrown if timeout < 0
+        if (!connection.isValid(0)) {
+            initMySqlConnection();
+        }
+
         return connection;
     }
 

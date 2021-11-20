@@ -12,3 +12,6 @@ micronaut:
           client-id:
           client-secret:
     enabled: false
+nolebot:
+  websocket:
+    secret:

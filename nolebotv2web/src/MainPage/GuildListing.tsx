@@ -1,13 +1,13 @@
 import { useStateMachine } from "little-state-machine";
-import { APIGuild, APIGuildMember, APIPartialGuild } from "discord-api-types";
+import { APIGuild, APIPartialGuild } from "discord-api-types";
 import React from "react";
-import { axiosDiscordInstance } from "../util/AxiosNolebotInstance";
+import { axiosDiscordInstance, axiosNolebotInstance } from "../util/AxiosNolebotInstance";
 
 
 export default function GuildListing() {
-    const [isGameAdmin, setIsGameAdmin] = React.useState<boolean>(false);
+    const [isGameAdmin, _setIsGameAdmin] = React.useState<boolean>(false);
     const [isFsuServerMember, setIsFsuServerMember] = React.useState<boolean>(false);
-    const [fsuGuild, setFsuGuild] = React.useState<APIPartialGuild>();
+    const [_fsuGuild, setFsuGuild] = React.useState<APIPartialGuild>();
 
     const [guilds, setGuilds] = React.useState<APIPartialGuild[]>([]);
     const { state } = useStateMachine();
@@ -33,6 +33,14 @@ export default function GuildListing() {
         }
     }, [state?.userToken])
 
+    const onsubmit = (event: React.FormEvent<{postTest: HTMLInputElement}>) => {
+        event.preventDefault();
+        axiosNolebotInstance.post('/oauth/test', {
+            text: event.currentTarget.postTest.value
+        })
+            .then (resp => {console.log(resp)})
+    }
+
     return (
         <div>
             Are you in the FSU Esports Discord?
@@ -49,6 +57,13 @@ export default function GuildListing() {
             <pre>
                 {JSON.stringify(guilds, null, 2)}
             </pre>
+
+            {/* @ts-ignore */}
+            <form onSubmit={onsubmit}>
+                <input type={"text"} id={"postTest"}/>
+                <button type={"submit"}> post </button>
+            </form>
+
         </div>
     )
 }
