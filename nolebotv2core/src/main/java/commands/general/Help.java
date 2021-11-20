@@ -10,6 +10,7 @@ import enums.EmojiCodes;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import util.NoleBotUtil;
 import util.chat.EmbedHelper;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
@@ -35,6 +36,10 @@ public class Help extends ReactionCommand {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onCommandReceived(CommandEvent event) {
+        NoleBotUtil.getApiWebSocketConnector().sendMessage(
+                "sending some bullshit"
+        );
+
         final boolean isGenericHelpCommand = event.getMessageContent().size() == 1 ||
                                              Objects.nonNull(Ints.tryParse(event.getMessageContent().get(1)));
 
@@ -48,7 +53,7 @@ public class Help extends ReactionCommand {
             }
         }
         else if (event.getMessageContent().size() == 2) {
-            event.getChannel().sendMessage(sendSpecificCommandHelp(event)).queue();
+            event.getChannel().sendMessageEmbeds(sendSpecificCommandHelp(event)).queue();
         }
     }
 
@@ -64,7 +69,7 @@ public class Help extends ReactionCommand {
             nextPage = message.getCurrentEmbedPage() + 1;
         }
         else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
-            retrievedDiscordMessage.editMessage(EmbedHelper.getDefaultExitMessage()).queue();
+            retrievedDiscordMessage.editMessageEmbeds(EmbedHelper.getDefaultExitMessage()).queue();
             retrievedDiscordMessage.clearReactions().queue();
             ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
             return;
@@ -76,7 +81,7 @@ public class Help extends ReactionCommand {
         if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
             message.setCurrentEmbedPage(nextPage);
 
-            retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
+            retrievedDiscordMessage.editMessageEmbeds(message.getEmbedList().get(nextPage)).queue(editDone -> {
                 editDone.clearReactions().queue();
 
                 for (EmojiCodes emojiCodes : message.getReactionsUsed()) {
@@ -163,7 +168,7 @@ public class Help extends ReactionCommand {
         );
 
         // Always send the first page when creating the display. Use the callback to populate the cache. Index is 0.
-        event.getChannel().sendMessage(commandHelpPages.get(0))
+        event.getChannel().sendMessageEmbeds(commandHelpPages.get(0))
                 .queue(message -> {
                     if (commandHelpPages.size() > 1) {
                         for (EmojiCodes helpReaction : helpReactions) {

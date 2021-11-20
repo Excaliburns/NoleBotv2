@@ -1,7 +1,7 @@
 package com.tut.nolebotv2webapi.controllers;
 
 import com.tut.nolebotv2webapi.client.DiscordApiClient;
-import com.tut.nolebotv2webapi.dtos.DiscordAccessTokenRequestDto;
+import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.http.HttpResponse;
@@ -11,10 +11,13 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 
-import java.util.HashMap;
+import javax.inject.Inject;
 
 @Controller("/oauth")
 public class AuthController {
+    @Inject
+    private CoreWebSocketServer websocketServer;
+
     @Property(name = "micronaut.security.oauth2.clients.discord.client-id")
     protected String client_id;
 
@@ -44,5 +47,11 @@ public class AuthController {
         ).blockingSingle();
 
         return HttpResponse.ok(token);
+    }
+
+    @Post("/test")
+    public void test(@Body final String text) {
+        websocketServer.getBroadcaster()
+                .broadcastSync(text);
     }
 }

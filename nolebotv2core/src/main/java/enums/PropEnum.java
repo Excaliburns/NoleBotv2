@@ -11,7 +11,8 @@ public enum PropEnum {
     DB_PASS               ("db.pass"),
     DB_PORT               ("db.port"),
     TOKEN                 ("bot.token"),
-    API_WEBSOCKET_ENABLED ("api.websocket.enabled");
+    API_WEBSOCKET_ENABLED ("api.websocket.enabled"),
+    API_WEBSOCKET_SECRET  ("api.websocket.secret");
 
     private final String propertyKey;
 
