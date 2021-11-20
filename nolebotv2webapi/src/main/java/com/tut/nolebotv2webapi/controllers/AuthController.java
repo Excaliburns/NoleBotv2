@@ -15,9 +15,6 @@ import javax.inject.Inject;
 
 @Controller("/oauth")
 public class AuthController {
-    @Inject
-    private CoreWebSocketServer websocketServer;
-
     @Property(name = "micronaut.security.oauth2.clients.discord.client-id")
     protected String client_id;
 
@@ -47,11 +44,5 @@ public class AuthController {
         ).blockingSingle();
 
         return HttpResponse.ok(token);
-    }
-
-    @Post("/test")
-    public void test(@Body final String text) {
-        websocketServer.getBroadcaster()
-                .broadcastSync(text);
     }
 }

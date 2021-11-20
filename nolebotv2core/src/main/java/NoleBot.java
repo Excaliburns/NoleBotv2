@@ -17,10 +17,15 @@ import listeners.GuildMessageReactionListener;
 import listeners.OnReadyListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import shared.entities.BroadcastPackage;
+import shared.entities.GuildUser;
+import shared.enums.BroadcastType;
 import util.NoleBotUtil;
 import util.PropertiesUtil;
 import util.db.DBConnection;
@@ -29,6 +34,7 @@ import javax.security.auth.login.LoginException;
 import java.net.URI;
 import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class NoleBot {
     private static final Logger logger = LogManager.getLogger(NoleBot.class);
@@ -103,8 +109,22 @@ public class NoleBot {
                         URI.create("ws://localhost:8080/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET))
                 );
                 webSocketConnector.addMessageHandler(message -> {
-                    System.out.println("handling");
-                    System.out.println("message: " + message);
+                    Member user = jda.getGuildById(
+                            "138481681630887936"
+                    ).getMemberById((String) message.getPayload());
+
+                    webSocketConnector.sendMessage(
+                            BroadcastPackage.builder()
+                                    .broadcastType(BroadcastType.GET_FSU_USER)
+                                    .correlationId(message.getCorrelationId())
+                                    .payload(
+                                            new GuildUser(
+                                                    user.getId(),
+                                                    user.getRoles().stream().map(role -> role.getId()).collect(Collectors.toList())
+                                            )
+                                    )
+                                    .build()
+                    );
                 });
                 NoleBotUtil.setApiWebSocketConnector( webSocketConnector );
             }

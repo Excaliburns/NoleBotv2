@@ -33,6 +33,9 @@ dependencies {
     // Junit Testing
     testImplementation(platform('org.junit:junit-bom:5.7.2'))
     testImplementation('org.junit.jupiter:junit-jupiter')
+
+    // Apache Commons
+    implementation 'org.apache.commons:commons-lang3:3.0'
 }
 
 test {
