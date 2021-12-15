@@ -10,15 +10,12 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
-import lombok.Getter;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import shared.entities.BroadcastPackage;
-import shared.enums.BroadcastType;
-import shared.enums.MessageType;
+import com.tut.nolebotshared.entities.BroadcastPackage;
+import com.tut.nolebotshared.enums.MessageType;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,7 +83,7 @@ public class CoreWebSocketServer {
         final BroadcastPackage broadcastPackage = (BroadcastPackage) SerializationUtils.deserialize(message);
 
         switch (broadcastPackage.getMessageType()) {
-            case REQUEST -> {return;} // do nothing atm
+            case REQUEST -> {} // do nothing atm
             case RESPONSE -> {
                 Optional<CompletableFuture<BroadcastPackage>> correlatingOutstandingMessage = Optional.ofNullable(this.requests.remove(broadcastPackage.getCorrelationId()));
 
@@ -94,8 +91,6 @@ public class CoreWebSocketServer {
                         .ifPresent(broadcastPackageCompletableFuture -> broadcastPackageCompletableFuture.complete(broadcastPackage));
             }
         }
-
-        System.out.println("message");
     }
 
     @OnClose

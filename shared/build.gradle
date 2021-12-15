@@ -1,11 +1,32 @@
-plugins {
-    id 'nolebotv2.common-dependencies'
-    id 'java-library'
+buildscript {
+    dependencies {
+        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.34.976'
+    }
+    repositories {
+        mavenCentral()
+    }
 }
+
+plugins {
+    id 'java-library'
+    id 'nolebotv2.common-dependencies'
+}
+
+apply plugin: 'cz.habarta.typescript-generator'
 
 version 'a0.1'
 group = 'com.tut.shared'
 
-dependencies {
+build {
+    dependsOn(generateTypeScript)
+}
 
+generateTypeScript {
+    jsonLibrary = 'gson'
+    classPatterns = [
+            'com.tut.nolebotshared.entities.*'
+    ]
+    outputFile = '../nolebotv2web/src/entities/JavaGenerated.ts'
+    outputFileType = 'implementationFile'
+    outputKind = 'module'
 }

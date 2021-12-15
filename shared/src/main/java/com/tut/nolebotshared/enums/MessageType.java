@@ -1,4 +1,4 @@
-package shared.enums;
+package com.tut.nolebotshared.enums;
 
 public enum MessageType {
     REQUEST,

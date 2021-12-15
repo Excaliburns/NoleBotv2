@@ -1,13 +1,12 @@
-package shared.entities;
+package com.tut.nolebotshared.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shared.enums.BroadcastType;
-import shared.enums.MessageType;
+import com.tut.nolebotshared.enums.BroadcastType;
+import com.tut.nolebotshared.enums.MessageType;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
