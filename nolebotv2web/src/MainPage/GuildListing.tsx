@@ -48,30 +48,30 @@ export default function GuildListing() {
                 isGameAdmin ?
                     <>
                         <p>
-                            Welcome Game Manager!
-                        </p>
-                        Your user data:
-                        <pre>
-                           {JSON.stringify(state.userDetails, null, 2)}
-                        </pre>
-
-                        FSU Guild data:
-                        <pre>
-                            {JSON.stringify(fsuGuild, null, 2)}
-                       </pre>
-
-                        Your FSU user data:
-                        <pre>
-                            {JSON.stringify(fsuGuildMemberInfo, null, 2)}
-                        </pre>
-                    </>
-                    :
-                    <>
-                        <p>
                             You're not a GM. :(
                         </p>
                     </>
+                    : null
             }
+            <>
+                <p>
+                    Welcome Game Manager!
+                </p>
+                Your user data:
+                <pre>
+                           {JSON.stringify(state.userDetails, null, 2)}
+                        </pre>
+
+                FSU Guild data:
+                <pre>
+                            {JSON.stringify(fsuGuild, null, 2)}
+                       </pre>
+
+                Your FSU user data:
+                <pre>
+                            {JSON.stringify(fsuGuildMemberInfo, null, 2)}
+                        </pre>
+            </>
         </div>
     )
 }
