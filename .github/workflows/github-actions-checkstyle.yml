@@ -14,7 +14,16 @@ jobs:
         run: chmod +x gradlew
       - name: Run Checkstyle on Core
         run: ./gradlew :nolebotv2core:checkstyleMain
+      - uses: jwgmeligmeyling/checkstyle-github-action@master
+        with:
+          path: 'nolebotv2core/build/reports/checkstyle/main.xml'
       - name: Run Checkstyle on WebApi
         run: ./gradlew :nolebotv2webapi:checkstyleMain
+      - uses: jwgmeligmeyling/checkstyle-github-action@master
+        with:
+          path: 'nolebotv2core/build/reports/checkstyle/main.xml'
       - name: Run Checkstyle on shared
         run: ./gradlew :shared:checkstyleMain
+      - uses: jwgmeligmeyling/checkstyle-github-action@master
+        with:
+          path: 'shared/build/reports/checkstyle/main.xml'
