@@ -18,6 +18,9 @@ checkstyle {
     toolVersion('9.2')
 }
 
+pmd {
+    ignoreFailures(true)
+}
 
 apply plugin: 'cz.habarta.typescript-generator'
 

@@ -11,6 +11,10 @@ checkstyle {
     toolVersion('9.2')
 }
 
+pmd {
+    ignoreFailures(true)
+}
+
 version 'a0.1'
 group = 'com.tut.nolebotv2webapi'
 
