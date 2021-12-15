@@ -14,7 +14,16 @@ jobs:
         run: chmod +x gradlew
       - name: Run PMD on Core
         run: ./gradlew :nolebotv2core:pmdMain
+      - uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: 'nolebotv2core/build/reports/pmd/main.xml'
       - name: Run PMD on WebApi
         run: ./gradlew :nolebotv2webapi:pmdMain
+      - uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: 'nolebotv2webapi/build/reports/pmd/main.xml'
       - name: Run PMD on shared
         run: ./gradlew :shared:pmdMain
+      - uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: 'shared/build/reports/pmd/main.xml'
