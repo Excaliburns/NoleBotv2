@@ -3,6 +3,12 @@ plugins {
     id 'nolebotv2.common-dependencies'
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("io.micronaut.application") version "3.0.0-M1"
+    id 'checkstyle'
+    id 'pmd'
+}
+
+checkstyle {
+    toolVersion('9.2')
 }
 
 version 'a0.1'

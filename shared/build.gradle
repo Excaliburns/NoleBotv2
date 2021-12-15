@@ -10,7 +10,14 @@ buildscript {
 plugins {
     id 'java-library'
     id 'nolebotv2.common-dependencies'
+    id 'checkstyle'
+    id 'pmd'
 }
+
+checkstyle {
+    toolVersion('9.2')
+}
+
 
 apply plugin: 'cz.habarta.typescript-generator'
 
