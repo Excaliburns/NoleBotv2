@@ -3,7 +3,8 @@
 /nolebotv2core/config
 /nolebotv2core/build
 /nolebotv2webapi/build
-/config/
+config/*
+!config/checkstyle/
 /build/
 /nolebotv2webapi/src/main/resources/application.yml
 /nolebotv2web/src/entities/JavaGenerated.ts
