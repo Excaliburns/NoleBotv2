@@ -16,7 +16,7 @@ public class GetUserID extends Command {
     }
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
-        final List<User> users = event.getOriginatingJDAEvent().getMessage().getMentionedUsers();
-        users.forEach(user -> event.getChannel().sendMessage(user.getId()).queue());
+        final List<User> mentionedUsers = event.getOriginatingJDAEvent().getMessage().getMentionedUsers();
+        mentionedUsers.forEach(user -> event.getChannel().sendMessage(user.getId()).queue());
     }
 }

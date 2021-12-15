@@ -6,9 +6,11 @@ import commands.general.Help;
 import commands.guildcommands.Attendance;
 import commands.guildcommands.HelloWorld;
 import commands.guildcommands.ShadowBan;
-import commands.guildcommands.guilds.roles.AddAssignableRole;
 import commands.guildcommands.guilds.roles.AddRole;
+import commands.guildcommands.guilds.roles.GivePerms;
+import commands.guildcommands.guilds.roles.LockRole;
 import commands.guildcommands.guilds.SetPrefix;
+import commands.guildcommands.guilds.roles.UnlockRole;
 import commands.guildcommands.guilds.permissions.ListGuildPermissions;
 import commands.util.CommandUtil;
 import enums.PropEnum;
@@ -19,7 +21,6 @@ import listeners.OnReadyListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.NoleBotUtil;
@@ -54,7 +55,6 @@ public class NoleBot {
         final List<GatewayIntent> INTENT_LIST = List.of(
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_VOICE_STATES,
                 GatewayIntent.DIRECT_MESSAGES,
                 GatewayIntent.DIRECT_MESSAGE_REACTIONS);
@@ -67,9 +67,11 @@ public class NoleBot {
         commandUtil.addCommand(new Attendance());
         commandUtil.addCommand(new ShadowBan());
         commandUtil.addCommand(new AddRole());
-        commandUtil.addCommand(new AddAssignableRole());
         commandUtil.addCommand(new GetRoleID());
         commandUtil.addCommand(new GetUserID());
+        commandUtil.addCommand(new LockRole());
+        commandUtil.addCommand(new UnlockRole());
+        commandUtil.addCommand(new GivePerms());
 
         try {
             //Bot token from properties file
@@ -85,7 +87,6 @@ public class NoleBot {
 
             // If it's still null, user probably hasn't set it.
             final JDA jda = JDABuilder.create(token, INTENT_LIST)
-                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     // Add Listeners to JDA instance
                     .addEventListeners(
                             commandUtil,
