@@ -1,4 +1,4 @@
-name: Push Checkstyle report
+name: Push PMD report
 on: [push]
 jobs:
   build:
