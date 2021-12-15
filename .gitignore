@@ -6,6 +6,7 @@
 /config/
 /build/
 /nolebotv2webapi/src/main/resources/application.yml
+/nolebotv2web/src/entities/JavaGenerated.ts
 
 
 nolebotv2webapi/Thumbs.db

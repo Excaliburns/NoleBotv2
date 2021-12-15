@@ -3,12 +3,13 @@ import { APIGuild, APIPartialGuild } from "discord-api-types";
 import React from "react";
 import { axiosDiscordInstance, axiosNolebotInstance } from "../util/AxiosNolebotInstance";
 import { AxiosResponse } from "axios";
+import { GuildUser } from "../entities/JavaGenerated";
 
 
 export default function GuildListing() {
     const [isGameAdmin, setIsGameAdmin] = React.useState<boolean>(false);
     const [fsuGuild, setFsuGuild] = React.useState<APIPartialGuild>();
-    const [fsuGuildMemberInfo, setFsuGuildMemberInfo] = React.useState<{id: string, roleIds: string[]}>()
+    const [fsuGuildMemberInfo, setFsuGuildMemberInfo] = React.useState<GuildUser>()
 
     const [guilds, setGuilds] = React.useState<APIPartialGuild[]>([]);
     const { state } = useStateMachine();
@@ -26,12 +27,12 @@ export default function GuildListing() {
                     setFsuGuild(fsu)
 
                     if (fsu) {
-                        axiosNolebotInstance.post(`guild/fsu/${state.userDetails?.id}`)
-                            .then((r: AxiosResponse<{id: string, roleIds: string[]}>) => {
-                                const gameMasterRole = r.data.roleIds.find( any => {
+                        axiosNolebotInstance.post(`guilds/${process.env.REACT_APP_MAIN_SERVER_ID}/${state.userDetails?.id}`)
+                            .then((r: AxiosResponse<GuildUser>) => {
+                                const gameMasterRole = r.data.roles.find( any => {
                                     console.log(any);
-                                    console.log(any === '454011610445643806');
-                                    return any === '454011610445643806'
+                                    console.log(any.id === '454011610445643806');
+                                    return any.id === '454011610445643806'
                                 });
                                 setIsGameAdmin(!!gameMasterRole)
                                 setFsuGuildMemberInfo(r.data);

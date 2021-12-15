@@ -1,3 +1,4 @@
+import apiconnect.ApiMessageHandler;
 import apiconnect.ApiWebSocketConnector;
 import commands.general.GetRoleID;
 import commands.general.GetUserID;
@@ -17,15 +18,10 @@ import listeners.GuildMessageReactionListener;
 import listeners.OnReadyListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import shared.entities.BroadcastPackage;
-import shared.entities.GuildUser;
-import shared.enums.BroadcastType;
 import util.NoleBotUtil;
 import util.PropertiesUtil;
 import util.db.DBConnection;
@@ -34,7 +30,13 @@ import javax.security.auth.login.LoginException;
 import java.net.URI;
 import java.sql.Connection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class NoleBot {
     private static final Logger logger = LogManager.getLogger(NoleBot.class);
@@ -105,28 +107,16 @@ public class NoleBot {
             final boolean WEBSOCKET_ENABLED = Boolean.parseBoolean(PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENABLED));
             logger.info("Websocket enabled? {}", WEBSOCKET_ENABLED);
             if (WEBSOCKET_ENABLED) {
-                final ApiWebSocketConnector webSocketConnector = new ApiWebSocketConnector(
-                        URI.create("ws://localhost:8080/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET))
-                );
-                webSocketConnector.addMessageHandler(message -> {
-                    Member user = jda.getGuildById(
-                            "138481681630887936"
-                    ).getMemberById((String) message.getPayload());
+                try {
+                    final ApiWebSocketConnector connector = tryConnectApi()
+                            .get();
 
-                    webSocketConnector.sendMessage(
-                            BroadcastPackage.builder()
-                                    .broadcastType(BroadcastType.GET_FSU_USER)
-                                    .correlationId(message.getCorrelationId())
-                                    .payload(
-                                            new GuildUser(
-                                                    user.getId(),
-                                                    user.getRoles().stream().map(role -> role.getId()).collect(Collectors.toList())
-                                            )
-                                    )
-                                    .build()
-                    );
-                });
-                NoleBotUtil.setApiWebSocketConnector( webSocketConnector );
+                    connector.addMessageHandler(new ApiMessageHandler(jda, connector));
+                    NoleBotUtil.setApiWebSocketConnector( connector );
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("Fatal exception when connecting to API: {} ", e.getMessage());
+                    e.printStackTrace();
+                }
             }
 
             NoleBotUtil.setJda(jda);
@@ -135,4 +125,22 @@ public class NoleBot {
             logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());
         }
     }
+
+    static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    private static CompletableFuture<ApiWebSocketConnector> tryConnectApi() {
+        CompletableFuture<ApiWebSocketConnector> completableFuture = new CompletableFuture<>();
+        final ScheduledFuture<?> checkFuture = executorService.scheduleAtFixedRate(() -> {
+            try {
+                final ApiWebSocketConnector connector = new ApiWebSocketConnector(URI.create("ws://localhost:8080/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET)));
+                completableFuture.complete(connector);
+            } catch ( Exception e ) {
+                logger.info("Swallowing exception, will attempt to reconnect api in 10 seconds.");
+            }
+        }, 0, 10, TimeUnit.SECONDS);
+        completableFuture.whenComplete( (result, thrown) -> checkFuture.cancel(true));
+        return completableFuture;
+    }
+
+
 }
