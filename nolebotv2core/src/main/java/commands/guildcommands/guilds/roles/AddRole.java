@@ -14,8 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AddRole extends Command {
-    public AddRole()
-    {
+    /**
+     * Constructor.
+     */
+    public AddRole() {
         name = "addrole";
         description = "Assigns a role to a user";
         helpDescription = "Assigns a pingable role to a given user";
@@ -31,12 +33,14 @@ public class AddRole extends Command {
         final boolean guildHasRoleOverrides = !guildSettings.getRoleOverrides().isEmpty();
         final HashMap<String, List<String>> guildOverrides = guildSettings.getRoleOverrides();
 
-        if (event.getOriginatingJDAEvent().getMember() == null ) { throw new NullPointerException("Couldn't find user executing command in guild!"); }
+        if (event.getOriginatingJDAEvent().getMember() == null) {
+            throw new NullPointerException("Couldn't find user executing command in guild!");
+        }
 
         final List<String> authorsRoleIds = event.getOriginatingJDAEvent().getMember().getRoles()
-                                                 .stream()
-                                                 .map(Role::getId)
-                                                 .collect(Collectors.toList());
+                .stream()
+                .map(Role::getId)
+                .collect(Collectors.toList());
 
         for (final Role mentionedRole : mentionedRolesList) {
             if (guildHasRoleOverrides) {
@@ -82,7 +86,9 @@ public class AddRole extends Command {
                     addedRoles.add(role);
                 }
                 else {
-                    event.sendErrorResponseToOriginatingChannel(String.format("Role [%s] is locked, and cannot be assigned", role.getName()));
+                    event.sendErrorResponseToOriginatingChannel(
+                            String.format("Role [%s] is locked, and cannot be assigned", role.getName())
+                    );
                 }
             }
             sendSuccessMessageAfterAddingRoles(addedMembers, addedRoles, event);
@@ -97,16 +103,22 @@ public class AddRole extends Command {
         }
     }
 
-    private void sendSuccessMessageAfterAddingRoles(final Set<Member> memberList, final Set<Role> rolesList, final CommandEvent event) {
+    private void sendSuccessMessageAfterAddingRoles(
+            final Set<Member> memberList,
+            final Set<Role> rolesList,
+            final CommandEvent event
+    ) {
         final StringBuilder successMessageBeforeMember = new StringBuilder();
         successMessageBeforeMember.append("Successfully added ");
 
         successMessageBeforeMember.append("(");
-        rolesList.forEach( role -> successMessageBeforeMember.append(String.format("[%s], ", role.getName())));
+        rolesList.forEach(role -> successMessageBeforeMember.append(String.format("[%s], ", role.getName())));
         successMessageBeforeMember.append(")");
 
         List<String> successMessages = new ArrayList<>();
-        memberList.forEach( member -> successMessages.add(successMessageBeforeMember.toString() + " to " + member.getEffectiveName()));
+        memberList.forEach(
+                member -> successMessages.add(successMessageBeforeMember + " to " + member.getEffectiveName())
+        );
 
         event.sendSuccessResponseToOriginatingChannel(successMessages);
     }

@@ -20,6 +20,12 @@ import static com.tut.nolebotshared.enums.BroadcastType.GET_FSU_USER;
 
 @AllArgsConstructor
 public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
+    // todo: lang
+    final String guildNotFound =
+            "Guild [%s] could not be found. Make sure NoleBot is in the guild you are querying.";
+    final String memberNotFound =
+            "Member [%s] could not be found in Guild [%s]. Make sure they are in that guild.";
+
     private JDA jda;
     private ApiWebSocketConnector webSocketConnector;
 
@@ -40,9 +46,12 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                                     .build()
                     );
                 }
+                default -> {
+                 // no op
+                }
             }
         }
-        catch ( Exception e ) {
+        catch (Exception e) {
             webSocketConnector.sendMessage(
                     broadcastPackageBuilder
                             .broadcastType(EXCEPTION)
@@ -53,19 +62,24 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
     }
 
     /**
-     * Get details of a member of a guild
+     * Get details of a member of a guild.
+     *
      * @param memberSnowflakeId member's snowflake ID
-     * @param guildSnowflakeId guild's snowflake Id
+     * @param guildSnowflakeId  guild's snowflake Id
      * @return GuildUser
      */
-    private GuildUser getMemberDetails (final String memberSnowflakeId, final String guildSnowflakeId) throws GuildNotFoundException, MemberNotFoundException {
+    private GuildUser getMemberDetails(
+            final String memberSnowflakeId,
+            final String guildSnowflakeId
+    ) throws GuildNotFoundException, MemberNotFoundException {
+
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
-                .orElseThrow( () -> new GuildNotFoundException(
-                        String.format("Guild [%s] could not be found. Make sure NoleBot is in the guild you are querying.", guildSnowflakeId)
+                .orElseThrow(() -> new GuildNotFoundException(
+                        String.format(guildNotFound, guildSnowflakeId)
                 ));
         final Member member = Optional.ofNullable(guild.getMemberById(memberSnowflakeId))
-                .orElseThrow( () -> new MemberNotFoundException(
-                        String.format("Member [%s] could not be found in Guild [%s]. Make sure they are in that guild.", memberSnowflakeId, guildSnowflakeId)
+                .orElseThrow(() -> new MemberNotFoundException(
+                        String.format(memberNotFound, memberSnowflakeId, guildSnowflakeId)
                 ));
 
         return new GuildUser(

@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 @AllArgsConstructor
-public class Attendance {
+public class AttendanceEntity {
     private String userID;
     private String serverID;
     private String nickname;

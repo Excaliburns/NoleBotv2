@@ -17,7 +17,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 
 /**
- * This class handles incoming connections from the Nolebot Webserver
+ * This class handles incoming connections from the Nolebot Webserver.
  */
 @ClientEndpoint
 public class ApiWebSocketConnector {
@@ -26,14 +26,21 @@ public class ApiWebSocketConnector {
     Session userSession;
     private MessageHandler messageHandler;
 
+    /**
+     * Constructor.
+     *
+     * @param endpointURI Where to connect
+     */
     public ApiWebSocketConnector(final URI endpointURI) {
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, endpointURI);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     @OnOpen
     public void onOpen(Session userSession) {
         logger.info("Opened WS connection to: {}", userSession.getRequestURI().toString());
