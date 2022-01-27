@@ -5,6 +5,7 @@ import commands.util.ReactionCommand;
 import enums.EmojiCodes;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.NoleBotUtil;
 import util.chat.EmbedHelper;
+import util.db.entities.AttendanceEntity;
 import util.db.statements.AttendanceStatements;
 import util.reactions.ReactionMessage;
 import util.reactions.ReactionMessageCache;
@@ -39,6 +41,12 @@ import java.util.stream.Collectors;
  * This command is used to take attendance in a guild at a given time.
  */
 public class Attendance extends ReactionCommand {
+    // Todo: lang
+    final String improperlyFormattedError =
+            "Your message is improperly formatted. Use !help attendance to see more detailed usage information.";
+    final String didNotSpecifyTimer =
+            "You didn't specify minutes or seconds. Please use 'm' or 's' to denote the time scale you would like.";
+
     private static final Logger logger = LogManager.getLogger(Attendance.class);
     private final AttendanceStatements statements = new AttendanceStatements();
 
@@ -47,9 +55,13 @@ public class Attendance extends ReactionCommand {
     private final HashMap<Guild, Message> attendanceMessageCache = new HashMap<>();
 
 
+    /**
+     * Constructor.
+     */
     public Attendance() {
         name = "attendance";
-        description = "Use this command to start/stop the attendance reaction message, or set the timer. Should only " + "be used once per 'meeting'";
+        description = "Use this command to start/stop the attendance reaction message, or set the timer. " +
+                      "Should only be used once per 'meeting'";
         helpDescription = "Starts/Stops attendance reaction message, or sets the timer.";
         requiredPermissionLevel = 1000;
         usages.add("attendance start");
@@ -60,115 +72,91 @@ public class Attendance extends ReactionCommand {
     @Override
     public void onCommandReceived(CommandEvent event) {
         final List<String> messages = event.getMessageContent();
+        final Settings guildSettings = event.getSettings();
 
-        if (messages.size() > 1) {
-            final String command = messages.get(1);
+        if (messages.size() < 1) {
+            event.sendErrorResponseToOriginatingChannel(
+                    "Please start, stop, or modify the timer. Use !help attendance"
+            );
+        }
 
-            switch (command) {
-                case "start" -> {
-                    if (!attendanceMessageCache.containsKey(event.getGuild())) {
-                        handleStartAttendance(event);
-                    }
-                    else {
-                        event.sendErrorResponseToOriginatingChannel("Can not start two attendance counters at the " + "same time in one guild");
-                    }
+        final String command = messages.get(1);
+
+        switch (command) {
+            case "start" -> {
+                if (!attendanceMessageCache.containsKey(event.getGuild())) {
+                    handleStartAttendance(event);
                 }
-                case "timer" -> {
-                    if (messages.size() > 2) {
-                        //TODO: this can be cleaned up?
-                        int durationNum;
-                        final String potentialContainsSecondsOrMinute = messages.get(2);
-                        final Settings guildSettings = event.getSettings();
-
-                        if (potentialContainsSecondsOrMinute.toLowerCase().contains("m")) {
-                            final String durationString = potentialContainsSecondsOrMinute.substring(0, potentialContainsSecondsOrMinute.toLowerCase().indexOf("m"));
-
-                            durationNum = getTimerInteger(durationString, event);
-                            if (durationNum == -1) {
-                                return;
-                            }
-
-                            saveNewAttendanceTimer(event, guildSettings, durationNum, true);
-
-                        }
-                        else if (potentialContainsSecondsOrMinute.toLowerCase().contains("s")) {
-                            final String durationString = potentialContainsSecondsOrMinute.substring(0, potentialContainsSecondsOrMinute.toLowerCase().indexOf("s"));
-
-                            durationNum = getTimerInteger(durationString, event);
-                            if (durationNum == -1) {
-                                return;
-                            }
-
-                            saveNewAttendanceTimer(event, guildSettings, durationNum, false);
-                        }
-                        else {
-                            if (messages.size() > 3) {
-
-                                durationNum = getTimerInteger(messages.get(2), event);
-                                if (durationNum == -1) {
-                                    return;
-                                }
-
-                                final String probableMOrSChar = messages.get(3);
-
-                                if (probableMOrSChar.equalsIgnoreCase("m")) {
-                                    saveNewAttendanceTimer(event, guildSettings, durationNum, true);
-                                }
-                                else if (probableMOrSChar.equalsIgnoreCase("s")) {
-                                    saveNewAttendanceTimer(event, guildSettings, durationNum, false);
-                                }
-                                else {
-                                    event.sendErrorResponseToOriginatingChannel("You didn't specify minutes or seconds. Please use 'm' or 's' to denote the time scale you would like.");
-                                }
-                            }
-                            else {
-                                event.sendErrorResponseToOriginatingChannel("Your message is improperly formatted. Use !help attendance to see more detailed usage information.");
-                            }
-                        }
-                    }
-                    else {
-                        event.sendErrorResponseToOriginatingChannel("You didn't specify a time! Use !help attendance");
-                    }
-                }
-                case "stop" -> {
-                    if (attendanceMessageCache.containsKey(event.getGuild())) {
-                        timeLeft.put(event.getGuild(), Duration.ZERO);
-                    }
-                    else {
-                        event.sendErrorResponseToOriginatingChannel("Attendance is not currently being taken");
-                    }
+                else {
+                    event.sendErrorResponseToOriginatingChannel(
+                            "Can not start two attendance counters at the " + "same time in one guild"
+                    );
                 }
             }
-        }
-        else {
-            event.sendErrorResponseToOriginatingChannel("Please start, stop, or modify the timer. Use !help attendance");
+            case "timer" -> saveTimer(messages, event, guildSettings);
+            case "stop" -> {
+                if (attendanceMessageCache.containsKey(event.getGuild())) {
+                    timeLeft.put(event.getGuild(), Duration.ZERO);
+                }
+                else {
+                    event.sendErrorResponseToOriginatingChannel(
+                            "Attendance is not currently being taken"
+                    );
+                }
+            }
+            default -> event.sendErrorResponseToOriginatingChannel("Unknown usage.");
         }
     }
 
     @Override
-    public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
+    public void handleReaction(
+            final GuildMessageReactionAddEvent event,
+            final ReactionMessage message,
+            final Message retrievedDiscordMessage
+    ) {
         final Member originalMember = event.getGuild().getMemberById(message.getUserInitiatedId());
-        if (originalMember != null && Objects.nonNull(originalMember.getVoiceState()) && originalMember.getVoiceState().inVoiceChannel()) {
-            final VoiceChannel voiceChannel = originalMember.getVoiceState().getChannel();
-
-            // If they are in the same voice channel as the original sender
-            if (Objects.nonNull(event.getMember().getVoiceState()) && event.getMember().getVoiceState().getChannel() == voiceChannel) {
-                if (event.getReactionEmote().getEmoji().equals(EmojiCodes.CHECK_MARK.unicodeValue)) {
-                    final List<Member> memberList = countedMembers.containsKey(event.getGuild()) ? countedMembers.get(event.getGuild()) : new ArrayList<>();
-
-                    if (!memberList.contains(event.getMember())) {
-                        memberList.add(event.getMember());
-                    }
-
-                    countedMembers.put(event.getGuild(), memberList);
-                }
-            }
-            else {
-                event.getUser().openPrivateChannel().queue(callback -> callback.sendMessage("It seems that you aren't in the same voice channel as the person taking attendance. Make sure you join their voice channel in order to be counted!").queue());
-            }
+        if (originalMember == null) {
+            event.getUser()
+                    .openPrivateChannel()
+                    .queue(callback -> callback.sendMessage("It seems like the person who started attendance " +
+                            "has left all available guilds? Weird! Get them to join back... Or something."
+                    ).queue());
+            return;
         }
-        else {
-            event.getUser().openPrivateChannel().queue(callback -> callback.sendMessage("It seems like the person who is taking attendance is currently not in a voice channel. Please tell them to join one so we can verify that you are in the meeting with them!").queue());
+
+        final GuildVoiceState originalMemberVoiceState = originalMember.getVoiceState();
+        if (originalMemberVoiceState == null || !originalMember.getVoiceState().inVoiceChannel()) {
+            event.getUser()
+                    .openPrivateChannel()
+                    .queue(callback -> callback.sendMessage(
+                            "It seems like the person who is taking attendance is currently not in a voice channel. " +
+                                 "Please tell them to join one so we can verify that you are in the meeting with them!"
+                    ).queue());
+            return;
+        }
+
+        final VoiceChannel originalUserVoiceChannel = originalMember.getVoiceState().getChannel();
+        final GuildVoiceState userVoiceState = event.getMember().getVoiceState();
+        if (Objects.isNull(userVoiceState) || originalUserVoiceChannel != userVoiceState.getChannel()) {
+            event.getUser()
+                    .openPrivateChannel()
+                    .queue(callback -> callback.sendMessage(
+                            "It seems that you aren't in the same voice channel as the person taking attendance. " +
+                                    "Make sure you join their voice channel in order to be counted!"
+                    ).queue());
+            return;
+        }
+
+        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.CHECK_MARK.unicodeValue)) {
+            final List<Member> memberList = countedMembers.containsKey(event.getGuild())
+                    ? countedMembers.get(event.getGuild())
+                    : new ArrayList<>();
+
+            if (!memberList.contains(event.getMember())) {
+                memberList.add(event.getMember());
+            }
+
+            countedMembers.put(event.getGuild(), memberList);
         }
     }
 
@@ -182,7 +170,7 @@ public class Attendance extends ReactionCommand {
 
         final ReactionMessage message = getReactionMessageForAttendance(guild, channel, authorId, messageId);
 
-        event.getChannel().sendMessage(message.getEmbedList().get(0)).queue(sentMessage -> {
+        event.getChannel().sendMessageEmbeds(message.getEmbedList().get(0)).queue(sentMessage -> {
             sentMessage.addReaction(EmojiCodes.CHECK_MARK.unicodeValue).queue();
             ReactionMessageCache.setReactionMessage(sentMessage.getId(), message);
             attendanceMessageCache.put(guild, sentMessage);
@@ -199,19 +187,30 @@ public class Attendance extends ReactionCommand {
 
                         try {
                             if (insertAttendanceList(guild)) {
-                                finalEmbed.addField("Final count! These names have also been added to the database", "", false);
+                                finalEmbed.addField(
+                                        "Final count! These names have also been added to the database",
+                                        "",
+                                        false
+                                );
                             }
-                        } catch (SQLException e) {
+                        }
+                        catch (SQLException e) {
                             logger.error(e);
                             channel.sendMessage("Couldn't update the database!").queue();
-                            channel.sendMessage(EmbedHelper.getDefaultExceptionReactionMessage(e)).queue();
+                            channel.sendMessageEmbeds(EmbedHelper.getDefaultExceptionReactionMessage(e)).queue();
 
-                            finalEmbed.addField("Final count! As there was an error, these names have not been added " + "to the database", "", false);
-                        } finally {
+                            finalEmbed.addField(
+                                    "Final count! As there was an error, " +
+                                          "these names have not been added to the database",
+                                    "",
+                                    false
+                            );
+                        }
+                        finally {
                             //noinspection ConstantConditions
                             finalEmbed = addAttendanceToMessageEmbed(getAttendanceAsEmbedFieldList(guild), finalEmbed);
 
-                            channel.sendMessage(finalEmbed.build()).queue();
+                            channel.sendMessageEmbeds(finalEmbed.build()).queue();
                             attendanceMessageCache.remove(guild);
                             timeLeft.remove(guild);
                             countedMembers.remove(guild);
@@ -222,30 +221,64 @@ public class Attendance extends ReactionCommand {
         });
     }
 
-    // Called every thirty seconds
-    private void updateAttendancePage(final Guild guild, final MessageChannel channel, final String authorId, final String messageId) {
+    /**
+     * Helper method that is called every 30 seconds to update the attendance page.
+     *
+     * @param guild Guild that this operation is in
+     * @param channel Channel that the operation is in
+     * @param authorId Original author of the attendance message.
+     * @param messageId Message id of the attendance method.
+     */
+    private void updateAttendancePage(
+            final Guild guild,
+            final MessageChannel channel,
+            final String authorId,
+            final String messageId
+    ) {
         Duration newTimeLeft = timeLeft.get(guild).minus(Duration.ofSeconds(2));
         timeLeft.put(guild, newTimeLeft);
 
         final ReactionMessage newReactionMessage = getReactionMessageForAttendance(guild, channel, authorId, messageId);
+        final MessageEmbed attendanceEmbed = newReactionMessage.getEmbedList().get(0);
 
-        channel.editMessageById(attendanceMessageCache.get(guild).getId(), newReactionMessage.getEmbedList().get(0)).queue(sentMessage -> {
+        channel.editMessageEmbedsById(attendanceMessageCache.get(guild).getId(), attendanceEmbed).queue(sentMessage -> {
             ReactionMessageCache.setReactionMessage(sentMessage.getId(), newReactionMessage);
             attendanceMessageCache.put(guild, sentMessage);
         });
     }
 
-    private ReactionMessage getReactionMessageForAttendance(final Guild guild, final MessageChannel channel, final String authorID, final String messageId) {
+    /**
+     * Builds the message embed for the attendance command.
+     *
+     * @param guild Guild that the command was run in
+     * @param channel Channel that the command was run in.
+     * @param authorID The author of the attendance command.
+     * @param messageId The messageId of the attendance command.
+     * @return A build MessageEmbed for attendance.
+     */
+    private ReactionMessage getReactionMessageForAttendance(
+            final Guild guild,
+            final MessageChannel channel,
+            final String authorID,
+            final String messageId
+    ) {
         final Duration attendanceTimer = timeLeft.get(guild);
         List<String> countedMemberList = getAttendanceAsEmbedFieldList(guild);
 
-        EmbedBuilder attendancePage = EmbedHelper.getDefaultEmbedBuilder().addField("Click the check mark to be added" + " to the attendance!", "", false);
-
+        EmbedBuilder attendancePage = EmbedHelper.getDefaultEmbedBuilder().addField(
+                "Click the check mark to be added to the attendance!",
+                "",
+                false
+        );
         //noinspection ConstantConditions
         attendancePage = addAttendanceToMessageEmbed(countedMemberList, attendancePage);
 
         if (!attendanceTimer.isZero() && !attendanceTimer.isNegative()) {
-            attendancePage.addField("Time Left", NoleBotUtil.getFormattedDurationString(attendanceTimer), false);
+            attendancePage.addField(
+                    "Time Left",
+                    NoleBotUtil.getFormattedDurationString(attendanceTimer),
+                    false
+            );
         }
         else {
             attendancePage.addField("Times up!", "", false);
@@ -254,7 +287,15 @@ public class Attendance extends ReactionCommand {
         final List<EmojiCodes> attendanceReaction = Collections.singletonList(EmojiCodes.CHECK_MARK);
         final List<MessageEmbed> pages = Collections.singletonList(attendancePage.build());
 
-        return new ReactionMessage(ReactionMessageType.ATTENDANCE_COMMAND, channel, authorID, messageId, 0, pages, attendanceReaction);
+        return new ReactionMessage(
+                ReactionMessageType.ATTENDANCE_COMMAND,
+                channel,
+                authorID,
+                messageId,
+                0,
+                pages,
+                attendanceReaction
+        );
     }
 
     private List<String> getAttendanceAsEmbedFieldList(final Guild guild) {
@@ -280,7 +321,10 @@ public class Attendance extends ReactionCommand {
         return countedMemberList;
     }
 
-    private EmbedBuilder addAttendanceToMessageEmbed(final List<String> countedMemberList, final EmbedBuilder embedBuilder) {
+    private EmbedBuilder addAttendanceToMessageEmbed(
+            final List<String> countedMemberList,
+            final EmbedBuilder embedBuilder
+    ) {
         try {
             for (int i = 0; i < countedMemberList.size(); i++) {
                 if (i == 0) {
@@ -290,7 +334,8 @@ public class Attendance extends ReactionCommand {
                     embedBuilder.addField("", countedMemberList.get(i), true);
                 }
             }
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             embedBuilder.addField("Max Counted Users reached!", "", false);
         }
 
@@ -299,9 +344,14 @@ public class Attendance extends ReactionCommand {
 
     private boolean insertAttendanceList(Guild guild) throws SQLException {
         if (countedMembers.containsKey(guild)) {
-            final List<util.db.entities.Attendance> attendanceList = countedMembers.get(guild).stream().map(member -> new util.db.entities.Attendance(member.getId(), guild.getId(), member.getNickname())).collect(Collectors.toList());
+            final List<AttendanceEntity> attendanceList = countedMembers
+                    .get(guild)
+                    .stream()
+                    .map(member -> new AttendanceEntity(member.getId(), guild.getId(), member.getNickname()))
+                    .collect(Collectors.toList());
 
-            return Arrays.stream(statements.insertAttendanceList(attendanceList)).noneMatch(pred -> pred == -1);
+            return Arrays.stream(statements.insertAttendanceList(attendanceList))
+                    .noneMatch(returnCode -> returnCode == -1);
         }
         else {
             return false;
@@ -313,8 +363,11 @@ public class Attendance extends ReactionCommand {
 
         try {
             durationNum = Integer.parseInt(possibleTimerInput);
-            if (durationNum < 0) { throw new NumberFormatException(); }
-        } catch (NumberFormatException e) {
+            if (durationNum < 0) {
+                throw new NumberFormatException();
+            }
+        }
+        catch (NumberFormatException e) {
             event.sendErrorResponseToOriginatingChannel("Your second parameter is not a valid number!");
             return -1;
         }
@@ -335,35 +388,68 @@ public class Attendance extends ReactionCommand {
         SettingsCache.saveSettingsForGuild(event.getGuild(), settings);
     }
 
-//    private void muteChannelUntilAttendanceEnds(
-//            final CommandEvent event,
-//            final String authorId,
-//            final Guild guild,
-//            final TextChannel textChannel
-//    ) {
-//        final GenericPermission highestUserPermission = GenericPermissionsFactory.getHighestPermissionObjectForUser(authorId, guild);
-//        List<String> highestGuildPermissionIds = GenericPermissionsFactory.getPermissionsHigherOrEqualToGivenPermission(guild, highestUserPermission)
-//                                                                          .stream()
-//                                                                          .map(GenericPermission::getSnowflakeId)
-//                                                                          .collect(Collectors.toList());
-//        List<Role> roleList = event.getGuild().getRoles().stream().filter( each -> highestGuildPermissionIds.contains(each.getId())).collect(Collectors.toList())
-//
-//        textChannel.upsertPermissionOverride(guild.getPublicRole())
-//                   .setDeny(Permission.MESSAGE_WRITE).reason("Automatic Attendance command permission removal")
-//                   .queue();
-//    }
-//
-//    private void removeAllPermissionsFromChannel(TextChannel channel) {
-//        final ChannelManager manager = channel.getManager();
-//        channel.getPermissionOverrides().forEach( override -> {
-//            if (override.getPermissionHolder() != null) {
-//                manager.removePermissionOverride(override.getPermissionHolder());
-//            }
-//            else {
-//                MessageUtil.sendErrorResponseToChannel("Permission holder was null for role: " + override.getId(), channel);
-//            }
-//        });
-//
-//        manager.complete();
-//    }
+    /**
+     * Method used in the switch statement in the main command.
+     * Used to update the default timer for a guild.
+     *
+     * @param messages original command messages to parse
+     * @param event originating CommandEvent
+     * @param guildSettings settings for guild
+     */
+    private void saveTimer(
+            final List<String> messages,
+            final CommandEvent event,
+            final Settings guildSettings
+    ) {
+        int durationNum;
+        String durationString;
+
+        if (messages.size() > 3) {
+            durationNum = getTimerInteger(messages.get(2), event);
+            final String probableMOrSChar = messages.get(3);
+            final boolean isM = probableMOrSChar.equalsIgnoreCase("m");
+            final boolean isS = probableMOrSChar.equalsIgnoreCase("s");
+            if (!isM || !isS) {
+                event.sendErrorResponseToOriginatingChannel(didNotSpecifyTimer);
+                return;
+            }
+
+            if (isM) {
+                saveNewAttendanceTimer(event, guildSettings, durationNum, true);
+            }
+            else {
+                saveNewAttendanceTimer(event, guildSettings, durationNum, false);
+            }
+        }
+
+        if (!(messages.size() > 2)) {
+            event.sendErrorResponseToOriginatingChannel(
+                    "You didn't specify a time! Use !help attendance"
+            );
+        }
+        final String userMessage = messages.get(2);
+        final boolean containsM = userMessage.toLowerCase().contains("m");
+        final boolean containsS = userMessage.toLowerCase().contains("s");
+        final boolean containsValidChar = containsM || containsS;
+
+        if (!containsValidChar) {
+            event.sendErrorResponseToOriginatingChannel(improperlyFormattedError);
+            return;
+        }
+
+        if (containsM) {
+            durationString = userMessage.substring(0, userMessage.toLowerCase().indexOf("m"));
+        }
+        else {
+            durationString = userMessage.substring(0, userMessage.toLowerCase().indexOf("s"));
+        }
+
+        durationNum = getTimerInteger(durationString, event);
+
+        if (durationNum == -1) {
+            return;
+        }
+
+        saveNewAttendanceTimer(event, guildSettings, durationNum, true);
+    }
 }

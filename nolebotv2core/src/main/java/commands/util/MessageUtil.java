@@ -68,7 +68,7 @@ public class MessageUtil {
         final PrintWriter pw  = new PrintWriter(sw);
         e.printStackTrace(pw);
 
-        final String firstTenLinesOfStackTrace = Arrays.stream((sw.toString() + " ").split("\r?\n"))
+        final String firstTenLinesOfStackTrace = Arrays.stream((sw + " ").split("\r?\n"))
                                                        .limit(10)
                                                        .collect(Collectors.joining("\n"));
 

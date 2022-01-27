@@ -8,13 +8,23 @@ import util.NoleBotUtil;
 import util.permissions.GenericPermission;
 import util.settings.Settings;
 import util.settings.SettingsCache;
-import util.settings.SettingsManager;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AddAssignableRole extends Command {
+    // Todo: lang
+    final String permissionLevelValidText =
+            "Could not find a valid permission level. The permission level must not exceed your own.";
+    final String cantMakeHigherPermissionLower =
+            "You cannot assign a lower permission to a command that has a higher permission level than you.";
+
+    /**
+     * Constructor.
+     */
     public AddAssignableRole() {
         this.name = "addassignablerole";
         this.description = "Marks a role from your server as assignable";
@@ -27,26 +37,33 @@ public class AddAssignableRole extends Command {
     public void onCommandReceived(final CommandEvent event) throws Exception {
         final Settings settings = event.getSettings();
         final TreeSet<GenericPermission> permissionList = settings.getPermissionList();
-        int permissionLevel;
+        final List<Role> roles = event.getMentionedRoles();
+        final int userInitiatedPermissionLevel = event.getUserInitiatedPermissionLevel();
+        final String rawMessageContent = event.getRawMessageContent();
+        final String messageContentMinusName = rawMessageContent.substring(this.name.length());
+
+        final Optional<Integer> permissionLevel = getPermissionLevelFromInputMessage(roles, messageContentMinusName);
 
         if (event.getMentionedRoles().size() == 0) {
             event.sendErrorResponseToOriginatingChannel("You did not mention any roles.");
             return;
         }
-
-        try {
-            permissionLevel = getPermissionLevelFromInputMessage(event.getMentionedRoles(), event.getRawMessageContent().substring(this.name.length()));
-            if (permissionLevel > event.getUserInitiatedPermissionLevel()) { throw new Exception(); }
+        if (permissionLevel.isEmpty()) {
+            event.sendErrorResponseToOriginatingChannel("Can't parse entered permission level.");
+            return;
         }
-        catch (final Exception _e) {
-            event.sendErrorResponseToOriginatingChannel("Could not find a valid permission level. The permission level must not exceed your own.");
+
+        final int permissionLevelParsed = permissionLevel.get();
+
+        if (permissionLevelParsed > userInitiatedPermissionLevel) {
+            event.sendErrorResponseToOriginatingChannel("Your permission level is too low.");
             return;
         }
 
         final MessageBuilder messageBuilder = new MessageBuilder();
 
         for (final Role role : event.getMentionedRoles()) {
-            final GenericPermission genericPermission = new GenericPermission(role, permissionLevel);
+            final GenericPermission genericPermission = new GenericPermission(role, permissionLevelParsed);
 
             final List<GenericPermission> potentialMatches = permissionList
                     .stream()
@@ -56,26 +73,34 @@ public class AddAssignableRole extends Command {
             if (messageBuilder.length() != 0) {
                 messageBuilder.append("\n");
             }
+
             if (potentialMatches.size() > 0) {
-                if (potentialMatches.stream().anyMatch( match -> match.getPermissionLevel() > event.getUserInitiatedPermissionLevel())) {
-                    event.sendErrorResponseToOriginatingChannel("You cannot assign a lower permission to a command that has a higher permission level than you.");
+                final Predicate<? super GenericPermission> checkUserCanCreate =
+                        match -> match.getPermissionLevel() > event.getUserInitiatedPermissionLevel();
+
+                if (potentialMatches.stream().anyMatch(checkUserCanCreate)) {
+                    event.sendErrorResponseToOriginatingChannel(cantMakeHigherPermissionLower);
                     continue;
                 }
 
                 messageBuilder.append("Found existing assignable role for role [**")
-                              .append(role.getName())
-                              .append("]** with permission level(s) **")
-                              .append(NoleBotUtil.getFormattedStringFromList(potentialMatches.stream().map(GenericPermission::getPermissionLevel).collect(Collectors.toList())))
-                              .append("**. Updating this to ")
-                              .append(permissionLevel);
+                        .append(role.getName())
+                        .append("]** with permission level(s) **")
+                        .append(NoleBotUtil.getFormattedStringFromList(
+                                potentialMatches
+                                        .stream()
+                                        .map(GenericPermission::getPermissionLevel).collect(Collectors.toList())
+                        ))
+                        .append("**. Updating this to ")
+                        .append(permissionLevel);
                 potentialMatches.forEach(permissionList::remove);
             }
             else {
                 messageBuilder.append("Added permission level **")
-                              .append(permissionLevel)
-                              .append("** for role [**")
-                              .append(role.getName())
-                              .append("**].");
+                        .append(permissionLevel)
+                        .append("** for role [**")
+                        .append(role.getName())
+                        .append("**].");
             }
 
             permissionList.add(genericPermission);
@@ -86,7 +111,7 @@ public class AddAssignableRole extends Command {
         SettingsCache.saveSettingsForGuild(event.getGuild(), settings);
     }
 
-    private int getPermissionLevelFromInputMessage(final List<Role> roleList, final String rawMessage) {
+    private Optional<Integer> getPermissionLevelFromInputMessage(final List<Role> roleList, final String rawMessage) {
         String permissionLevelString = rawMessage;
 
         for (final Role role : roleList) {
@@ -94,6 +119,11 @@ public class AddAssignableRole extends Command {
         }
         permissionLevelString = permissionLevelString.trim();
 
-        return Integer.parseInt(permissionLevelString);
+        try {
+            return Optional.of(Integer.parseInt(permissionLevelString));
+        }
+        catch (final Exception unused) {
+            return Optional.empty();
+        }
     }
 }

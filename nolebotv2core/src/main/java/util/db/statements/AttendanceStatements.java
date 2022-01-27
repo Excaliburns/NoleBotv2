@@ -1,27 +1,34 @@
 package util.db.statements;
 
 import util.db.DBConnection;
-import util.db.entities.Attendance;
+import util.db.entities.AttendanceEntity;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
 public class AttendanceStatements {
-    final String INSERT_ATTENDANCE =
-    " INSERT INTO Attendance                              " +
-    "   (DateEntered,       UserID, ServerID, Nickname  ) " +
-    "   VALUES                                            " +
-    "   (current_timestamp, ?,      ?,        ?         ) " ;
+    final String insertAttendance =
+            " INSERT INTO Attendance                              " +
+            "   (DateEntered,       UserID, ServerID, Nickname  ) " +
+            "   VALUES                                            " +
+            "   (current_timestamp, ?,      ?,        ?         ) ";
 
 
-    public int[] insertAttendanceList(final List<Attendance> attendanceList) throws SQLException {
-        final PreparedStatement preparedStatement = DBConnection.getConnection().prepareStatement(INSERT_ATTENDANCE);
+    /**
+     * Insert the attendance list into the database.
+     *
+     * @param attendanceList List of attendance entities to add.
+     * @return An array of SQL return codes, all should be 0 if everything was ok.
+     * @throws SQLException If an error occurs.
+     */
+    public int[] insertAttendanceList(final List<AttendanceEntity> attendanceList) throws SQLException {
+        final PreparedStatement preparedStatement = DBConnection.getConnection().prepareStatement(insertAttendance);
 
-        for (Attendance attendance : attendanceList) {
-            preparedStatement.setString(1, attendance.getUserID());
-            preparedStatement.setString(2, attendance.getServerID());
-            preparedStatement.setString(3, attendance.getNickname());
+        for (AttendanceEntity attendanceEntity : attendanceList) {
+            preparedStatement.setString(1, attendanceEntity.getUserID());
+            preparedStatement.setString(2, attendanceEntity.getServerID());
+            preparedStatement.setString(3, attendanceEntity.getNickname());
             preparedStatement.addBatch();
         }
 
