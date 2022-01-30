@@ -1,3 +1,4 @@
+// CHECKSTYLE:OFF
 package com.tut.nolebotv2webapi.entities;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
