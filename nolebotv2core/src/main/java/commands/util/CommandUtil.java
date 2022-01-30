@@ -19,15 +19,12 @@ public class CommandUtil extends ListenerAdapter {
     public static final ArrayList<Command>        commands     = new ArrayList<>();
     public static final HashMap<String, Integer>  commandIndex = new HashMap<>();
 
-    @Override
-    public void onReady(@NotNull ReadyEvent event) {
-//        logger.info("Initializing NoleBotv2...");
-//
-//        JDA jda = event.getJDA();
-//
-    }
-
-    public void addCommand(Command command) {
+    /**
+     * Adds a command to the command list.
+     *
+     * @param command the command to add
+     */
+    public void addCommand(final Command command) {
         String name = command.getName();
 
         synchronized (commandIndex) {
@@ -38,11 +35,18 @@ public class CommandUtil extends ListenerAdapter {
         commands.add(command);
     }
 
-    public static Optional<Command> getCommandFromMap(String commandName) {
-        try {
-            return Optional.of(commands.get(commandIndex.get(commandName)));
-        } catch (NullPointerException e) {
+    /**
+     * Gets a command object from the map given the name of the command.
+     * Should be equal to the command's classname in Java.
+     *
+     * @param commandName Name of the command.
+     * @return The command, if it exists. Otherwise, an empty optional.
+     */
+    public static Optional<Command> getCommandFromMap(final String commandName) {
+        if (!commandIndex.containsKey(commandName)) {
             return Optional.empty();
         }
+
+        return Optional.of(commands.get(commandIndex.get(commandName)));
     }
 }

@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 
-@Getter @Setter
+@Getter
+@Setter
 public class CommandEvent {
     private GuildMessageReceivedEvent originatingJDAEvent;
     private Command                   command;
@@ -35,7 +36,22 @@ public class CommandEvent {
 
     private int            userInitiatedPermissionLevel;
 
-    public CommandEvent(GuildMessageReceivedEvent event, String rawMessage, List<String> message, Settings settings, Command command) {
+    /**
+     * Default constructor.
+     *
+     * @param event Originating JDA event
+     * @param rawMessage Raw text of the sent message, with no formatting applied.
+     * @param message A list of each string separated by spaces in the message.
+     * @param settings Settings of the guild that sent the command
+     * @param command The command used.
+     */
+    public CommandEvent(
+            final GuildMessageReceivedEvent event,
+            final String rawMessage,
+            final List<String> message,
+            final Settings settings,
+            final Command command
+    ) {
         this.originatingJDAEvent          = event;
         this.command                      = command;
         this.rawMessageContent            = rawMessage;
@@ -50,47 +66,47 @@ public class CommandEvent {
         ).getPermissionLevel();
     }
 
-    public void sendErrorResponseToOriginatingChannel(String errorMessageContent) {
+    public void sendErrorResponseToOriginatingChannel(final String errorMessageContent) {
         MessageUtil.sendErrorResponseToChannel(errorMessageContent, this.channel);
     }
 
-    public void sendErrorResponseToOriginatingChannel(String ...errorMessages) {
+    public void sendErrorResponseToOriginatingChannel(final String ...errorMessages) {
         MessageUtil.sendErrorResponseToChannel(this.channel, Arrays.asList(errorMessages));
     }
 
-    public void sendErrorResponseToOriginatingChannel(List<String> errorMessageContent) {
+    public void sendErrorResponseToOriginatingChannel(final List<String> errorMessageContent) {
         MessageUtil.sendErrorResponseToChannel(this.channel, errorMessageContent);
     }
 
-    public void sendSuccessResponseToOriginatingChannel(String successMessageContent) {
+    public void sendSuccessResponseToOriginatingChannel(final String successMessageContent) {
         MessageUtil.sendSuccessResponseToChannel(successMessageContent, this.channel);
     }
 
-    public void sendSuccessResponseToOriginatingChannel(String ...successMessageContent) {
+    public void sendSuccessResponseToOriginatingChannel(final String ...successMessageContent) {
         MessageUtil.sendSuccessResponseToChannel(this.channel, Arrays.asList(successMessageContent));
     }
 
-    public void sendSuccessResponseToOriginatingChannel(List<String> successMessageContent) {
+    public void sendSuccessResponseToOriginatingChannel(final List<String> successMessageContent) {
         MessageUtil.sendSuccessResponseToChannel(this.channel, successMessageContent);
     }
 
-    public void printStackTraceToChannelFromThrowable(MessageChannel channel, Throwable e) {
+    public void printStackTraceToChannelFromThrowable(final MessageChannel channel, final Throwable e) {
         MessageUtil.printStackTraceToChannelFromThrowable(channel, e);
     }
 
-    public void sendMessageToOriginatingChannel(Queue<Message> message) {
+    public void sendMessageToOriginatingChannel(final Queue<Message> message) {
         MessageUtil.sendMessageToChannel(message, this.channel);
     }
 
-    public void sendMessageToOriginatingChannel(Message message) {
+    public void sendMessageToOriginatingChannel(final Message message) {
         MessageUtil.sendMessageToChannel(message, this.channel);
     }
 
-    public void sendMessageToOriginatingChannel(String message) {
+    public void sendMessageToOriginatingChannel(final String message) {
         MessageUtil.sendMessageToChannel(message, this.channel);
     }
 
-    public void sendMessageToOriginatingChannel(MessageEmbed embed) {
+    public void sendMessageToOriginatingChannel(final MessageEmbed embed) {
         MessageUtil.sendMessageToChannel(embed, this.channel);
     }
 
