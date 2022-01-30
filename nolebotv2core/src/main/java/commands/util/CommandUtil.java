@@ -1,16 +1,11 @@
 package commands.util;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class CommandUtil extends ListenerAdapter {
@@ -20,10 +15,10 @@ public class CommandUtil extends ListenerAdapter {
     public static final HashMap<String, Integer>  commandIndex = new HashMap<>();
 
     /**
-     * Adds a command to the command list.
-     *
-     * @param command the command to add
-     */
+    * Adds a command to the command list.
+    *
+    * @param command the command to add
+    */
     public void addCommand(final Command command) {
         String name = command.getName();
 

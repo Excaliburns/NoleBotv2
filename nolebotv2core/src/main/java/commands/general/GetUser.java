@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.entities.User;
 import java.util.List;
 
 public class GetUser extends Command {
+    /**
+     * Creates an instance of the user command.
+     */
     public GetUser() {
         name = "user";
         description = "Gets the information for a member";

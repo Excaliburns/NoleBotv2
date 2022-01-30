@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class MessageUtil {
     public static void sendErrorResponseToChannel(String errorMessageContent, MessageChannel channel) {
         channel.sendMessage(EmojiCodes.DOUBLE_BANG.unicodeValue + "     " + errorMessageContent + "     " + EmojiCodes.DOUBLE_BANG.unicodeValue)
-               .queue();
+                .queue();
     }
 
     public static void sendErrorResponseToChannel(MessageChannel channel, String ...errorMessages) {
@@ -46,10 +46,10 @@ public class MessageUtil {
         MessageBuilder builder = new MessageBuilder();
 
         builder.append(EmojiCodes.CHECK_MARK.unicodeValue)
-               .append(" ")
-               .append(EmojiCodes.DASH.unicodeValue)
-               .append(" ")
-               .append("Successfully executed the following events:\n");
+                .append(" ")
+                .append(EmojiCodes.DASH.unicodeValue)
+                .append(" ")
+                .append("Successfully executed the following events:\n");
 
         for (String s : successMessageContent) {
             if (builder.length() > 1500) {
@@ -80,6 +80,7 @@ public class MessageUtil {
             channel.sendMessage(message.poll()).queue();
         }
     }
+
     public static void sendMessageToChannel(final Message message, final MessageChannel channel) {
         channel.sendMessage(message).queue();
     }
@@ -89,6 +90,6 @@ public class MessageUtil {
     }
 
     public static void sendMessageToChannel(final MessageEmbed embed, final MessageChannel channel) {
-        channel.sendMessage(embed).queue();
+        channel.sendMessageEmbeds(embed).queue();
     }
 }

@@ -23,6 +23,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class Help extends ReactionCommand {
+    /**
+     * Creates an instance of the help command.
+     */
     public Help() {
         name                    = "help";
         description             = "Sends the help message. Also used to ask for help on other commands.";
@@ -55,6 +58,7 @@ public class Help extends ReactionCommand {
         }
     }
 
+    //TODO: Add generic paginated command
     @Override
     public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
         int nextPage;
@@ -118,7 +122,7 @@ public class Help extends ReactionCommand {
 
             //Make a string of usages, with each usage on its own line
             final StringBuilder usages = new StringBuilder();
-            calledCommand.getUsages().forEach( usage -> usages.append(prefix).append(usage).append("\n"));
+            calledCommand.getUsages().forEach(usage -> usages.append(prefix).append(usage).append("\n"));
 
             List<MessageEmbed.Field> fieldList = new ArrayList<>();
             fieldList.add(new MessageEmbed.Field("Command Name: ",                commandString,                                                true));
@@ -127,8 +131,10 @@ public class Help extends ReactionCommand {
             fieldList.add(new MessageEmbed.Field("Usages <required> [optional]:", usages.toString(),                                            false));
 
             return EmbedHelper.buildDefaultMessageEmbed(fieldList);
-        } else {
-            final MessageEmbed.Field field = new MessageEmbed.Field("Error!", "No command with that name found!", false);
+        }
+        else {
+            final MessageEmbed.Field field = new MessageEmbed.Field("Error!",
+                    "No command with that name found!", false);
             return EmbedHelper.buildDefaultMessageEmbed(field);
         }
     }
@@ -139,10 +145,11 @@ public class Help extends ReactionCommand {
 
         final String prefix                            = event.getSettings().getPrefix();
         //Divide help command into pages of ten commands
-        final int numPages                             = (commands.size() % 10 == 0) ? commands.size() / 10 : (commands.size() / 10) + 1;
+        final int numPages                             = (commands.size() % 10 == 0) ? commands.size() / 10 :
+                                                         (commands.size() / 10) + 1;
 
         for (int i = 1; i <= numPages; i++) {
-            final int startIndex = ( i - 1 ) * 10;
+            final int startIndex = (i - 1) * 10;
             final int endIndex   = commands.size() < 10 ? commands.size() : Math.min(i * 10, commands.size());
 
             // creat sublist of commands for each page
@@ -150,7 +157,7 @@ public class Help extends ReactionCommand {
             final List<MessageEmbed.Field> fields = new ArrayList<>();
 
             // For each command in the sublist, append some info about it and add that to the pages list
-            commandPageSubList.forEach( c -> {
+            commandPageSubList.forEach(c -> {
                 final String info1 = prefix + c.getName() + ": ";
                 final String info2 = c.getDescription();
 
