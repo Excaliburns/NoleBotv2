@@ -1,9 +1,7 @@
+// CHECKSTYLE:OFF
 package com.tut.nolebotv2webapi.client;
 
-import com.tut.nolebotv2webapi.dtos.DiscordAccessTokenRequestDto;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
