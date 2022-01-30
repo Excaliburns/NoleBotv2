@@ -144,7 +144,7 @@ public class NoleBot {
         }, 0, 10, TimeUnit.SECONDS);
         completableFuture.whenComplete((result, thrown) -> checkFuture.cancel(true));
         return completableFuture;
-  }
+    }
 
 
 }
