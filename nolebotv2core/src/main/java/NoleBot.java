@@ -95,6 +95,8 @@ public class NoleBot {
               banListListener
           ).build();
 
+      NoleBotUtil.setJda(jda);
+
       // TODO: Support multiple dbs? DBConnection should store variations of initializing them.
       // maybe some property like, switch (property) case mysql: initMysql, case postgreSql: initPostgre
       DBConnection.initMySqlConnection();
@@ -119,8 +121,6 @@ public class NoleBot {
           e.printStackTrace();
         }
       }
-
-      NoleBotUtil.setJda(jda);
     } catch (LoginException e) {
       logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());
     }

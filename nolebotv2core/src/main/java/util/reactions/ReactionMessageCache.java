@@ -27,12 +27,11 @@ public class ReactionMessageCache {
                 //Edits the original message when the cache expires to show that Reactions are no longer being listened to
                 //Also clears reactions from the original message.
                 public void onRemoval(@NotNull RemovalNotification<Object, Object> notification) {
-                    if (notification.getCause() == RemovalCause.EXPIRED
-                            || notification.getCause() == RemovalCause.COLLECTED) {
+                    if (notification.getCause() == RemovalCause.EXPIRED || notification.getCause() == RemovalCause.COLLECTED) {
                         final String          originalMessageId = (String) notification.getKey();
                         final ReactionMessage messageContents   = (ReactionMessage) notification.getValue();
 
-                        messageContents.getOriginatingMessageChannel().editMessageById(
+                        messageContents.getOriginatingMessageChannel().editMessageEmbedsById(
                                 originalMessageId,
                                 EmbedHelper.getDefaultExpiryReactionMessage()
                         ).queue(andAfter -> andAfter.clearReactions().queue());

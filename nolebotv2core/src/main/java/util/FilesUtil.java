@@ -4,17 +4,23 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.gson.GsonDuration;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 public class FilesUtil {
     private static final Logger logger = LogManager.getLogger(FilesUtil.class);
-    public static final Gson GSON_INSTANCE = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    public static final Gson GSON_INSTANCE = new GsonBuilder()
+            .setPrettyPrinting()
+            .serializeNulls()
+            .registerTypeAdapter(Duration.class, new GsonDuration())
+            .create();
 
     /**
      * Create file and directories if they don't already exist

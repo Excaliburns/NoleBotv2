@@ -109,7 +109,7 @@ public class ListGuildPermissions extends ReactionCommand {
             nextPage = message.getCurrentEmbedPage() + 1;
         }
         else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
-            retrievedDiscordMessage.editMessage(EmbedHelper.getDefaultExitMessage()).queue();
+            retrievedDiscordMessage.editMessageEmbeds(EmbedHelper.getDefaultExitMessage()).queue();
             retrievedDiscordMessage.clearReactions().queue();
             ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
             return;
@@ -123,7 +123,7 @@ public class ListGuildPermissions extends ReactionCommand {
             //Set the permission message to the next page
             message.setCurrentEmbedPage(nextPage);
             //Clear previous reactions
-            retrievedDiscordMessage.editMessage(message.getEmbedList().get(nextPage)).queue(editDone -> {
+            retrievedDiscordMessage.editMessageEmbeds(message.getEmbedList().get(nextPage)).queue(editDone -> {
                 editDone.clearReactions().queue();
 
                 for (EmojiCodes emojiCode : message.getReactionsUsed()) {
