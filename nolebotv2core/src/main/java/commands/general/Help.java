@@ -60,7 +60,10 @@ public class Help extends ReactionCommand {
 
     //TODO: Add generic paginated command
     @Override
-    public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
+    public void handleReaction(
+            GuildMessageReactionAddEvent event,
+            ReactionMessage message,
+            Message retrievedDiscordMessage) {
         int nextPage;
 
         // if left arrow
@@ -92,7 +95,8 @@ public class Help extends ReactionCommand {
                 for (EmojiCodes emojiCode : message.getReactionsUsed()) {
                     // If the last embed page had a next arrow and we are on the last embed page
                     // Is checking the emojiCode necessary here?
-                    boolean isLastPage = emojiCode == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
+                    boolean isLastPage = emojiCode ==
+                            EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
                     // If the last embed page had a next arrow and we are on the first embed page
                     // Is checking the emojiCode necessary here?
                     boolean isFirstPage = emojiCode == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
@@ -107,7 +111,7 @@ public class Help extends ReactionCommand {
             });
         }
     }
-
+    //CHECKSTYLE:OFF
     private MessageEmbed sendSpecificCommandHelp(CommandEvent event) {
         // Uses the map of commands in CommandUtil to match the second word of the message to a command
         // event.getCommand() doesn't work here
@@ -138,6 +142,7 @@ public class Help extends ReactionCommand {
             return EmbedHelper.buildDefaultMessageEmbed(field);
         }
     }
+    //CHECKSTYLE:ON
 
     private void displayGenericHelpMenu(CommandEvent event) {
         final ArrayList<MessageEmbed> commandHelpPages = new ArrayList<>();

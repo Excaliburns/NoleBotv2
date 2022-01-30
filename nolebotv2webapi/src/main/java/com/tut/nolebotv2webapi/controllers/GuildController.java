@@ -34,7 +34,8 @@ public class GuildController {
             final GuildUser guildUser = (GuildUser) broadcastPackage.getPayload();
 
             return HttpResponse.ok(guildUser);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
 

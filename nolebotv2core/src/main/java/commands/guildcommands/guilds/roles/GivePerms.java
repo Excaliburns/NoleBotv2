@@ -33,12 +33,19 @@ public class GivePerms extends Command {
         else {
             Settings eventSettings = event.getSettings();
             rolesMentioned.forEach(role -> {
-                final GenericPermission permToAdd = new GenericPermission(PermissionType.ROLE, role.getName(), role.getId(), permLevel);
+                final GenericPermission permToAdd = new GenericPermission(PermissionType.ROLE,
+                        role.getName(),
+                        role.getId(),
+                        permLevel
+                );
                 eventSettings.addPermission(permToAdd);
                 SettingsCache.saveSettingsForGuild(event.getGuild(), eventSettings);
             });
             membersMentioned.forEach(member -> {
-                final GenericPermission permToAdd = new GenericPermission(PermissionType.USER, member.getEffectiveName(), member.getId(), permLevel);
+                final GenericPermission permToAdd = new GenericPermission(PermissionType.USER,
+                        member.getEffectiveName(),
+                        member.getId(),
+                        permLevel);
                 eventSettings.addPermission(permToAdd);
                 SettingsCache.saveSettingsForGuild(event.getGuild(), eventSettings);
             });
