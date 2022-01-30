@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 @ServerWebSocket("/internalApi/{clientSecret}")
 public class CoreWebSocketServer {
@@ -34,8 +35,14 @@ public class CoreWebSocketServer {
 
     Map<UUID, CompletableFuture<BroadcastPackage>> requests;
 
+    /**
+     * Default constructor.
+     *
+     * @param secret Secret of the websocket server.
+     * @param broadcaster Message broadcaster.
+     */
     public CoreWebSocketServer(
-            @Property( name = "nolebot.websocket.secret") String secret,
+            @Property(name = "nolebot.websocket.secret") String secret,
             WebSocketBroadcaster broadcaster
     ) {
         this.secret = secret;
@@ -49,6 +56,15 @@ public class CoreWebSocketServer {
         broadcaster.broadcastSync(SerializationUtils.serialize(broadcastPackage), MediaType.MULTIPART_FORM_DATA_TYPE);
     }
 
+    /**
+     * Send a message to the client and expect a response back.
+     *
+     * @param broadcastPackage Package of information to broadcast
+     * @return a broadcast package containing response information
+     * @throws ExecutionException if future throws an exception
+     * @throws InterruptedException if future's thread is interrupted
+     * @throws TimeoutException if future is not completed within 60000ms
+     */
     public BroadcastPackage sendWithResponse(
             final BroadcastPackage broadcastPackage
     ) throws ExecutionException, InterruptedException, TimeoutException {
@@ -64,8 +80,15 @@ public class CoreWebSocketServer {
         return future.get(60000, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * What happens when a connection is opened.
+     * If the path does not contain a matching secret, the session is closed.
+     *
+     * @param session Session that was just opened.
+     * @param clientSecret Secret that was sent by client.
+     */
     @OnOpen
-    public void onOpen(WebSocketSession session, @PathVariable String clientSecret) {
+    public void onOpen(final WebSocketSession session, final @PathVariable String clientSecret) {
         if (!Objects.equals(clientSecret, this.secret)) {
             session.close(CloseReason.POLICY_VIOLATION);
         }
@@ -74,6 +97,13 @@ public class CoreWebSocketServer {
         }
     }
 
+    /**
+     * What happens when a message is sent from the client.
+     *
+     * @param message a bytearray containing the message data, will be cast to a BroadcastPackage
+     * @param session The session between the server and the client.
+     * @param clientSecret Secret that was sent by client.
+     */
     @OnMessage
     public void onMessage(byte[] message, WebSocketSession session, @PathVariable String clientSecret) {
         if (!Objects.equals(clientSecret, this.secret)) {
@@ -81,15 +111,20 @@ public class CoreWebSocketServer {
         }
 
         final BroadcastPackage broadcastPackage = (BroadcastPackage) SerializationUtils.deserialize(message);
+        final Consumer<? super CompletableFuture<BroadcastPackage>> packageCompletableFuture =
+                broadcastPackageCompletableFuture -> broadcastPackageCompletableFuture.complete(broadcastPackage);
 
         switch (broadcastPackage.getMessageType()) {
-            case REQUEST -> {} // do nothing atm
             case RESPONSE -> {
-                Optional<CompletableFuture<BroadcastPackage>> correlatingOutstandingMessage = Optional.ofNullable(this.requests.remove(broadcastPackage.getCorrelationId()));
+                Optional<CompletableFuture<BroadcastPackage>> correlatingOutstandingMessage = Optional.ofNullable(
+                        this.requests.remove(broadcastPackage.getCorrelationId())
+                );
 
-                correlatingOutstandingMessage
-                        .ifPresent(broadcastPackageCompletableFuture -> broadcastPackageCompletableFuture.complete(broadcastPackage));
+                correlatingOutstandingMessage.ifPresent(packageCompletableFuture);
             }
+            default -> {
+
+            } // do nothing, again.
         }
     }
 
