@@ -13,6 +13,7 @@ public enum EmojiCodes {
     PLEADING("\uD83E\uDD7A"),
     WARNING_ARROW("\u26A0"), // ⚠
     WAVING_HAND("\uD83D\uDC4B"), // 👋
+    THINKING("\uD83E\uDD14"), // 🤔
 
     // Error / Success
     DOUBLE_BANG("\u203C"), //‼
