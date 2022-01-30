@@ -8,6 +8,13 @@
     <node-interpreter value="project" />
     <package-manager value="npm" />
     <envs />
-    <method v="2" />
+    <method v="2">
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/nolebotv2web/package.json" />
+        <command value="install" />
+        <node-interpreter value="project" />
+        <envs />
+      </option>
+    </method>
   </configuration>
 </component>
