@@ -18,13 +18,16 @@ import java.util.stream.Collectors;
 
 public class GenericPermissionsFactory {
     private static final Logger logger = LogManager.getLogger(GenericPermissionsFactory.class);
+
     /**
-     * Gets the set of permissions stored that are greater than or equal to permission
+     * Gets the set of permissions stored that are greater than or equal to permission.
+     *
      * @param guild The guild object that the user to check is a member of
      * @param permission The permission to check against
      * @return The int permissionLevel for the specified user in the specified guild
      */
-    public static TreeSet<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(Guild guild, GenericPermission permission) {
+    public static TreeSet<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(Guild guild,
+                    GenericPermission permission) {
         final Settings settings = SettingsFactory.getSettings(guild);
 
         return settings.getPermissionList()
@@ -32,8 +35,10 @@ public class GenericPermissionsFactory {
                        .filter(each -> each.getPermissionLevel() >= permission.getPermissionLevel())
                        .collect(Collectors.toCollection(TreeSet::new));
     }
+
     /**
-     * Gets the int permissionLevel for the user in the current guild, if there is one
+     * Gets the int permissionLevel for the user in the current guild, if there is one.
+     *
      * @param userId The ID of the user to check permissions for
      * @param guild The guild object that the user to check is a member of
      * @return The int permissionLevel for the specified user in the specified guild
@@ -41,8 +46,10 @@ public class GenericPermissionsFactory {
     public static int getHighestPermissionForUser(String userId, Guild guild) {
         return getHighestPermissionObjectForUser(userId, guild).getPermissionLevel();
     }
+
     /**
-     * Gets the GenericPermission object for specified user in the specified guild, if there is one
+     * Gets the GenericPermission object for specified user in the specified guild, if there is one.
+     *
      * @param userId The ID of the user to check permissions for
      * @param guild The guild object that the user to check is a member of
      * @return The GenericPermission for the specified user in the specified guild
@@ -50,8 +57,10 @@ public class GenericPermissionsFactory {
     public static GenericPermission getHighestPermissionObjectForUser(String userId, Guild guild) {
         return PermissionCache.getPermissionForUser(userId, guild.getId());
     }
+
     /**
-     * Gets the set of permissions for the user in the current guild, if there is one
+     * Gets the set of permissions for the user in the current guild, if there is one.
+     *
      * @param userId The ID of the user to check permissions for
      * @param guild The guild object that the user to check is a member of
      * @return The Set of permissions for the specified user in the specified guild if it exists, otherwise null
@@ -76,7 +85,8 @@ public class GenericPermissionsFactory {
             final Set<String> userPermissions = memberRoleIds.stream()
                                                              .filter(guildPermissionIds::contains)
                                                              .collect(Collectors.toCollection(TreeSet::new));
-            //The set of GenericPermissions that apply to the user from their roles + GenericPermissions defined for their UserID
+            //The set of GenericPermissions that apply to the user from their roles
+            // + GenericPermissions defined for their UserID
             final TreeSet<GenericPermission> userGenericPermissionList = settings.getPermissionList()
                                                                                  .stream()
                     //Gets a set of GenericPermissions that are stored in settings that correspond to the RoleIDs that match the snowflake ID of the permissions stored in settings

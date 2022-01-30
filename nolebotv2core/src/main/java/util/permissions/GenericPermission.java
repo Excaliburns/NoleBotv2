@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
-@AllArgsConstructor @Getter
+@AllArgsConstructor
+@Getter
 public class GenericPermission implements Comparable<GenericPermission> {
     //Type of permission, USER, GROUP, or ROLE
     private final PermissionType type;

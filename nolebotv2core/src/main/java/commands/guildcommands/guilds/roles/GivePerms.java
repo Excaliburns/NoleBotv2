@@ -46,7 +46,11 @@ public class GivePerms extends Command {
         }
     }
 
-    private void sendSuccessMessageAfterSettingPerms(List<Role> addedRoles, List<Member> addedMembers, int permLevel, CommandEvent event) {
+    private void sendSuccessMessageAfterSettingPerms(
+            List<Role> addedRoles,
+            List<Member> addedMembers,
+            int permLevel,
+            CommandEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("Successfully added permLevel [%s] to :\n", permLevel));
         builder.append("Roles: \n");

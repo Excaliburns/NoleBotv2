@@ -41,10 +41,20 @@ public class DBConnection {
             ;
             logger.info("Successfully initialized database connection: MySQL");
 
-        } catch (ClassNotFoundException e) {
-            logger.error("MySQL driver could not be instantiated. Commands that require a database connection will work, but will error. {}", e.getMessage());
-        } catch (SQLException e) {
-            logger.error("Could not establish DB Connection. Commands that require a database connection will work, but will error. {}", e.getMessage());
+        }
+        catch (ClassNotFoundException e) {
+            logger.error(
+                    "MySQL driver could not be instantiated. " +
+                    "Commands that require a database connection will work, but will error. {}",
+                    e.getMessage()
+            );
+        }
+        catch (SQLException e) {
+            logger.error(
+                    "Could not establish DB Connection. " +
+                    "Commands that require a database connection will work, but will error. {}",
+                    e.getMessage()
+            );
         }
     }
 }
