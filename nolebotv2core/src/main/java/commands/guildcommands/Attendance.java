@@ -52,7 +52,7 @@ public class Attendance extends ReactionCommand {
 
     private final ConcurrentHashMap<Guild, Duration> timeLeft = new ConcurrentHashMap<>();
     private final HashMap<Guild, List<Member>> countedMembers = new HashMap<>();
-    private final HashMap<Guild, Message> attendanceMessageCache = new HashMap<>();
+    private final HashMap<Guild, String> attendanceMessageCache = new HashMap<>();
 
 
     /**
@@ -100,7 +100,7 @@ public class Attendance extends ReactionCommand {
                 }
                 else {
                     event.sendErrorResponseToOriginatingChannel(
-                            "Attendance is not currently being taken"
+                            "Attendance is not currently being taken."
                     );
                 }
             }
@@ -173,7 +173,7 @@ public class Attendance extends ReactionCommand {
         event.getChannel().sendMessageEmbeds(message.getEmbedList().get(0)).queue(sentMessage -> {
             sentMessage.addReaction(EmojiCodes.CHECK_MARK.unicodeValue).queue();
             ReactionMessageCache.setReactionMessage(sentMessage.getId(), message);
-            attendanceMessageCache.put(guild, sentMessage);
+            attendanceMessageCache.put(guild, sentMessage.getId());
 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -241,9 +241,9 @@ public class Attendance extends ReactionCommand {
         final ReactionMessage newReactionMessage = getReactionMessageForAttendance(guild, channel, authorId, messageId);
         final MessageEmbed attendanceEmbed = newReactionMessage.getEmbedList().get(0);
 
-        channel.editMessageEmbedsById(attendanceMessageCache.get(guild).getId(), attendanceEmbed).queue(sentMessage -> {
+        channel.editMessageEmbedsById(attendanceMessageCache.get(guild), attendanceEmbed).queue(sentMessage -> {
             ReactionMessageCache.setReactionMessage(sentMessage.getId(), newReactionMessage);
-            attendanceMessageCache.put(guild, sentMessage);
+            attendanceMessageCache.put(guild, sentMessage.getId());
         });
     }
 
@@ -409,23 +409,20 @@ public class Attendance extends ReactionCommand {
             final String probableMOrSChar = messages.get(3);
             final boolean isM = probableMOrSChar.equalsIgnoreCase("m");
             final boolean isS = probableMOrSChar.equalsIgnoreCase("s");
-            if (!isM || !isS) {
+            if (!isM && !isS) {
                 event.sendErrorResponseToOriginatingChannel(didNotSpecifyTimer);
                 return;
             }
 
-            if (isM) {
-                saveNewAttendanceTimer(event, guildSettings, durationNum, true);
-            }
-            else {
-                saveNewAttendanceTimer(event, guildSettings, durationNum, false);
-            }
+            saveNewAttendanceTimer(event, guildSettings, durationNum, isM);
+            return;
         }
 
         if (!(messages.size() > 2)) {
             event.sendErrorResponseToOriginatingChannel(
                     "You didn't specify a time! Use !help attendance"
             );
+            return;
         }
         final String userMessage = messages.get(2);
         final boolean containsM = userMessage.toLowerCase().contains("m");
@@ -450,6 +447,6 @@ public class Attendance extends ReactionCommand {
             return;
         }
 
-        saveNewAttendanceTimer(event, guildSettings, durationNum, true);
+        saveNewAttendanceTimer(event, guildSettings, durationNum, containsM);
     }
 }

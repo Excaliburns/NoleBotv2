@@ -40,7 +40,7 @@ public class GuildMessageReactionListener extends ListenerAdapter {
                     // Likely a reaction message that has expired in the cache.
                     if (callback.isEdited()) {
                         logger.warn("Message was not found in cache - message likely expired.");
-                        callback.editMessage(EmbedHelper.getDefaultExpiryReactionMessage()).queue();
+                        callback.editMessageEmbeds(EmbedHelper.getDefaultExpiryReactionMessage()).queue();
                     }
                 }
             }
