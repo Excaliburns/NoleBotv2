@@ -14,6 +14,7 @@ public class UnlockRole extends Command {
         usages.add("unlockrole <List of @Role>");
         requiredPermissionLevel = 1000;
     }
+
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
         final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();

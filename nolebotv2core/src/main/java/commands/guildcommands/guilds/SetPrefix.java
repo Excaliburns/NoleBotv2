@@ -19,7 +19,6 @@ public class SetPrefix extends Command {
     public void onCommandReceived(CommandEvent event) {
         final String oldPrefix       = event.getSettings().getPrefix();
         final String newPrefix       = event.getMessageContent().get(1);
-
         if (oldPrefix.equals(newPrefix)) {
             event.sendErrorResponseToOriginatingChannel("\uD83E\uDD14 Those prefixes are the same!");
         }

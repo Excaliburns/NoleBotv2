@@ -9,7 +9,6 @@ import util.permissions.PermissionType;
 import util.settings.Settings;
 import util.settings.SettingsCache;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GivePerms extends Command {
@@ -20,14 +19,15 @@ public class GivePerms extends Command {
         usages.add("giveperms <List of @Roles> <List of @Users> <Number of Permission Level>");
         requiredPermissionLevel = 1000;
     }
+
     //TODO: Check if role/user already has a lower permission, delete if so.
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
         final List<Role> rolesMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final List<Member> membersMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
         final List<String> message = event.getMessageContent();
-        final int permLevel = Integer.valueOf(message.get(message.size() - 1));
-        if (rolesMentioned.size() == 0 && membersMentioned.size() == 0 ) {
+        final int permLevel = Integer.parseInt(message.get(message.size() - 1));
+        if (rolesMentioned.size() == 0 && membersMentioned.size() == 0) {
             event.sendErrorResponseToOriginatingChannel("Please mention at least one member or role!");
         }
         else {
@@ -42,17 +42,23 @@ public class GivePerms extends Command {
                 eventSettings.addPermission(permToAdd);
                 SettingsCache.saveSettingsForGuild(event.getGuild(), eventSettings);
             });
-            sendSuccessMessageAfterSettingPerms(rolesMentioned, membersMentioned,permLevel, event);
+            sendSuccessMessageAfterSettingPerms(rolesMentioned, membersMentioned, permLevel, event);
         }
     }
+
     private void sendSuccessMessageAfterSettingPerms(List<Role> addedRoles, List<Member> addedMembers, int permLevel, CommandEvent event) {
-        List<String> successAdded = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("Successfully added permLevel [%s] to :\n", permLevel));
         builder.append("Roles: \n");
-        addedRoles.forEach( role -> builder.append(role.getName() + '\n'));
+        addedRoles.forEach(role -> {
+            builder.append(role.getName());
+            builder.append('\n');
+        });
         builder.append("Members: \n");
-        addedMembers.forEach( member -> builder.append(member.getEffectiveName() + '\n'));
+        addedMembers.forEach(member -> {
+            builder.append(member.getEffectiveName());
+            builder.append('\n');
+        });
         event.sendSuccessResponseToOriginatingChannel(builder.toString());
     }
 }

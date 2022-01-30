@@ -15,6 +15,7 @@ public class LockRole extends Command {
         usages.add("lockrole <List of @Role>");
         requiredPermissionLevel = 1000;
     }
+
     @Override
     public void onCommandReceived(CommandEvent event) throws Exception {
         final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
