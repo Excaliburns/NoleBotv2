@@ -5,6 +5,7 @@ import commands.util.CommandEvent;
 import commands.util.CommandUtil;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
@@ -17,14 +18,16 @@ import util.settings.SettingsFactory;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 public class GuildMessageCommandListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageCommandListener.class);
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot())
+        if (event.getAuthor().isBot()) {
             return;
+        }
 
         List<String> commandMessage;
         final String message = event.getMessage().getContentRaw();
@@ -46,7 +49,11 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
 
             if (command != null) {
-                final CommandEvent commandEvent = new CommandEvent(event, noPrefixMessage, commandMessage, settings, command);
+                final CommandEvent commandEvent = new CommandEvent(event,
+                        noPrefixMessage,
+                        commandMessage,
+                        settings,
+                        command);
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",
                         command.getName(),
@@ -56,7 +63,8 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
                 try {
                     command.executeCommand(commandEvent);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     commandEvent.sendErrorResponseToOriginatingChannel(
                             "There was an exception while processing your request!",
                             "Check the logs and message the bot author if this seems unexpected.");
