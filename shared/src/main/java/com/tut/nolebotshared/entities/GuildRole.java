@@ -2,7 +2,7 @@ package com.tut.nolebotshared.entities;
 
 import java.io.Serializable;
 
-public record GuildRole (
+public record GuildRole(
         String id,
         String name,
         Integer color,
