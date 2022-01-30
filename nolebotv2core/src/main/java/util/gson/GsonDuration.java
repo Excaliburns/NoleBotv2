@@ -14,7 +14,8 @@ import java.time.Duration;
 public class GsonDuration implements JsonSerializer<Duration>, JsonDeserializer<Duration> {
 
     @Override
-    public Duration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public Duration deserialize(JsonElement jsonElement, Type type,
+                                JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         final String durationString = jsonElement.getAsString();
 
         return Duration.parse(durationString);
