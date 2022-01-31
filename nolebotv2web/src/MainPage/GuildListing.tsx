@@ -26,8 +26,12 @@ export default function GuildListing() {
                     const fsu = response.data.find( (each: APIGuild) => each.id === process.env.REACT_APP_MAIN_SERVER_ID );
                     setFsuGuild(fsu)
 
-                    if (fsu) {
-                        axiosNolebotInstance.post(`guilds/${process.env.REACT_APP_MAIN_SERVER_ID}/${state.userDetails?.id}`)
+                    if (fsu && state?.userDetails) {
+                        axiosNolebotInstance.post(`guilds/${process.env.REACT_APP_MAIN_SERVER_ID}/${state.userDetails?.id}`, '', {
+                            headers: {
+                                'X-Username': state.userDetails.username
+                            }
+                        })
                             .then((r: AxiosResponse<GuildUser>) => {
                                 const gameMasterRole = r.data.roles.find( any => {
                                     console.log(any);
