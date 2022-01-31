@@ -27,6 +27,7 @@ public class NoleBotExceptionWrapper {
     private String methodName;
     private String rootCause;
     private String message;
+    private String user;
 
     private NoleBotExceptionWrapper() {
         id = UUID.randomUUID().toString();
@@ -66,8 +67,12 @@ public class NoleBotExceptionWrapper {
         return message;
     }
 
+    @MappedProperty(value = "Username")
+    public String getUser() {
+        return user;
+    }
     //Micronaut doesnt like things passed in through constructors that arent persistent
-    public static NoleBotExceptionWrapper getWrapperForException(NoleBotException ex) {
+    public static NoleBotExceptionWrapper getWrapperForException(Exception ex) {
         NoleBotExceptionWrapper result = new NoleBotExceptionWrapper();
         StackTraceElement rootCause = ex.getStackTrace()[0];
         result.setLineNum(rootCause.getLineNumber());
