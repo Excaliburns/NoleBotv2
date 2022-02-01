@@ -4,6 +4,8 @@ import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
@@ -13,7 +15,7 @@ import com.tut.nolebotshared.enums.BroadcastType;
 
 import javax.inject.Inject;
 
-@Controller("/guilds")
+@Controller(value = "/guilds", consumes = MediaType.ALL)
 public class GuildController {
     @Inject
     private CoreWebSocketServer websocketServer;
