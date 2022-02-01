@@ -1,18 +1,13 @@
 package com.tut.nolebotv2webapi.exception;
 
-import com.tut.nolebotshared.exceptions.NoleBotException;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
-import io.micronaut.data.annotation.Transient;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.UUID;
 
 @MappedEntity(value = "NolebotExceptions")
@@ -44,6 +39,7 @@ public class NoleBotExceptionWrapper {
     public Timestamp getTimestamp() {
         return timestamp;
     }
+
     @MappedProperty(value = "OrigClass")
     public String getOrigClass() {
         return origClass;
@@ -53,10 +49,12 @@ public class NoleBotExceptionWrapper {
     public int getLineNum() {
         return lineNum;
     }
+
     @MappedProperty(value = "MethodName")
     public String getMethodName() {
         return methodName;
     }
+
     @MappedProperty(value = "RootCause")
     public String getRootCause() {
         return rootCause;
