@@ -71,39 +71,40 @@ public class GenericPermissionsFactory {
         //If the member exists gets tge
         if (member.isPresent()) {
             //The list of RoleIDs that the member holds
-            final List<String> memberRoleIds = member.get()
-                                                     .getRoles()
-                                                     .stream()
-                                                     .map(ISnowflake::getId)
-                                                     .collect(Collectors.toList());
+            final List<String> memberRoleIds = member.get().getRoles()
+                    .stream()
+                    .map(ISnowflake::getId)
+                    .collect(Collectors.toList());
             //The set of Snowflake IDs for the permissions stored in settings
             final Set<String> guildPermissionIds = settings.getPermissionList()
-                                                           .stream()
-                                                           .map(GenericPermission::getSnowflakeId)
-                                                           .collect(Collectors.toSet());
+                    .stream()
+                    .map(GenericPermission::getSnowflakeId)
+                    .collect(Collectors.toSet());
             //The set of the RoleIDs that the user holds that have a permission stored in settings
-            final Set<String> userPermissions = memberRoleIds.stream()
-                                                             .filter(guildPermissionIds::contains)
-                                                             .collect(Collectors.toCollection(TreeSet::new));
-            //The set of GenericPermissions that apply to the user from their roles
-            // + GenericPermissions defined for their UserID
+            final Set<String> userPermissions = memberRoleIds
+                    .stream()
+                    .filter(guildPermissionIds::contains)
+                    .collect(Collectors.toCollection(TreeSet::new));
+            // The set of GenericPermissions that apply to the user from their roles +
+            // GenericPermissions defined for their UserID
             final TreeSet<GenericPermission> userGenericPermissionList = settings.getPermissionList()
-                                                                                 .stream()
-                    //Gets a set of GenericPermissions that are stored in settings that correspond to the RoleIDs that match the snowflake ID of the permissions stored in settings
-                                                                                 .filter(ele -> userPermissions.stream()
-                                                                                                               .anyMatch(element -> ele
-                                                                                                               .getSnowflakeId()
-                                                                                                               .equals(element)))
-                                                                                 .collect(Collectors.toCollection(TreeSet::new));
+                    .stream()
+                    // Gets a set of GenericPermissions that are stored in settings that
+                    // correspond to the RoleIDs that match the snowflake ID of the permissions stored in settings
+                    .filter(ele -> userPermissions
+                            .stream()
+                            .anyMatch(element -> ele.getSnowflakeId().equals(element))
+                    )
+                    .collect(Collectors.toCollection(TreeSet::new));
 
             // add user permission to list if present
             settings.getPermissionList()
                     .stream()
-                    //Gets the Set of GenericPermissions that are stored for a user
+                    // Gets the Set of GenericPermissions that are stored for a user
                     .filter(entry -> userId.equals(entry.getSnowflakeId()))
-                    //Checks if there are any GenericPermissions stored for a user
+                    // Checks if there are any GenericPermissions stored for a user
                     .findAny()
-                    //If there are, add them to the list of permissions stored for a user
+                    // If there are, add them to the list of permissions stored for a user
                     .ifPresent(userGenericPermissionList::add);
 
             return userGenericPermissionList;
