@@ -2,6 +2,7 @@ package com.tut.nolebotv2webapi.exception;
 
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.server.exceptions.ExceptionHandler;
 
 import javax.inject.Inject;
@@ -19,6 +20,7 @@ public class WebExceptionHandler implements ExceptionHandler<Exception, HttpResp
             wrapper.setUser(request.getHeaders().get("X-Username"));
         }
         repo.save(wrapper);
-        return HttpResponse.serverError(wrapper.getId());
+        return HttpResponse.serverError("<h1> Internal Server Error </h1>" +
+                "<p>Please report this error id if you need help: " + wrapper.getId() + "</p>").contentType(MediaType.TEXT_HTML);
     }
 }
