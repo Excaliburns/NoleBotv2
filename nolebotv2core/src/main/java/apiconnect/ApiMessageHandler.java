@@ -11,6 +11,8 @@ import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
 import com.tut.nolebotshared.exceptions.MemberNotFoundException;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,16 +73,14 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
     private GuildUser getMemberDetails(
             final String memberSnowflakeId,
             final String guildSnowflakeId
-    ) throws GuildNotFoundException, MemberNotFoundException {
+    ) throws GuildNotFoundException, ErrorResponseException{
 
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
                 .orElseThrow(() -> new GuildNotFoundException(
                         String.format(guildNotFound, guildSnowflakeId)
                 ));
-        final Member member = Optional.ofNullable(guild.getMemberById(memberSnowflakeId))
-                .orElseThrow(() -> new MemberNotFoundException(
-                        String.format(memberNotFound, memberSnowflakeId, guildSnowflakeId)
-                ));
+        //This SHOULD throw an error if member doesn't exist or isnt a member of the guild
+        Member member = guild.retrieveMemberById(memberSnowflakeId).complete();
 
         return new GuildUser(
                 member.getId(),
