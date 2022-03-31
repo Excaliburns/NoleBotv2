@@ -4,15 +4,16 @@ import java.util.HashMap;
 
 public enum PropEnum {
     // TOKEN ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    BOT_AVATAR_URL        ("bot.avatar.url"),
-    DB_NAME               ("db.name"),
-    DB_ADDR               ("db.addr"),
-    DB_USER               ("db.user"),
-    DB_PASS               ("db.pass"),
-    DB_PORT               ("db.port"),
-    TOKEN                 ("bot.token"),
-    API_WEBSOCKET_ENABLED ("api.websocket.enabled"),
-    API_WEBSOCKET_SECRET  ("api.websocket.secret");
+    BOT_AVATAR_URL               ("bot.avatar.url"),
+    DB_NAME                      ("db.name"),
+    DB_ADDR                      ("db.addr"),
+    DB_USER                      ("db.user"),
+    DB_PASS                      ("db.pass"),
+    DB_PORT                      ("db.port"),
+    TOKEN                        ("bot.token"),
+    API_WEBSOCKET_ENABLED        ("api.websocket.enabled"),
+    API_WEBSOCKET_SECRET         ("api.websocket.secret"),
+    ATTENDANCE_LEADER_IN_CHANNEL ("bot.attendance.leader.in.channel");
 
     private final String propertyKey;
 

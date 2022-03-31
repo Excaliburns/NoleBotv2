@@ -3,6 +3,7 @@ package commands.guildcommands;
 import commands.util.CommandEvent;
 import commands.util.ReactionCommand;
 import enums.EmojiCodes;
+import enums.PropEnum;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.NoleBotUtil;
+import util.PropertiesUtil;
 import util.chat.EmbedHelper;
 import util.db.entities.AttendanceEntity;
 import util.db.statements.AttendanceStatements;
@@ -50,9 +52,9 @@ public class Attendance extends ReactionCommand {
     private static final Logger logger = LogManager.getLogger(Attendance.class);
     private final AttendanceStatements statements = new AttendanceStatements();
 
-    private final ConcurrentHashMap<Guild, Duration> timeLeft = new ConcurrentHashMap<>();
-    private final HashMap<Guild, List<Member>> countedMembers = new HashMap<>();
-    private final HashMap<Guild, String> attendanceMessageCache = new HashMap<>();
+    private final ConcurrentHashMap<String, Duration> timeLeft = new ConcurrentHashMap<>();
+    private final HashMap<String, List<Member>> countedMembers = new HashMap<>();
+    private final HashMap<String, String> attendanceMessageCache = new HashMap<>();
 
 
     /**
@@ -84,7 +86,7 @@ public class Attendance extends ReactionCommand {
 
         switch (command) {
             case "start" -> {
-                if (!attendanceMessageCache.containsKey(event.getGuild())) {
+                if (!attendanceMessageCache.containsKey(event.getGuild().getId())) {
                     handleStartAttendance(event);
                 }
                 else {
@@ -95,8 +97,8 @@ public class Attendance extends ReactionCommand {
             }
             case "timer" -> saveTimer(messages, event, guildSettings);
             case "stop" -> {
-                if (attendanceMessageCache.containsKey(event.getGuild())) {
-                    timeLeft.put(event.getGuild(), Duration.ZERO);
+                if (attendanceMessageCache.containsKey(event.getGuild().getId())) {
+                    timeLeft.put(event.getGuild().getId(), Duration.ZERO);
                 }
                 else {
                     event.sendErrorResponseToOriginatingChannel(
@@ -137,7 +139,8 @@ public class Attendance extends ReactionCommand {
 
         final VoiceChannel originalUserVoiceChannel = originalMember.getVoiceState().getChannel();
         final GuildVoiceState userVoiceState = event.getMember().getVoiceState();
-        if (Objects.isNull(userVoiceState) || originalUserVoiceChannel != userVoiceState.getChannel()) {
+        final boolean leaderMustBeInChannel = Boolean.parseBoolean(PropertiesUtil.getProperty(PropEnum.ATTENDANCE_LEADER_IN_CHANNEL));
+        if (leaderMustBeInChannel && (Objects.isNull(userVoiceState) || originalUserVoiceChannel != userVoiceState.getChannel())) {
             event.getUser()
                     .openPrivateChannel()
                     .queue(callback -> callback.sendMessage(
@@ -148,32 +151,33 @@ public class Attendance extends ReactionCommand {
         }
 
         if (event.getReactionEmote().getEmoji().equals(EmojiCodes.CHECK_MARK.unicodeValue)) {
-            final List<Member> memberList = countedMembers.containsKey(event.getGuild())
-                    ? countedMembers.get(event.getGuild())
+            final List<Member> memberList = countedMembers.containsKey(event.getGuild().getId())
+                    ? countedMembers.get(event.getGuild().getId())
                     : new ArrayList<>();
 
             if (!memberList.contains(event.getMember())) {
                 memberList.add(event.getMember());
             }
 
-            countedMembers.put(event.getGuild(), memberList);
+            countedMembers.put(event.getGuild().getId(), memberList);
         }
     }
 
     private void handleStartAttendance(CommandEvent event) {
         final Guild guild = event.getGuild();
+        final String guildId = guild.getId();
         final MessageChannel channel = event.getChannel();
         final String authorId = event.getOriginatingJDAEvent().getAuthor().getId();
         final String messageId = event.getOriginatingJDAEvent().getMessageId();
 
-        timeLeft.put(guild, event.getSettings().getAttendanceTimer());
+        timeLeft.put(guildId, event.getSettings().getAttendanceTimer());
 
         final ReactionMessage message = getReactionMessageForAttendance(guild, channel, authorId, messageId);
 
         event.getChannel().sendMessageEmbeds(message.getEmbedList().get(0)).queue(sentMessage -> {
             sentMessage.addReaction(EmojiCodes.CHECK_MARK.unicodeValue).queue();
             ReactionMessageCache.setReactionMessage(sentMessage.getId(), message);
-            attendanceMessageCache.put(guild, sentMessage.getId());
+            attendanceMessageCache.put(guildId, sentMessage.getId());
 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -181,7 +185,7 @@ public class Attendance extends ReactionCommand {
                 public void run() {
                     updateAttendancePage(guild, channel, authorId, messageId);
 
-                    if (timeLeft.get(guild).toSeconds() <= 0) {
+                    if (timeLeft.get(guildId).toSeconds() <= 0) {
                         timer.cancel();
                         EmbedBuilder finalEmbed = EmbedHelper.getDefaultEmbedBuilder();
 
@@ -211,9 +215,9 @@ public class Attendance extends ReactionCommand {
                             finalEmbed = addAttendanceToMessageEmbed(getAttendanceAsEmbedFieldList(guild), finalEmbed);
 
                             channel.sendMessageEmbeds(finalEmbed.build()).queue();
-                            attendanceMessageCache.remove(guild);
-                            timeLeft.remove(guild);
-                            countedMembers.remove(guild);
+                            timeLeft.remove(guildId);
+                            countedMembers.remove(guildId);
+                            attendanceMessageCache.remove(guildId);
                         }
                     }
                 }
@@ -235,15 +239,17 @@ public class Attendance extends ReactionCommand {
             final String authorId,
             final String messageId
     ) {
-        Duration newTimeLeft = timeLeft.get(guild).minus(Duration.ofSeconds(2));
-        timeLeft.put(guild, newTimeLeft);
+        Duration newTimeLeft = timeLeft.get(guild.getId()).minus(Duration.ofSeconds(2));
+        timeLeft.put(guild.getId(), newTimeLeft);
 
         final ReactionMessage newReactionMessage = getReactionMessageForAttendance(guild, channel, authorId, messageId);
         final MessageEmbed attendanceEmbed = newReactionMessage.getEmbedList().get(0);
 
-        channel.editMessageEmbedsById(attendanceMessageCache.get(guild), attendanceEmbed).queue(sentMessage -> {
+        channel.editMessageEmbedsById(attendanceMessageCache.get(guild.getId()), attendanceEmbed).queue(sentMessage -> {
             ReactionMessageCache.setReactionMessage(sentMessage.getId(), newReactionMessage);
-            attendanceMessageCache.put(guild, sentMessage.getId());
+            if (timeLeft.containsKey(guild.getId()) && !(timeLeft.get(guild.getId()).toSeconds() <= 0)) {
+                attendanceMessageCache.put(guild.getId(), sentMessage.getId());
+            }
         });
     }
 
@@ -262,7 +268,7 @@ public class Attendance extends ReactionCommand {
             final String authorID,
             final String messageId
     ) {
-        final Duration attendanceTimer = timeLeft.get(guild);
+        final Duration attendanceTimer = timeLeft.get(guild.getId());
         List<String> countedMemberList = getAttendanceAsEmbedFieldList(guild);
 
         EmbedBuilder attendancePage = EmbedHelper.getDefaultEmbedBuilder().addField(
@@ -302,10 +308,10 @@ public class Attendance extends ReactionCommand {
         final List<String> countedMemberList = new ArrayList<>();
 
         // TODO: This will be calculated every time the message needs to update. Can probably also be stored in a cache.
-        if (countedMembers.containsKey(guild)) {
+        if (countedMembers.containsKey(guild.getId())) {
             StringBuilder workingString = new StringBuilder();
 
-            for (Member m : countedMembers.get(guild)) {
+            for (Member m : countedMembers.get(guild.getId())) {
                 if (workingString.length() < 900) {
                     workingString.append(m.getAsMention());
                     workingString.append("\n");
@@ -343,9 +349,9 @@ public class Attendance extends ReactionCommand {
     }
 
     private boolean insertAttendanceList(Guild guild) throws SQLException {
-        if (countedMembers.containsKey(guild)) {
+        if (countedMembers.containsKey(guild.getId())) {
             final List<AttendanceEntity> attendanceList = countedMembers
-                    .get(guild)
+                    .get(guild.getId())
                     .stream()
                     .map(member -> new AttendanceEntity(member.getId(), guild.getId(), member.getNickname()))
                     .collect(Collectors.toList());
