@@ -24,3 +24,8 @@ nolebotv2webapi/.project
 nolebotv2webapi/.settings
 nolebotv2webapi/.classpath
 nolebotv2webapi/.factorypath
+/nolebotv2webapi/logs/
+/shared/build/
+/.gradle/
+/buildSrc/.gradle/
+/buildSrc/build/
