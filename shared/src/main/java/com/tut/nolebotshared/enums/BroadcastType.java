@@ -2,5 +2,6 @@ package com.tut.nolebotshared.enums;
 
 public enum BroadcastType {
     GET_FSU_USER,
-    EXCEPTION
+    EXCEPTION,
+    GET_GUILD_USERS,
 }

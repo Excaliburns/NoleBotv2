@@ -22,6 +22,7 @@ import listeners.OnReadyListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.NoleBotUtil;
@@ -57,9 +58,8 @@ public class NoleBot {
                 GatewayIntent.GUILD_MESSAGE_REACTIONS,
                 GatewayIntent.GUILD_VOICE_STATES,
                 GatewayIntent.DIRECT_MESSAGES,
-                GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                GatewayIntent.GUILD_MEMBERS
-                );
+                GatewayIntent.GUILD_MEMBERS,
+                GatewayIntent.DIRECT_MESSAGE_REACTIONS);
 
         // Add Commands
         commandUtil.addCommand(new Help());
@@ -96,7 +96,9 @@ public class NoleBot {
                             guildMessageCommandListener,
                             guildMessageReactionListener,
                             banListListener
-                    ).build();
+                    )
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .build();
 
             NoleBotUtil.setJda(jda);
 

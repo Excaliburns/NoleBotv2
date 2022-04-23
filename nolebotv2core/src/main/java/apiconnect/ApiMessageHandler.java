@@ -1,5 +1,7 @@
 package apiconnect;
 
+import com.tut.nolebotshared.payloads.GetMembersPayload;
+import com.tut.nolebotshared.payloads.MembersPayload;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -9,16 +11,18 @@ import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
-import com.tut.nolebotshared.exceptions.MemberNotFoundException;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.checkerframework.checker.units.qual.A;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.tut.nolebotshared.enums.BroadcastType.EXCEPTION;
 import static com.tut.nolebotshared.enums.BroadcastType.GET_FSU_USER;
+import static com.tut.nolebotshared.enums.BroadcastType.GET_GUILD_USERS;
 
 @AllArgsConstructor
 public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
@@ -48,6 +52,10 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                                     .build()
                     );
                 }
+                case GET_GUILD_USERS -> {
+                    final GetMembersPayload payload = (GetMembersPayload) message.getPayload();
+                    sendUsers(payload.guildId(), broadcastPackageBuilder, payload.pageNum());
+                }
                 default -> {
                  // no op
                 }
@@ -73,7 +81,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
     private GuildUser getMemberDetails(
             final String memberSnowflakeId,
             final String guildSnowflakeId
-    ) throws GuildNotFoundException, ErrorResponseException{
+    ) throws GuildNotFoundException, ErrorResponseException {
 
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
                 .orElseThrow(() -> new GuildNotFoundException(
@@ -95,5 +103,27 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 ).collect(Collectors.toList()),
                 member.getEffectiveAvatarUrl()
         );
+    }
+
+    private void sendUsers(String guildSnowflakeId, BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder, int pageNum) throws GuildNotFoundException {
+        final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
+                .orElseThrow(() -> new GuildNotFoundException(
+                        String.format(guildNotFound, guildSnowflakeId)
+                ));
+        guild.loadMembers().onSuccess((t) -> {
+            ArrayList<GuildUser> users = new ArrayList<>();
+            int numPages = (int) Math.ceil(((double) t.size()) / 300.0);
+            for (int i = 300 * (pageNum - 1); i < 300 * pageNum && i < t.size(); i++) {
+                Member member = t.get(i);
+                users.add(new GuildUser(member.getId(), member.getEffectiveName(), null, null, member.getEffectiveAvatarUrl()));
+            }
+            webSocketConnector.sendMessage(
+                    broadcastPackageBuilder
+                            .payload(new MembersPayload(users, numPages))
+                            .broadcastType(GET_GUILD_USERS)
+                            .build()
+            );
+        });
+        
     }
 }
