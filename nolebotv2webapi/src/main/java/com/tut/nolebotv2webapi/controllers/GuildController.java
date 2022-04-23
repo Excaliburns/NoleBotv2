@@ -1,21 +1,22 @@
 package com.tut.nolebotv2webapi.controllers;
 
 import com.tut.nolebotshared.enums.MessageType;
+import com.tut.nolebotshared.exceptions.MemberNotFoundException;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.BroadcastType;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 
-@Controller(value = "/guilds", consumes = MediaType.ALL)
+@Slf4j
+@Controller("/guilds")
 public class GuildController {
     @Inject
     private CoreWebSocketServer websocketServer;
@@ -32,9 +33,10 @@ public class GuildController {
                                     .broadcastType(BroadcastType.GET_FSU_USER)
                                     .payload(new MemberAndGuildPayload(guildId, userId)).build()
             );
-
+            if (broadcastPackage.getBroadcastType() == BroadcastType.EXCEPTION) {
+                throw (Exception) broadcastPackage.getPayload();
+            }
             final GuildUser guildUser = (GuildUser) broadcastPackage.getPayload();
-
             return HttpResponse.ok(guildUser);
         }
         catch (Exception e) {

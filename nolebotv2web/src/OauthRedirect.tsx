@@ -14,7 +14,8 @@ const updateUserToken = (state: GlobalState, payload: AccessToken) => ({
     }
 });
 
-const updateUserDetails = (state: GlobalState, payload: APIUser) => ({
+const updateUserDetails = (state: GlobalState, payload: APIUser) => (
+    {
     ...state,
     userDetails: {
         ...state.userDetails,
@@ -70,9 +71,8 @@ function OauthRedirect() {
             })
             .then ( response => {
                 actions.updateUserDetails(response.data)
+                navigate('/');
             })
-
-            navigate('/');
         }
     }, [state?.userToken])
 
