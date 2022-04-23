@@ -51,6 +51,11 @@ public class NoleBot {
 
     private static Connection dbconnection;
 
+    /**
+     * Entrypoint.
+     *
+     * @param args args passed to program by environment
+     */
     public static void main(String[] args) {
         // Enable specific events from discord gateway.
         final List<GatewayIntent> INTENT_LIST = List.of(
@@ -59,7 +64,8 @@ public class NoleBot {
                 GatewayIntent.GUILD_VOICE_STATES,
                 GatewayIntent.DIRECT_MESSAGES,
                 GatewayIntent.GUILD_MEMBERS,
-                GatewayIntent.DIRECT_MESSAGE_REACTIONS);
+                GatewayIntent.DIRECT_MESSAGE_REACTIONS
+        );
 
         // Add Commands
         commandUtil.addCommand(new Help());
@@ -112,7 +118,8 @@ public class NoleBot {
             }
 
             final boolean WEBSOCKET_ENABLED = Boolean.parseBoolean(
-                    PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENABLED));
+                    PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENABLED)
+            );
             logger.info("Websocket enabled? {}", WEBSOCKET_ENABLED);
             if (WEBSOCKET_ENABLED) {
                 try {
@@ -139,7 +146,9 @@ public class NoleBot {
             try {
                 final ApiWebSocketConnector connector = new ApiWebSocketConnector(URI.create(
                         "ws://localhost:8080/internalApi/" + PropertiesUtil.getProperty(
-                                PropEnum.API_WEBSOCKET_SECRET)));
+                                PropEnum.API_WEBSOCKET_SECRET
+                        )
+                ));
                 completableFuture.complete(connector);
             }
             catch (Exception e) {

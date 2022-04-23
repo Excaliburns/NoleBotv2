@@ -105,7 +105,11 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
         );
     }
 
-    private void sendUsers(String guildSnowflakeId, BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder, int pageNum) throws GuildNotFoundException {
+    private void sendUsers(
+            String guildSnowflakeId,
+            BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder,
+            int pageNum
+    ) throws GuildNotFoundException {
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
                 .orElseThrow(() -> new GuildNotFoundException(
                         String.format(guildNotFound, guildSnowflakeId)
@@ -114,8 +118,15 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
             ArrayList<GuildUser> users = new ArrayList<>();
             int numPages = (int) Math.ceil(((double) t.size()) / 300.0);
             for (int i = 300 * (pageNum - 1); i < 300 * pageNum && i < t.size(); i++) {
-                Member member = t.get(i);
-                users.add(new GuildUser(member.getId(), member.getEffectiveName(), null, null, member.getEffectiveAvatarUrl()));
+                final Member member = t.get(i);
+                final GuildUser user = new GuildUser(
+                        member.getId(),
+                        member.getEffectiveName(),
+                        null,
+                        null,
+                        member.getEffectiveAvatarUrl()
+                );
+                users.add(user);
             }
             webSocketConnector.sendMessage(
                     broadcastPackageBuilder

@@ -60,7 +60,11 @@ public class Help extends ReactionCommand {
 
     //TODO: Add generic paginated command
     @Override
-    public void handleReaction(GuildMessageReactionAddEvent event, ReactionMessage message, Message retrievedDiscordMessage) {
+    public void handleReaction(
+            GuildMessageReactionAddEvent event,
+            ReactionMessage message,
+            Message retrievedDiscordMessage
+    ) {
         int nextPage;
 
         // if left arrow
@@ -92,10 +96,16 @@ public class Help extends ReactionCommand {
                 for (EmojiCodes emojiCode : message.getReactionsUsed()) {
                     // If the last embed page had a next arrow and we are on the last embed page
                     // Is checking the emojiCode necessary here?
-                    boolean isLastPage = emojiCode == EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
+                    boolean isLastPage = (
+                               emojiCode == EmojiCodes.NEXT_ARROW
+                                && nextPage == message.getEmbedList().size() - 1
+                    );
                     // If the last embed page had a next arrow and we are on the first embed page
                     // Is checking the emojiCode necessary here?
-                    boolean isFirstPage = emojiCode == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
+                    boolean isFirstPage = (
+                            emojiCode == EmojiCodes.PREVIOUS_ARROW
+                            && nextPage == 0
+                    );
                     //If we aren't on the first page or last page, add the reaction we are checking
                     //I think it would make more sense to check emojiCodes here.
                     if (!isLastPage && !isFirstPage) {
