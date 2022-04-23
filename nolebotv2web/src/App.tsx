@@ -3,6 +3,7 @@ import MainPage from "./MainPage/MainPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
 import { createStore, StateMachineProvider } from "little-state-machine";
+import RolePage from "./RolePage/RolePage";
 
 
 createStore({
@@ -30,6 +31,7 @@ function App() {
                     <Routes>
                         <Route path="/auth/redirect" element={<OauthRedirect />} />
                         <Route path="/" element={<MainPage />} />
+                        <Route path={"/roles"} element={<RolePage/>}/>
                     </Routes>
                 </div>
             </BrowserRouter>

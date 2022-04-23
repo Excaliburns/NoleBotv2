@@ -4,5 +4,5 @@ import com.tut.nolebotshared.entities.GuildUser;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public record MembersPayload(ArrayList<GuildUser> users, int numPages) implements Serializable {
+public record MembersPayload(ArrayList<GuildUser> users) implements Serializable {
 }

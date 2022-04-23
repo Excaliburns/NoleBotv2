@@ -17,6 +17,7 @@ import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 }
                 case GET_GUILD_USERS -> {
                     final GetMembersPayload payload = (GetMembersPayload) message.getPayload();
-                    sendUsers(payload.guildId(), broadcastPackageBuilder, payload.pageNum());
+                    sendUsers(payload.guildId(), broadcastPackageBuilder, payload.search());
                 }
                 default -> {
                  // no op
@@ -108,12 +109,28 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
     private void sendUsers(
             String guildSnowflakeId,
             BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder,
-            int pageNum
+            String search
     ) throws GuildNotFoundException {
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
                 .orElseThrow(() -> new GuildNotFoundException(
                         String.format(guildNotFound, guildSnowflakeId)
                 ));
+        guild.retrieveMembersByPrefix(search, 100).onSuccess((m) -> {
+            List<GuildUser> users = m.stream().map((u) -> new GuildUser(
+                    u.getId(),
+                    u.getEffectiveName(),
+                    null,
+                    null,
+                    u.getEffectiveAvatarUrl()
+            )).collect(Collectors.toList());
+            webSocketConnector.sendMessage(
+                    broadcastPackageBuilder
+                            .payload(new MembersPayload(new ArrayList<>(users)))
+                            .broadcastType(GET_GUILD_USERS)
+                            .build()
+            );
+        });
+        /*
         guild.loadMembers().onSuccess((t) -> {
             ArrayList<GuildUser> users = new ArrayList<>();
             int numPages = (int) Math.ceil(((double) t.size()) / 300.0);
@@ -135,6 +152,8 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                             .build()
             );
         });
+
+         */
         
     }
 }

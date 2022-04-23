@@ -13,10 +13,12 @@ import io.micronaut.http.annotation.Post;
 import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.BroadcastType;
+import io.micronaut.http.annotation.QueryValue;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Controller("/guilds")
@@ -49,31 +51,19 @@ public class GuildController {
     }
 
     @Get("/{guildId}/users/")
-    public HttpResponse<GuildUser[]> getAllUsers(@PathVariable String guildId) {
+    public HttpResponse<List<GuildUser>> getAllUsers(@PathVariable String guildId, @QueryValue String name) {
         try {
             BroadcastPackage broadcastPackage = websocketServer.sendWithResponse(
                     BroadcastPackage.builder()
                             .messageType(MessageType.REQUEST)
                             .broadcastType(BroadcastType.GET_GUILD_USERS)
-                            .payload(new GetMembersPayload(guildId, 1)).build()
+                            .payload(new GetMembersPayload(guildId, name)).build()
             );
             if (broadcastPackage.getBroadcastType() == BroadcastType.EXCEPTION) {
                 throw (Exception) broadcastPackage.getPayload();
             }
-            int numPages = ((MembersPayload) broadcastPackage.getPayload()).numPages();
-            ArrayList<GuildUser> users =((MembersPayload) broadcastPackage.getPayload()).users();
-            for (int i = 2; i <= numPages; i++) {
-                broadcastPackage = websocketServer.sendWithResponse(
-                        BroadcastPackage.builder()
-                                .messageType(MessageType.REQUEST)
-                                .broadcastType(BroadcastType.GET_GUILD_USERS)
-                                .payload(new GetMembersPayload(guildId, i)).build()
-                );
-                users.addAll(((MembersPayload) broadcastPackage.getPayload()).users());
-            }
-            GuildUser[] userArray = new GuildUser[users.size()];
-            users.toArray(userArray);
-            return HttpResponse.ok(userArray);
+            ArrayList<GuildUser> users = ((MembersPayload) broadcastPackage.getPayload()).users();
+            return HttpResponse.ok(users);
         }
         catch (Exception e) {
             e.printStackTrace();
