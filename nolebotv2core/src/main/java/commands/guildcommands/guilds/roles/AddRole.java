@@ -31,7 +31,7 @@ public class AddRole extends Command {
 
         final List<Role> mentionedRolesList = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final boolean guildHasRoleOverrides = !guildSettings.getRoleOverrides().isEmpty();
-        final HashMap<String, List<String>> guildOverrides = guildSettings.getRoleOverrides();
+        final HashMap<String, List<String>> guildOverrides = new HashMap<>(guildSettings.getRoleOverrides());
 
         if (event.getOriginatingJDAEvent().getMember() == null) {
             throw new NullPointerException("Couldn't find user executing command in guild!");

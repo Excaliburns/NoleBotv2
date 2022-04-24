@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import javax.inject.Inject;
 
 @MicronautTest
-class Nolebotv2webapiTest {
+class Nolebotv2webTest {
 
     @Inject
     EmbeddedApplication<?> application;

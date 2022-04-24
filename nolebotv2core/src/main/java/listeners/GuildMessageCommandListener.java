@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import util.permissions.PermissionCache;
 import util.settings.Settings;
 import util.settings.SettingsFactory;
 
@@ -58,10 +57,10 @@ public class GuildMessageCommandListener extends ListenerAdapter {
                 );
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",
-                        command.getName(),
-                        event.getAuthor().getAsTag(),
-                        event.getGuild().getName(),
-                        event.getGuild().getId()
+                        command::getName,
+                        () -> event.getAuthor().getAsTag(),
+                        () -> event.getGuild().getName(),
+                        () -> event.getGuild().getId()
                 );
 
                 try {

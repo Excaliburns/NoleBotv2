@@ -2,21 +2,15 @@ package commands.guildcommands.guilds.permissions;
 
 import commands.util.CommandEvent;
 import commands.util.ReactionCommand;
-import enums.EmojiCodes;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import util.chat.EmbedHelper;
 import util.permissions.GenericPermission;
 import util.permissions.PermissionType;
 import util.reactions.ReactionMessage;
-import util.reactions.ReactionMessageCache;
 import util.reactions.ReactionMessageType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -36,7 +30,7 @@ public class ListGuildPermissions extends ReactionCommand {
     @Override
     public void onCommandReceived(CommandEvent event) {
         final ArrayList<MessageEmbed> permissionPages = new ArrayList<>();
-        final TreeSet<GenericPermission> permissionList  = event.getSettings().getPermissionList();
+        final TreeSet<GenericPermission> permissionList = new TreeSet<>(event.getSettings().getPermissionList());
         //Maps permissionLevels to a Set that is in descending order
         //NavigableSet is just the return type of the method used to invert the TreeSet,
         //could cast back to a TreeSet, or just a Set

@@ -13,10 +13,10 @@ import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import org.checkerframework.checker.units.qual.A;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +27,8 @@ import static com.tut.nolebotshared.enums.BroadcastType.GET_GUILD_USERS;
 
 @AllArgsConstructor
 public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
+    private static final Logger logger = LogManager.getLogger(ApiMessageHandler.class);
+
     // todo: lang
     final String guildNotFound =
             "Guild [%s] could not be found. Make sure NoleBot is in the guild you are querying.";
@@ -44,7 +46,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
 
         try {
             switch (message.getBroadcastType()) {
-                case GET_FSU_USER -> {
+                case GET_FSU_USER: {
                     final MemberAndGuildPayload payload = (MemberAndGuildPayload) message.getPayload();
                     webSocketConnector.sendMessage(
                             broadcastPackageBuilder
@@ -52,13 +54,18 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                                     .broadcastType(GET_FSU_USER)
                                     .build()
                     );
+                    break;
                 }
-                case GET_GUILD_USERS -> {
+                case GET_GUILD_USERS: {
                     final GetMembersPayload payload = (GetMembersPayload) message.getPayload();
                     sendUsers(payload.guildId(), broadcastPackageBuilder, payload.search());
+                    break;
                 }
-                default -> {
-                 // no op
+                default: {
+                    logger.warn(
+                            "Message broadcast type {} did not have matching case",
+                            message::getBroadcastType
+                    );
                 }
             }
         }

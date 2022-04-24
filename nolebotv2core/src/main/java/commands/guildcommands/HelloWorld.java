@@ -4,9 +4,6 @@ import commands.util.Command;
 import commands.util.CommandEvent;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class HelloWorld extends Command {
 
     /**

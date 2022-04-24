@@ -43,13 +43,13 @@ public class ApiWebSocketConnector {
 
     @OnOpen
     public void onOpen(Session userSession) {
-        logger.info("Opened WS connection to: {}", userSession.getRequestURI().toString());
+        logger.info("Opened WS connection to: {}", () -> userSession.getRequestURI().toString());
         this.userSession = userSession;
     }
 
     @OnClose
     public void onClose(Session userSession) {
-        logger.info("Closed WS connection to: {}", userSession.getRequestURI().toString());
+        logger.info("Closed WS connection to: {}", () -> userSession.getRequestURI().toString());
         this.userSession = null;
     }
 

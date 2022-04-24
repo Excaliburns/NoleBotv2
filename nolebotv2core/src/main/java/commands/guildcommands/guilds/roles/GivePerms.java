@@ -30,7 +30,7 @@ public class GivePerms extends Command {
         final List<Member> membersMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
         final List<String> message = event.getMessageContent();
         final int permLevel = Integer.parseInt(message.get(message.size() - 1));
-        if (rolesMentioned.size() == 0 && membersMentioned.size() == 0) {
+        if (rolesMentioned.isEmpty() && membersMentioned.isEmpty()) {
             event.sendErrorResponseToOriginatingChannel("Please mention at least one member or role!");
         }
         else {

@@ -1,23 +1,16 @@
 package commands.general;
 
 import com.google.common.primitives.Ints;
-import commands.guildcommands.HelloWorld;
 import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
 import commands.util.ReactionCommand;
-import enums.EmojiCodes;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import util.NoleBotUtil;
 import util.chat.EmbedHelper;
 import util.reactions.ReactionMessage;
-import util.reactions.ReactionMessageCache;
 import util.reactions.ReactionMessageType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

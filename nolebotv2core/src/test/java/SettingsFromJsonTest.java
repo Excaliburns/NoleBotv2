@@ -2,30 +2,32 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.gson.GsonDuration;
 import util.settings.Settings;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.time.Duration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-
-public class SettingsFromJsonTest {
+class SettingsFromJsonTest {
     static Logger logger = LogManager.getLogger(SettingsFromJsonTest.class);
-    Settings testSettings;
+    static Settings testSettings;
+    static String sampleSettingsJson;
+    static Gson gson;
+    static Settings fromJsonSettings;
 
-    @BeforeEach
-    public void setupTestSettings() {
+    @BeforeAll
+    public static void setupTestSettings() {
+        logger.info("Running SettingsFromJson Test");
         testSettings = new Settings();
 
         testSettings.setPrefix("!");
@@ -40,33 +42,52 @@ public class SettingsFromJsonTest {
 
 
         testSettings.setCommandPermissionMap(testCommandPermissionMap);
+        InputStream resourceStream = SettingsFromJsonTest.class
+                .getClassLoader()
+                .getResourceAsStream("samplesettings.json");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(resourceStream)));
+        sampleSettingsJson = reader.lines().collect(Collectors.joining());
+        gson = new GsonBuilder()
+                .serializeNulls()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Duration.class, new GsonDuration())
+                .create();
+        fromJsonSettings = gson.fromJson(sampleSettingsJson, Settings.class);
     }
 
     @Test
-    public void LoadSettingsFromJsonTest() {
-        logger.info("Running SettingsFromJson Test");
-        InputStream resourceStream = getClass().getClassLoader().getResourceAsStream("samplesettings.json");
+    void loadSettingsFromJsonTest_PrefixCorrect() {
+        Assertions.assertEquals(
+                fromJsonSettings.getPrefix(),
+                testSettings.getPrefix(),
+                "Parsed Prefix Equals Test Prefix"
+        );
+    }
 
-        assertNotNull(resourceStream);
+    @Test
+    void loadSettingsFromJsonTest_GuildIdCorrect() {
+        Assertions.assertEquals(
+                fromJsonSettings.getGuildId(),
+                testSettings.getGuildId(),
+                "Parsed GuildId Equals Test GuildId"
+        );
+    }
 
-        BufferedReader reader = new BufferedReader( new InputStreamReader(resourceStream));
+    @Test
+    void loadSettingsFromJsonTest_CommandPermissionMapCorrect() {
+        Assertions.assertEquals(
+                fromJsonSettings.getCommandPermissionMap(),
+                testSettings.getCommandPermissionMap(),
+                "Parsed Command Permission Map Equals Test Command Permission Map"
+        );
+    }
 
-        assertNotNull(reader);
-        logger.info("Read settings successfully");
-
-        String sampleSettingsJson = reader.lines().collect(Collectors.joining());
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .setPrettyPrinting()
-                .create();
-
-        Settings settings = gson.fromJson(sampleSettingsJson, Settings.class);
-
-        assertEquals(settings.getPrefix              (), testSettings.getPrefix());
-        assertEquals(settings.getGuildId             (), testSettings.getGuildId());
-        assertEquals(settings.getCommandPermissionMap(), testSettings.getCommandPermissionMap());
-        assertEquals(settings.getPermissionList      (), testSettings.getPermissionList());
-
-        logger.info("Completed SettingsFromJson Test");
+    @Test
+    void loadSettingsFromJsonTest_PermissionListCorrect() {
+        Assertions.assertEquals(
+                fromJsonSettings.getPermissionList(),
+                testSettings.getPermissionList(),
+                "Parsed Permission List Equals Test Permission List"
+        );
     }
 }

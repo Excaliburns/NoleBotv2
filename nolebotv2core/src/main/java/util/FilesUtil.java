@@ -35,7 +35,7 @@ public class FilesUtil {
                 Files.createDirectory(file.getParent());
             }
             catch (IOException e) {
-                logger.error("Could not create config directory. {}", e.getMessage());
+                logger.error("Could not create config directory. {}", e::getMessage);
             }
         }
 
@@ -46,7 +46,7 @@ public class FilesUtil {
                 Files.createFile(file);
             }
             catch (IOException e) {
-                logger.error("Could not create config file. {}", e.getMessage());
+                logger.error("Could not create config file. {}", e::getMessage);
             }
         }
     }
@@ -70,14 +70,14 @@ public class FilesUtil {
      */
     public static String getFileContentsAsString(final Path uri) {
         String fileString;
-        logger.info("Getting file as string: " + uri);
+        logger.info("Getting file as string: {}", () -> uri);
 
         try {
             BufferedReader reader = Files.newBufferedReader(uri);
             fileString = reader.lines().collect(Collectors.joining());
         }
         catch (IOException e) {
-            logger.error("Exception occurred while reading file: " + e.getMessage() + "\nReturning empty string.");
+            logger.error("Exception occurred while reading file: {}\nReturning empty string.", e::getMessage);
             return "";
         }
 
@@ -109,7 +109,10 @@ public class FilesUtil {
             writer.close();
         }
         catch (IOException e) {
-            logger.error("Could not create writer for file {}, Reason: {}", uri.toString(), e.getMessage());
+            logger.error("Could not create writer for file {}, Reason: {}",
+                    uri::toString,
+                    e::getMessage
+            );
         }
     }
 }

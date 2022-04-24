@@ -22,7 +22,7 @@ public class UnlockRole extends Command {
     public void onCommandReceived(CommandEvent event) throws Exception {
         final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final StringBuilder builder = new StringBuilder();
-        if (mentionedRoles.size() > 0) {
+        if (!mentionedRoles.isEmpty()) {
             mentionedRoles.forEach(role -> {
                 event.getSettings().unlockRole(role.getId());
                 builder.append(String.format("Role [%s] unlocked\n", role.getName()));

@@ -3,14 +3,13 @@ package util.permissions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import util.NoleBotUtil;
 
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
@@ -25,12 +24,22 @@ public class PermissionCache {
                     .build(new CacheLoader<>() {
                         @SuppressWarnings("NullableProblems")
                         @Override
-                        public TreeSet<GenericPermission> load(@NotNull Pair<String, String> key) {
+                        public TreeSet<GenericPermission> load(@NotNull Pair<String, String> key) throws Exception {
                             logger.info("Permissions not in cache for user {} - loading from disk.", key);
-                            return GenericPermissionsFactory.getPermissionsForUser(
-                                    key.getLeft(),
-                                    NoleBotUtil.getJda().getGuildById(key.getRight())
-                            );
+                            final Set<GenericPermission> permissionTree =
+                                    GenericPermissionsFactory.getPermissionsForUser(
+                                            key.getLeft(),
+                                            NoleBotUtil.getJda().getGuildById(key.getRight())
+                                    );
+                            if (permissionTree == null) {
+                                final String exceptionString = String.format(
+                                        "Couldn't build permission set in permission cache for Guild:User %s:%s",
+                                        key.getLeft(),
+                                        key.getRight()
+                                );
+                                throw new Exception(exceptionString);
+                            }
+                            return new TreeSet<>(permissionTree);
                         }
                     });
 

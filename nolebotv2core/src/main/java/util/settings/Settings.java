@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,14 +19,14 @@ public class Settings {
     private String prefix;
     private String guildId;
     private Duration attendanceTimer;
-    private HashMap<String, Integer> commandPermissionMap;
-    private TreeSet<GenericPermission> permissionList;
+    private Map<String, Integer> commandPermissionMap;
+    private Set<GenericPermission> permissionList;
     private List<String> bannedUserIds;
 
     // First String = roleID id to be assigned.
     // String List = roleIDs that can assign the role
-    private HashMap<String, List<String>> roleOverrides;
-    private HashSet<String> lockedRoles;
+    private Map<String, List<String>> roleOverrides;
+    private Set<String> lockedRoles;
 
     // TODO: Name Verification
     //Initializes defaults that don't need to read anything from the server
@@ -34,7 +35,7 @@ public class Settings {
         this.attendanceTimer = Duration.ofMinutes(5);
         bannedUserIds        = new ArrayList<>();
         roleOverrides        = new HashMap<>();
-        lockedRoles         = new HashSet<>();
+        lockedRoles          = new HashSet<>();
     }
 
     public Settings() {

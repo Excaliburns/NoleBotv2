@@ -36,7 +36,7 @@ public class AddAssignableRole extends Command {
     @Override
     public void onCommandReceived(final CommandEvent event) throws Exception {
         final Settings settings = event.getSettings();
-        final TreeSet<GenericPermission> permissionList = settings.getPermissionList();
+        final TreeSet<GenericPermission> permissionList = new TreeSet<>(settings.getPermissionList());
         final List<Role> roles = event.getMentionedRoles();
         final int userInitiatedPermissionLevel = event.getUserInitiatedPermissionLevel();
         final String rawMessageContent = event.getRawMessageContent();
@@ -74,7 +74,7 @@ public class AddAssignableRole extends Command {
                 messageBuilder.append("\n");
             }
 
-            if (potentialMatches.size() > 0) {
+            if (!potentialMatches.isEmpty()) {
                 final Predicate<? super GenericPermission> checkUserCanCreate =
                         match -> match.getPermissionLevel() > event.getUserInitiatedPermissionLevel();
 

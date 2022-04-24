@@ -6,13 +6,15 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CommandUtil extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(CommandUtil.class);
 
-    public static final ArrayList<Command>        commands     = new ArrayList<>();
-    public static final HashMap<String, Integer>  commandIndex = new HashMap<>();
+    public static final List<Command>        commands     = new ArrayList<>();
+    public static final Map<String, Integer> commandIndex = new HashMap<>();
 
     /**
     * Adds a command to the command list.
@@ -24,7 +26,7 @@ public class CommandUtil extends ListenerAdapter {
 
         synchronized (commandIndex) {
             commandIndex.put(name, commands.size());
-            logger.info("Command registered: " + command.getName());
+            logger.info("Command registered: {}", command::getName);
         }
 
         commands.add(command);

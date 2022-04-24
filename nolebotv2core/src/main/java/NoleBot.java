@@ -1,6 +1,5 @@
 import apiconnect.ApiMessageHandler;
 import apiconnect.ApiWebSocketConnector;
-import com.google.common.collect.Lists;
 import commands.general.GetRoleID;
 import commands.general.GetUserID;
 import commands.general.Help;
@@ -128,13 +127,12 @@ public class NoleBot {
                     NoleBotUtil.setApiWebSocketConnector(connector);
                 }
                 catch (InterruptedException | ExecutionException e) {
-                    logger.error("Fatal exception when connecting to API: {} ", e.getMessage());
-                    e.printStackTrace();
+                    logger.error("Fatal exception when connecting to API: {} ", e::getMessage);
                 }
             }
         }
         catch (LoginException e) {
-            logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e.getMessage());
+            logger.fatal("Could not initialize bot instance. Was token incorrect? {}", e::getMessage);
         }
     }
 

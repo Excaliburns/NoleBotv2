@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,8 +54,8 @@ public class Attendance extends ReactionCommand {
     private final AttendanceStatements statements = new AttendanceStatements();
 
     private final ConcurrentHashMap<String, Duration> timeLeft = new ConcurrentHashMap<>();
-    private final HashMap<String, List<Member>> countedMembers = new HashMap<>();
-    private final HashMap<String, String> attendanceMessageCache = new HashMap<>();
+    private final Map<String, List<Member>> countedMembers = new HashMap<>();
+    private final Map<String, String> attendanceMessageCache = new HashMap<>();
 
 
     /**
@@ -76,7 +77,7 @@ public class Attendance extends ReactionCommand {
         final List<String> messages = event.getMessageContent();
         final Settings guildSettings = event.getSettings();
 
-        if (messages.size() < 1) {
+        if (messages.isEmpty()) {
             event.sendErrorResponseToOriginatingChannel(
                     "Please start, stop, or modify the timer. Use !help attendance"
             );
@@ -85,7 +86,7 @@ public class Attendance extends ReactionCommand {
         final String command = messages.get(1);
 
         switch (command) {
-            case "start" -> {
+            case "start": {
                 if (!attendanceMessageCache.containsKey(event.getGuild().getId())) {
                     handleStartAttendance(event);
                 }
@@ -94,9 +95,13 @@ public class Attendance extends ReactionCommand {
                             "Can not start two attendance counters at the " + "same time in one guild"
                     );
                 }
+                break;
             }
-            case "timer" -> saveTimer(messages, event, guildSettings);
-            case "stop" -> {
+            case "timer": {
+                saveTimer(messages, event, guildSettings);
+                break;
+            }
+            case "stop": {
                 if (attendanceMessageCache.containsKey(event.getGuild().getId())) {
                     timeLeft.put(event.getGuild().getId(), Duration.ZERO);
                 }
@@ -105,8 +110,9 @@ public class Attendance extends ReactionCommand {
                             "Attendance is not currently being taken."
                     );
                 }
+                break;
             }
-            default -> event.sendErrorResponseToOriginatingChannel("Unknown usage.");
+            default: event.sendErrorResponseToOriginatingChannel("Unknown usage.");
         }
     }
 
@@ -155,7 +161,7 @@ public class Attendance extends ReactionCommand {
             return;
         }
 
-        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.CHECK_MARK.unicodeValue)) {
+        if (EmojiCodes.CHECK_MARK.unicodeValue.equals(event.getReactionEmote().getEmoji())) {
             final List<Member> memberList = countedMembers.containsKey(event.getGuild().getId())
                     ? countedMembers.get(event.getGuild().getId())
                     : new ArrayList<>();
@@ -418,8 +424,8 @@ public class Attendance extends ReactionCommand {
         if (messages.size() > 3) {
             durationNum = getTimerInteger(messages.get(2), event);
             final String probableMOrSChar = messages.get(3);
-            final boolean isM = probableMOrSChar.equalsIgnoreCase("m");
-            final boolean isS = probableMOrSChar.equalsIgnoreCase("s");
+            final boolean isM = "m".equalsIgnoreCase(probableMOrSChar);
+            final boolean isS = "s".equalsIgnoreCase(probableMOrSChar);
             if (!isM && !isS) {
                 event.sendErrorResponseToOriginatingChannel(didNotSpecifyTimer);
                 return;

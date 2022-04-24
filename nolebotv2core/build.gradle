@@ -7,11 +7,14 @@ plugins {
 }
 
 checkstyle {
+    ignoreFailures = false
+    maxWarnings = 0
     toolVersion('9.2')
 }
 
 pmd {
-    ignoreFailures(true)
+    ignoreFailures(false)
+    ruleSets = ["category/java/bestpractices.xml"]
 }
 
 version 'a0.1'

@@ -93,7 +93,7 @@ public class CoreWebSocketServer {
             session.close(CloseReason.POLICY_VIOLATION);
         }
         else {
-            logger.info("Established a WS connection: " + session.getRequestURI());
+            logger.info("Established a WS connection: {}", session::getRequestURI);
         }
     }
 
@@ -115,21 +115,25 @@ public class CoreWebSocketServer {
                 broadcastPackageCompletableFuture -> broadcastPackageCompletableFuture.complete(broadcastPackage);
 
         switch (broadcastPackage.getMessageType()) {
-            case RESPONSE -> {
+            case RESPONSE: {
                 Optional<CompletableFuture<BroadcastPackage>> correlatingOutstandingMessage = Optional.ofNullable(
                         this.requests.remove(broadcastPackage.getCorrelationId())
                 );
 
                 correlatingOutstandingMessage.ifPresent(packageCompletableFuture);
+                break;
             }
-            default -> {
-
-            } // do nothing, again.
+            default: {
+                logger.warn(
+                        "Message broadcast type {} did not have matching case",
+                        broadcastPackage::getMessageType
+                );
+            }
         }
     }
 
     @OnClose
     public void onClose(WebSocketSession session, @PathVariable String clientSecret) {
-        logger.info("WS connection: " + session.getRequestURI() + " has disconnected.");
+        logger.info("WS connection: {} has disconnected.", session::getRequestURI);
     }
 }

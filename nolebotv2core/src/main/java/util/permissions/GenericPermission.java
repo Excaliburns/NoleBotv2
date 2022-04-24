@@ -6,8 +6,6 @@ import lombok.Getter;
 import net.dv8tion.jda.api.entities.Role;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-
 @AllArgsConstructor
 @Getter
 public class GenericPermission implements Comparable<GenericPermission> {

@@ -23,7 +23,7 @@ public class LockRole extends Command {
     public void onCommandReceived(CommandEvent event) throws Exception {
         final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final StringBuilder builder = new StringBuilder();
-        if (mentionedRoles.size() > 0) {
+        if (!mentionedRoles.isEmpty()) {
             mentionedRoles.forEach(role -> {
                 event.getSettings().lockRole(role.getId());
                 builder.append(String.format("[%s] added to locked roles\n", role.getName()));

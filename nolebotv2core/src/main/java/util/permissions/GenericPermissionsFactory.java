@@ -4,16 +4,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.settings.Settings;
-import util.settings.SettingsCache;
 import util.settings.SettingsFactory;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -28,7 +24,7 @@ public class GenericPermissionsFactory {
      * @param permission The permission to check against
      * @return The int permissionLevel for the specified user in the specified guild
      */
-    public static TreeSet<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(
+    public static Set<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(
             final Guild guild,
             final GenericPermission permission
     ) {
@@ -75,7 +71,7 @@ public class GenericPermissionsFactory {
      * @param guild The guild object that the user to check is a member of
      * @return The Set of permissions for the specified user in the specified guild if it exists, otherwise null
      */
-    public static TreeSet<GenericPermission> getPermissionsForUser(
+    public static Set<GenericPermission> getPermissionsForUser(
             final String userId,
             final Guild guild
     ) {
@@ -89,24 +85,26 @@ public class GenericPermissionsFactory {
             final String errorMessage = "Tried to get permissions for user {} " +
                     "in Guild {} with ID [{}] but user did not exist";
             switch (e.getErrorResponse()) {
-                case UNKNOWN_MEMBER -> logger.error(
+                case UNKNOWN_MEMBER: logger.error(
                         errorMessage + " in Guild!",
-                        userId,
-                        guild.getName(),
-                        guild.getId()
+                        () -> userId,
+                        guild::getName,
+                        guild::getId
                 );
-                case UNKNOWN_USER -> logger.error(
+                break;
+                case UNKNOWN_USER: logger.error(
                         errorMessage + "!",
-                        userId,
-                        guild.getName(),
-                        guild.getId()
+                        () -> userId,
+                        guild::getName,
+                        guild::getId
                 );
-                default -> logger.error(
+                break;
+                default: logger.error(
                         errorMessage + " in an unknown scenario {}!",
-                        userId,
-                        guild.getName(),
-                        guild.getId(),
-                        e.getErrorResponse().getMeaning()
+                        () -> userId,
+                        guild::getName,
+                        guild::getId,
+                        () -> e.getErrorResponse().getMeaning()
                 );
             }
             return null;

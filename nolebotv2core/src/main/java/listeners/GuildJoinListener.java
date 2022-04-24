@@ -13,6 +13,6 @@ public class GuildJoinListener extends ListenerAdapter {
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         super.onGuildJoin(event);
-        logger.info("Joined new guild {}", event.getGuild().getName());
+        logger.info("Joined new guild {}", () -> event.getGuild().getName());
     }
 }

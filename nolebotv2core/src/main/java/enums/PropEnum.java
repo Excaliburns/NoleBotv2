@@ -2,6 +2,7 @@
 package enums;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public enum PropEnum {
     // TOKEN ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,9 +24,9 @@ public enum PropEnum {
         getMappings().put(propertyKey, this);
     }
 
-    private static HashMap<String, PropEnum> mappings;
+    private static Map<String, PropEnum> mappings;
     @SuppressWarnings("DoubleCheckedLocking")
-    private static HashMap<String, PropEnum> getMappings() {
+    private static Map<String, PropEnum> getMappings() {
         if (mappings == null) {
             synchronized (PropEnum.class) {
                 if (mappings == null) {

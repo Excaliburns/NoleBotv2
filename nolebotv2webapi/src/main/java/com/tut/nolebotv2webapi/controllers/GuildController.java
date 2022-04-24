@@ -15,6 +15,8 @@ import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.BroadcastType;
 import io.micronaut.http.annotation.QueryValue;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ import java.util.List;
 @Slf4j
 @Controller("/guilds")
 public class GuildController {
+    private static final Logger logger = LogManager.getLogger(GuildController.class);
+
     @Inject
     private CoreWebSocketServer websocketServer;
 
@@ -52,7 +56,7 @@ public class GuildController {
             return HttpResponse.ok(guildUser);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception occurred getting FSU User: {}", e::getMessage);
         }
 
         return HttpResponse.serverError();
@@ -81,7 +85,12 @@ public class GuildController {
             return HttpResponse.ok(users);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error(
+                    "Exception occurred getting all users from guild {} with search {}: {}",
+                    () -> guildId,
+                    () -> name,
+                    e::getMessage
+            );
         }
 
         return HttpResponse.serverError();

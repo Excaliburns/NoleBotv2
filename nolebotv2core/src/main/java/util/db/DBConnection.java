@@ -54,14 +54,14 @@ public class DBConnection {
             logger.error(
                     "MySQL driver could not be instantiated. " +
                     "Commands that require a database connection will work, but will error. {}",
-                    e.getMessage()
+                    e::getMessage
             );
         }
         catch (SQLException e) {
             logger.error(
                     "Could not establish DB Connection. " +
                     "Commands that require a database connection will work, but will error. {}",
-                    e.getMessage()
+                    e::getMessage
             );
         }
     }

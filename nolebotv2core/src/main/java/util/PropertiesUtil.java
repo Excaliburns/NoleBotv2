@@ -15,8 +15,7 @@ import java.util.Properties;
 
 public class PropertiesUtil {
     private static final Logger logger = LogManager.getLogger(PropertiesUtil.class);
-    //
-    private static final HashMap<PropEnum, String> propertyMap;
+    private static final Map<PropEnum, String> propertyMap;
 
     /*
      * Checks for property directory and file. If not found, NoleBot will create both.
@@ -37,7 +36,7 @@ public class PropertiesUtil {
             inputStream = new BufferedInputStream(Files.newInputStream(defaultFile));
         }
         catch (IOException e) {
-            logger.error("Could not create Input Stream from properties file. {}", e.getMessage());
+            logger.error("Could not create Input Stream from properties file. {}", e::getMessage);
         }
 
         if (inputStream != null) {
@@ -58,7 +57,7 @@ public class PropertiesUtil {
                 logger.info("Successfully loaded all properties.");
             }
             catch (IOException e) {
-                logger.error("Could not load Input Stream from property file into Properties. {}", e.getMessage());
+                logger.error("Could not load Input Stream from property file into Properties. {}", e::getMessage);
             }
         }
     }
@@ -68,7 +67,7 @@ public class PropertiesUtil {
     }
 
 
-    public static HashMap<PropEnum, String> getPropertyMap() {
+    public static Map<PropEnum, String> getPropertyMap() {
         return propertyMap;
     }
 }
