@@ -1,5 +1,10 @@
 package com.tut.nolebotv2webapi.controllers;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.tut.nolebotshared.entities.DiscordUser;
+import com.tut.nolebotv2webapi.auth.JWTSignatureFactory;
 import com.tut.nolebotv2webapi.client.DiscordApiClient;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
 import io.micronaut.context.annotation.Property;
@@ -8,8 +13,20 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.security.token.jwt.encryption.secret.SecretEncryption;
+import io.micronaut.security.token.jwt.encryption.secret.SecretEncryptionConfiguration;
+import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration;
+import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator;
+import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration;
+import io.micronaut.security.token.jwt.signature.secret.SecretSignature;
+import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration;
+import jakarta.inject.Inject;
 
-@Controller("/oauth")
+@Controller("/")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class AuthController {
     @Property(name = "micronaut.security.oauth2.clients.discord.client-id")
     protected String clientId;
@@ -22,6 +39,8 @@ public class AuthController {
 
     private final DiscordApiClient discordApiClient;
 
+    @Inject
+    private SecretSignature generatorConfiguration;
     public AuthController(DiscordApiClient discordApiClient) {
         this.discordApiClient = discordApiClient;
     }
@@ -32,7 +51,7 @@ public class AuthController {
      * @param clientCode Client authorization code.
      * @return an access token from discord.
      */
-    @Post("/discord")
+    @Post("oauth/discord")
     @Produces(MediaType.APPLICATION_JSON)
     public HttpResponse<DiscordAccessToken> discord(
             final String clientCode
@@ -43,8 +62,16 @@ public class AuthController {
                 "authorization_code",
                 clientCode,
                 baseUiUrl
-        ).blockingSingle();
+        ).blockFirst();
 
         return HttpResponse.ok(token);
+    }
+
+    @Post("xd")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HttpResponse<String> login(@QueryValue String token) throws JOSEException {
+        DiscordUser user = discordApiClient.getDiscordUser("Bearer " + token).blockFirst();
+        SignedJWT jwt = generatorConfiguration.sign(new JWTClaimsSet.Builder().claim("username", user.id()).build());
+        return HttpResponse.ok().body(jwt.toString());
     }
 }

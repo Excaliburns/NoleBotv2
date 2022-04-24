@@ -64,14 +64,10 @@ function OauthRedirect() {
 
     React.useEffect(() => {
         if (state?.userToken) {
-            axiosDiscordInstance.get('/users/@me', {
-                headers: {
-                    Authorization: `Bearer ${state.userToken.access_token}`
-                }
-            })
-            .then ( response => {
-                actions.updateUserDetails(response.data)
-                navigate('/');
+            axiosNolebotInstance.post(
+                "/xd", {"token": state.userToken.access_token}
+            ).then((r) => {
+                console.log(r.headers)
             })
         }
     }, [state?.userToken])

@@ -2,7 +2,7 @@ plugins {
     id 'application'
     id 'nolebotv2.common-dependencies'
     id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("io.micronaut.application") version "3.0.0-M1"
+    id("io.micronaut.application") version "3.3.0"
     id 'checkstyle'
     id 'pmd'
 }
@@ -29,15 +29,16 @@ micronaut {
 
 dependencies {
     implementation project(':shared')
+    implementation("io.micronaut.security:micronaut-security:3.3.0")
+    implementation("io.micronaut.security:micronaut-security-oauth2:3.3.0")
+    implementation("io.micronaut.security:micronaut-security-jwt:3.3.0")
+    implementation ('io.projectreactor:reactor-core:3.4.17')
 
-    implementation("io.micronaut.security:micronaut-security-oauth2")
-    implementation("io.micronaut.security:micronaut-security-jwt")
-
-    implementation("io.micronaut:micronaut-http-client")
-    implementation("io.micronaut:micronaut-runtime")
+    implementation("io.micronaut:micronaut-http-client:3.3.0")
+    implementation("io.micronaut:micronaut-runtime:3.3.0")
     implementation("javax.annotation:javax.annotation-api")
 
-    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut:micronaut-validation:3.3.0")
 }
 
 
