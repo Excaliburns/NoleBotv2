@@ -139,8 +139,13 @@ public class Attendance extends ReactionCommand {
 
         final VoiceChannel originalUserVoiceChannel = originalMember.getVoiceState().getChannel();
         final GuildVoiceState userVoiceState = event.getMember().getVoiceState();
-        final boolean leaderMustBeInChannel = Boolean.parseBoolean(PropertiesUtil.getProperty(PropEnum.ATTENDANCE_LEADER_IN_CHANNEL));
-        if (leaderMustBeInChannel && (Objects.isNull(userVoiceState) || originalUserVoiceChannel != userVoiceState.getChannel())) {
+        final boolean leaderMustBeInChannel = Boolean.parseBoolean(
+                PropertiesUtil.getProperty(PropEnum.ATTENDANCE_LEADER_IN_CHANNEL)
+        );
+        if (
+                leaderMustBeInChannel
+                        && (Objects.isNull(userVoiceState) || originalUserVoiceChannel != userVoiceState.getChannel())
+        ) {
             event.getUser()
                     .openPrivateChannel()
                     .queue(callback -> callback.sendMessage(

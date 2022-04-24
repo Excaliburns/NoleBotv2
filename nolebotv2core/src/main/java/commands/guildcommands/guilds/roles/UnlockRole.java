@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.entities.Role;
 import java.util.List;
 
 public class UnlockRole extends Command {
+    /**
+     * Default Constructor.
+     */
     public UnlockRole() {
         name = "unlockrole";
         description = "Unlocks a role, so it can be assigned with the addrole command";

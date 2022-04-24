@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public class GuildMessageReactionListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageReactionListener.class);
+
     //Fire when someone reacts to a message
     @Override
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
@@ -28,7 +29,9 @@ public class GuildMessageReactionListener extends ListenerAdapter {
             //If the message is a reaction message, execute the corresponding command
             if (callback.getAuthor() == event.getJDA().getSelfUser()) {
                 ReactionMessageCache.cleanUpCache();
-                final Optional<ReactionMessage> reactionMessageOptional = ReactionMessageCache.getReactionMessage(callback.getId());
+                final Optional<ReactionMessage> reactionMessageOptional = ReactionMessageCache.getReactionMessage(
+                        callback.getId()
+                );
 
                 if (reactionMessageOptional.isPresent()) {
                     final ReactionMessage message = reactionMessageOptional.get();

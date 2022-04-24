@@ -2,13 +2,11 @@ package util.settings;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Role;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.FilesUtil;
 import util.permissions.GenericPermission;
-import util.permissions.PermissionType;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,18 +22,26 @@ public class SettingsFactory {
     }
 
     /**
-     * Get settings for guild by ID
+     * Get settings for guild by ID.
+     *
      * @param guildId will be used as file path for guild
      * @return Settings object
      */
     public static Settings getSettingsForGuildFromFile(String guildId) {
-        if (!SettingsManager.doesSettingsExistForGuild(guildId)) {
-            logger.error("Settings was empty for guild {}, throwing exception. Create guild settings before trying to get them next time.", guildId);
+        if (SettingsManager.doesSettingsExistForGuild(guildId)) {
+            logger.error(
+                    "Settings was empty for guild {}, throwing exception. " +
+                            "Create guild settings before trying to get them next time.",
+                    guildId
+            );
             throw new NullPointerException(String.format("Guild settings do not exist for guild %s!", guildId));
         }
         else {
             logger.info("Found settings for guild with id {}", guildId);
-            return FilesUtil.GSON_INSTANCE.fromJson(FilesUtil.getFileContentsAsString(getSettingsPathForGuild(guildId)), Settings.class);
+            return FilesUtil.GSON_INSTANCE.fromJson(
+                    FilesUtil.getFileContentsAsString(getSettingsPathForGuild(guildId)),
+                    Settings.class
+            );
         }
     }
 
@@ -43,9 +49,12 @@ public class SettingsFactory {
     public static Path getSettingsPathForGuild(String guildID) {
         return Paths.get("config/" + guildID + "/settings.json");
     }
+
     /**
-     * Create default settings object for guild
-     * @param guild Admin roles from this guild will be initialized with permission level 1000, all roles will added to config
+     * Create default settings object for guild.
+     *
+     * @param guild Admin roles from this guild will be initialized with permission level 1000,
+     *             all roles will add to config
      * @return settings with default permissions, default addable roles and prefix
      */
     public static Settings createDefaultSetting(Guild guild) {
@@ -53,8 +62,10 @@ public class SettingsFactory {
         initDefaultPermissionListForGuild(guild, settings);
         return settings;
     }
+
     /**
-     * Initialize default permission list object for guild
+     * Initialize default permission list object for guild.
+     *
      * @param guild Admin roles from this guild will be initialized with permission level 1000
      * @param s The settings object that the permission list will be saved to
      */

@@ -8,6 +8,9 @@ import util.settings.SettingsCache;
 import java.util.List;
 
 public class LockRole extends Command {
+    /**
+     * Default Constructor.
+     */
     public LockRole() {
         name = "lockrole";
         description = "Locks a role, so it cant be assigned with the addrole command";

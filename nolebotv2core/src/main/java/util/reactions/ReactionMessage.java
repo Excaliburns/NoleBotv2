@@ -10,7 +10,8 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 @AllArgsConstructor
 public class ReactionMessage {
     private ReactionMessageType   type;

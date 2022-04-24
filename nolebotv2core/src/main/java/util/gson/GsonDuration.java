@@ -14,14 +14,22 @@ import java.time.Duration;
 public class GsonDuration implements JsonSerializer<Duration>, JsonDeserializer<Duration> {
 
     @Override
-    public Duration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public Duration deserialize(
+            final JsonElement jsonElement,
+            final Type type,
+            final JsonDeserializationContext jsonDeserializationContext
+    ) throws JsonParseException {
         final String durationString = jsonElement.getAsString();
 
         return Duration.parse(durationString);
     }
 
     @Override
-    public JsonElement serialize(Duration duration, Type type, JsonSerializationContext jsonSerializationContext) {
+    public JsonElement serialize(
+            final Duration duration,
+            final Type type,
+            final JsonSerializationContext jsonSerializationContext
+    ) {
         return new JsonPrimitive(duration.toString());
     }
 }

@@ -13,6 +13,9 @@ import java.util.List;
 
 public class ShadowBan extends Command {
 
+    /**
+     * Default Constructor.
+     */
     public ShadowBan() {
         name                    = "shadowban";
         description             = "Shadow-bans or unbans a user";
@@ -42,7 +45,7 @@ public class ShadowBan extends Command {
                     }
                 }
 
-                event.getChannel().sendMessage(builder.build()).queue();
+                event.getChannel().sendMessageEmbeds(builder.build()).queue();
             }
 
         }

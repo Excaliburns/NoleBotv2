@@ -9,6 +9,9 @@ import java.util.List;
 
 public class HelloWorld extends Command {
 
+    /**
+     * Default Constructor.
+     */
     public HelloWorld() {
         name                    = "hello";
         description             = "Prints Hello World!";

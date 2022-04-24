@@ -39,7 +39,7 @@ public class Help extends ReactionCommand {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onCommandReceived(CommandEvent event) {
-        //Whether or not to execute the generic help command or to get a specific help page
+        // Whether to execute the generic help command or to get a specific help page
         final boolean isGenericHelpCommand = event.getMessageContent().size() == 1 ||
                                              //If the 2nd word can be parsed to an int
                                              Objects.nonNull(Ints.tryParse(event.getMessageContent().get(1)));
@@ -49,72 +49,12 @@ public class Help extends ReactionCommand {
                 displayGenericHelpMenu(event);
             }
             catch (IndexOutOfBoundsException e) {
-                //Not sure if its necessary to make this error message into a MessageEmbed
+                //Not sure if It's necessary to make this error message into a MessageEmbed
                 event.sendErrorResponseToOriginatingChannel("That help page doesn't exist!");
             }
         }
         else if (event.getMessageContent().size() == 2) {
             event.getChannel().sendMessageEmbeds(sendSpecificCommandHelp(event)).queue();
-        }
-    }
-
-    //TODO: Add generic paginated command
-    @Override
-    public void handleReaction(
-            GuildMessageReactionAddEvent event,
-            ReactionMessage message,
-            Message retrievedDiscordMessage
-    ) {
-        int nextPage;
-
-        // if left arrow
-        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.PREVIOUS_ARROW.unicodeValue)) {
-            nextPage = message.getCurrentEmbedPage() - 1;
-        }
-        // if right arrow
-        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.NEXT_ARROW.unicodeValue)) {
-            nextPage = message.getCurrentEmbedPage() + 1;
-        }
-        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
-            retrievedDiscordMessage.editMessageEmbeds(EmbedHelper.getDefaultExitMessage()).queue();
-            retrievedDiscordMessage.clearReactions().queue();
-            ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
-            return;
-        }
-        // if other reaction
-        else {
-            return;
-        }
-        // If the next page is between 0 and the number of help pages
-        if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
-            //Set the help message to the next page
-            message.setCurrentEmbedPage(nextPage);
-            //Clear previous reactions
-            retrievedDiscordMessage.editMessageEmbeds(message.getEmbedList().get(nextPage)).queue(editDone -> {
-                editDone.clearReactions().queue();
-
-                for (EmojiCodes emojiCode : message.getReactionsUsed()) {
-                    // If the last embed page had a next arrow and we are on the last embed page
-                    // Is checking the emojiCode necessary here?
-                    boolean isLastPage = (
-                               emojiCode == EmojiCodes.NEXT_ARROW
-                                && nextPage == message.getEmbedList().size() - 1
-                    );
-                    // If the last embed page had a next arrow and we are on the first embed page
-                    // Is checking the emojiCode necessary here?
-                    boolean isFirstPage = (
-                            emojiCode == EmojiCodes.PREVIOUS_ARROW
-                            && nextPage == 0
-                    );
-                    //If we aren't on the first page or last page, add the reaction we are checking
-                    //I think it would make more sense to check emojiCodes here.
-                    if (!isLastPage && !isFirstPage) {
-                        editDone.addReaction(emojiCode.unicodeValue).queue();
-                    }
-                }
-
-                ReactionMessageCache.setReactionMessage(message.getMessageId(), message);
-            });
         }
     }
 
@@ -135,16 +75,43 @@ public class Help extends ReactionCommand {
             calledCommand.getUsages().forEach(usage -> usages.append(prefix).append(usage).append("\n"));
 
             List<MessageEmbed.Field> fieldList = new ArrayList<>();
-            fieldList.add(new MessageEmbed.Field("Command Name: ",                commandString,                                                true));
-            fieldList.add(new MessageEmbed.Field("Permission Level Required: ",   String.valueOf(calledCommand.getRequiredPermissionLevel()),   true));
-            fieldList.add(new MessageEmbed.Field("Description: ",                 calledCommand.getHelpDescription(),                           false));
-            fieldList.add(new MessageEmbed.Field("Usages <required> [optional]:", usages.toString(),                                            false));
+            fieldList.add(
+                    new MessageEmbed.Field(
+                            "Command Name: ",
+                            commandString,
+                            true
+                    )
+            );
+            fieldList.add(
+                    new MessageEmbed.Field(
+                            "Permission Level Required: ",
+                            String.valueOf(calledCommand.getRequiredPermissionLevel()),
+                            true
+                    )
+            );
+            fieldList.add(
+                    new MessageEmbed.Field(
+                            "Description: ",
+                            calledCommand.getHelpDescription(),
+                            false
+                    )
+            );
+            fieldList.add(
+                    new MessageEmbed.Field(
+                            "Usages <required> [optional]: ",
+                            usages.toString(),
+                            false
+                    )
+            );
 
             return EmbedHelper.buildDefaultMessageEmbed(fieldList);
         }
         else {
-            final MessageEmbed.Field field = new MessageEmbed.Field("Error!",
-                    "No command with that name found!", false);
+            final MessageEmbed.Field field = new MessageEmbed.Field(
+                    "Error!",
+                    "No command with that name found!",
+                    false
+            );
             return EmbedHelper.buildDefaultMessageEmbed(field);
         }
     }
@@ -177,10 +144,6 @@ public class Help extends ReactionCommand {
             fields.add(new MessageEmbed.Field("Page " + i + " of " + numPages, "", false));
             commandHelpPages.add(EmbedHelper.buildDefaultMessageEmbed(fields));
         }
-        final List<EmojiCodes> helpReactions = Arrays.asList(
-                EmojiCodes.EXIT,
-                EmojiCodes.PREVIOUS_ARROW,
-                EmojiCodes.NEXT_ARROW);
 
         // Create ReactionMessage from sent messageEmbed
         final ReactionMessage reactionMessage = new ReactionMessage(
@@ -190,20 +153,16 @@ public class Help extends ReactionCommand {
                 event.getOriginatingJDAEvent().getMessageId(),
                 0,
                 commandHelpPages,
-                helpReactions
+                defaultEmojiCodeList
         );
 
         // Always send the first page when creating the display. Use the callback to populate the cache. Index is 0.
-        event.getChannel().sendMessageEmbeds(commandHelpPages.get(0))
-                .queue(message -> {
-                    if (commandHelpPages.size() > 1) {
-                        for (EmojiCodes helpReaction : helpReactions) {
-                            if (helpReaction != EmojiCodes.PREVIOUS_ARROW) {
-                                message.addReaction(helpReaction.unicodeValue).queue();
-                            }
-                        }
-                        ReactionMessageCache.setReactionMessage(message.getId(), reactionMessage);
-                    }
-                });
+        this.sendFirstPage(
+                event,
+                commandHelpPages.get(0),
+                commandHelpPages.size(),
+                defaultEmojiCodeList,
+                reactionMessage
+        );
     }
 }

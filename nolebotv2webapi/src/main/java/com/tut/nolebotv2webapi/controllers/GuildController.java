@@ -26,6 +26,13 @@ public class GuildController {
     @Inject
     private CoreWebSocketServer websocketServer;
 
+    /**
+     * Gets a guild user from core and returns it to the client.
+     *
+     * @param guildId GuildId to search
+     * @param userId UserId to search.
+     * @return A GuildUser, if found.
+     */
     @Post("/{guildId}/{userId}")
     public HttpResponse<GuildUser> getFsuUser(
             @PathVariable final String guildId,
@@ -43,13 +50,21 @@ public class GuildController {
             }
             final GuildUser guildUser = (GuildUser) broadcastPackage.getPayload();
             return HttpResponse.ok(guildUser);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
 
         return HttpResponse.serverError();
     }
 
+    /**
+     * Gets all users of a guild. Must be searched by name prefix.
+     *
+     * @param guildId GuildId to search
+     * @param name Name prefix to search
+     * @return A list of GuildUsers, if found.
+     */
     @Get("/{guildId}/users/")
     public HttpResponse<List<GuildUser>> getAllUsers(@PathVariable String guildId, @QueryValue String name) {
         try {

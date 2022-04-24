@@ -15,6 +15,11 @@ public class DBConnection {
     private static Connection connection;
 
 
+    /**
+     * Get the current connection and reinitialize if it has failed.
+     *
+     * @return MySql Connection instance
+     */
     @SneakyThrows
     public static Connection getConnection() {
         // Exception is only thrown if timeout < 0
@@ -25,6 +30,9 @@ public class DBConnection {
         return connection;
     }
 
+    /**
+     * Initialize the MySql connection, usually performed on startup.
+     */
     public static void initMySqlConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -37,14 +45,24 @@ public class DBConnection {
             connection = DriverManager.getConnection(
                     "jdbc:mysql://" + dbAddr + ":" + dbPort + "/" + dbName + "?autoReconnect=true",
                     dbUser,
-                    dbPass)
-            ;
+                    dbPass
+            );
             logger.info("Successfully initialized database connection: MySQL");
 
-        } catch (ClassNotFoundException e) {
-            logger.error("MySQL driver could not be instantiated. Commands that require a database connection will work, but will error. {}", e.getMessage());
-        } catch (SQLException e) {
-            logger.error("Could not establish DB Connection. Commands that require a database connection will work, but will error. {}", e.getMessage());
+        }
+        catch (ClassNotFoundException e) {
+            logger.error(
+                    "MySQL driver could not be instantiated. " +
+                    "Commands that require a database connection will work, but will error. {}",
+                    e.getMessage()
+            );
+        }
+        catch (SQLException e) {
+            logger.error(
+                    "Could not establish DB Connection. " +
+                    "Commands that require a database connection will work, but will error. {}",
+                    e.getMessage()
+            );
         }
     }
 }

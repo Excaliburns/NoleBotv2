@@ -12,6 +12,9 @@ import util.settings.SettingsCache;
 import java.util.List;
 
 public class GivePerms extends Command {
+    /**
+     * Default Constructor.
+     */
     public GivePerms() {
         name = "giveperms";
         description = "Assigns a permission level to an entity";
@@ -22,7 +25,7 @@ public class GivePerms extends Command {
 
     //TODO: Check if role/user already has a lower permission, delete if so.
     @Override
-    public void onCommandReceived(CommandEvent event) throws Exception {
+    public void onCommandReceived(final CommandEvent event) throws Exception {
         final List<Role> rolesMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final List<Member> membersMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
         final List<String> message = event.getMessageContent();
@@ -33,12 +36,22 @@ public class GivePerms extends Command {
         else {
             Settings eventSettings = event.getSettings();
             rolesMentioned.forEach(role -> {
-                final GenericPermission permToAdd = new GenericPermission(PermissionType.ROLE, role.getName(), role.getId(), permLevel);
+                final GenericPermission permToAdd = new GenericPermission(
+                        PermissionType.ROLE,
+                        role.getName(),
+                        role.getId(),
+                        permLevel
+                );
                 eventSettings.addPermission(permToAdd);
                 SettingsCache.saveSettingsForGuild(event.getGuild(), eventSettings);
             });
             membersMentioned.forEach(member -> {
-                final GenericPermission permToAdd = new GenericPermission(PermissionType.USER, member.getEffectiveName(), member.getId(), permLevel);
+                final GenericPermission permToAdd = new GenericPermission(
+                        PermissionType.USER,
+                        member.getEffectiveName(),
+                        member.getId(),
+                        permLevel
+                );
                 eventSettings.addPermission(permToAdd);
                 SettingsCache.saveSettingsForGuild(event.getGuild(), eventSettings);
             });
@@ -46,7 +59,12 @@ public class GivePerms extends Command {
         }
     }
 
-    private void sendSuccessMessageAfterSettingPerms(List<Role> addedRoles, List<Member> addedMembers, int permLevel, CommandEvent event) {
+    private void sendSuccessMessageAfterSettingPerms(
+            final List<Role> addedRoles,
+            final List<Member> addedMembers,
+            final int permLevel,
+            final CommandEvent event
+    ) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("Successfully added permLevel [%s] to :\n", permLevel));
         builder.append("Roles: \n");

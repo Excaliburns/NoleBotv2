@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
-@AllArgsConstructor @Getter
+@AllArgsConstructor
+@Getter
 public class GenericPermission implements Comparable<GenericPermission> {
     //Type of permission, USER, GROUP, or ROLE
     private final PermissionType type;
@@ -18,6 +19,12 @@ public class GenericPermission implements Comparable<GenericPermission> {
     //The permissionLevel of the User, Group, or Role
     private final int permissionLevel;
 
+    /**
+     * Default Constructor.
+     *
+     * @param role Role to be used to construct the permission, namely it's Name and ID
+     * @param permissionLevel Permission level for the permission object
+     */
     public GenericPermission(final Role role, final int permissionLevel) {
         this.type = PermissionType.ROLE;
         this.name = role.getName();

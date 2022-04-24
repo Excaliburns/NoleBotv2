@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package enums;
 
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public enum PropEnum {
     }
 
     private static HashMap<String, PropEnum> mappings;
+    @SuppressWarnings("DoubleCheckedLocking")
     private static HashMap<String, PropEnum> getMappings() {
         if (mappings == null) {
             synchronized (PropEnum.class) {

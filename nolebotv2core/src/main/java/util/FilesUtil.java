@@ -23,14 +23,15 @@ public class FilesUtil {
             .create();
 
     /**
-     * Create file and directories if they don't already exist
+     * Create file and directories if they don't already exist.
+     *
      * @param file URI
      */
-    public static void createFileIfNotExists (Path file) {
+    public static void createFileIfNotExists(Path file) {
         if (!Files.exists(file.getParent())) {
             logger.warn("Properties directory did not exist. Creating from default.");
 
-            try{
+            try {
                 Files.createDirectory(file.getParent());
             }
             catch (IOException e) {
@@ -43,35 +44,39 @@ public class FilesUtil {
 
             try {
                 Files.createFile(file);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 logger.error("Could not create config file. {}", e.getMessage());
             }
         }
     }
 
     /**
-     * Creates file and returns file contents as string (will be empty in most cases) (do i want to do this?)
-     * @param URI URI for file
+     * Creates file and returns file contents as string (will be empty in most cases).
+     *
+     * @param uri URI for file
      * @return Contents of file
      */
-    public static String getFileContentsAsStringAndCreateIfNotExists(final Path URI) {
-        createFileIfNotExists(URI);
-        return getFileContentsAsString(URI);
+    public static String getFileContentsAsStringAndCreateIfNotExists(final Path uri) {
+        createFileIfNotExists(uri);
+        return getFileContentsAsString(uri);
     }
 
     /**
-     * Gets String content of file
-     * @param URI URI for file
+     * Gets String content of file.
+     *
+     * @param uri URI for file
      * @return Contents of file
      */
-    public static String getFileContentsAsString(final Path URI) {
+    public static String getFileContentsAsString(final Path uri) {
         String fileString;
-        logger.info("Getting file as string: " + URI);
+        logger.info("Getting file as string: " + uri);
 
         try {
-            BufferedReader reader = Files.newBufferedReader(URI);
+            BufferedReader reader = Files.newBufferedReader(uri);
             fileString = reader.lines().collect(Collectors.joining());
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("Exception occurred while reading file: " + e.getMessage() + "\nReturning empty string.");
             return "";
         }
@@ -80,28 +85,31 @@ public class FilesUtil {
     }
 
     /**
-     * Creates file and writes string to it
-     * @param URI URI
+     * Creates file and writes string to it.
+     *
+     * @param uri URI
      * @param fileContents String to write to file
      */
-    public static void writeStringToFileAndCreateIfNotExists(final Path URI, final String fileContents) {
-        createFileIfNotExists(URI);
-        writeStringToFile(URI, fileContents);
+    public static void writeStringToFileAndCreateIfNotExists(final Path uri, final String fileContents) {
+        createFileIfNotExists(uri);
+        writeStringToFile(uri, fileContents);
     }
 
     /**
-     * Writes string to file
-     * @param URI URI
+     * Writes string to file.
+     *
+     * @param uri URI
      * @param fileContents String to write to file
      */
-    public static void writeStringToFile(final Path URI, final String fileContents) {
+    public static void writeStringToFile(final Path uri, final String fileContents) {
         try {
-            BufferedWriter writer = Files.newBufferedWriter(URI);
+            BufferedWriter writer = Files.newBufferedWriter(uri);
 
             writer.write(fileContents);
             writer.close();
-        } catch (IOException e) {
-            logger.error("Could not create writer for file {}, Reason: {}", URI.toString(), e.getMessage());
+        }
+        catch (IOException e) {
+            logger.error("Could not create writer for file {}, Reason: {}", uri.toString(), e.getMessage());
         }
     }
 }

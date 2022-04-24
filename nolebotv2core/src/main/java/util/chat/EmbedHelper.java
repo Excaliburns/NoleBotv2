@@ -6,12 +6,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import util.PropertiesUtil;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 
 public class EmbedHelper {
     /**
      * Gets the default EmbedBuilder template for adding new fields to.
+     *
      * @return a populated template EmbedBuilder. Must be converted to MessageEmbed.
      */
     public static EmbedBuilder getDefaultEmbedBuilder() {
@@ -27,6 +28,7 @@ public class EmbedHelper {
 
     /**
      * Builds the default message embed from a variable amount of fields.
+     *
      * @param fieldList Fields that will populate the new MessageEmbed
      * @return MessageEmbed with fields defined in params
      */
@@ -36,6 +38,7 @@ public class EmbedHelper {
 
     /**
      * Builds the default message embed from a variable amount of fields.
+     *
      * @param fields Fields that will populate the new MessageEmbed
      * @return MessageEmbed with fields defined in params
      */
@@ -48,28 +51,40 @@ public class EmbedHelper {
 
         return embedBuilder.build();
     }
+
     /**
-     * Builds the default exit message embed
-     * @return MessageEmbed with the message "Bye! Thank you for your inquiry
+     * Builds the default exit message embed.
+     *
+     * @return MessageEmbed with the message "Bye! Thank you for your inquiry!"
      */
     public static MessageEmbed getDefaultExitMessage() {
         return EmbedHelper.buildDefaultMessageEmbed(
-                new MessageEmbed.Field(EmojiCodes.WAVING_HAND.unicodeValue + " Bye!", "Thank you for your inquiry " + EmojiCodes.HEART.unicodeValue + "!", false)
+                new MessageEmbed.Field(
+                        EmojiCodes.WAVING_HAND.unicodeValue + " Bye!",
+                        "Thank you for your inquiry " + EmojiCodes.HEART.unicodeValue + "!",
+                        false
+                )
         );
     }
 
     /**
      * Get default expiry message for reactionMessage events.
+     *
      * @return default MessageEmbed page that states their query has expired.
      */
     public static MessageEmbed getDefaultExpiryReactionMessage() {
         return EmbedHelper.buildDefaultMessageEmbed(
-                new MessageEmbed.Field("Uh oh!", "Your query has timed out. Please use your command again.", false)
+                new MessageEmbed.Field(
+                        "Uh oh!",
+                        "Your query has timed out. Please use your command again.",
+                        false
+                )
         );
     }
 
     /**
-     * Get default message for when an exception is raised
+     * Get default message for when an exception is raised.
+     *
      * @param e - Exception that occurred during execution
      * @return default MessageEmbed page with information with the exception's message
      */

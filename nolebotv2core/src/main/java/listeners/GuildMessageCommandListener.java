@@ -17,14 +17,17 @@ import util.settings.SettingsFactory;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 public class GuildMessageCommandListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageCommandListener.class);
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot())
+        if (event.getAuthor().isBot()) {
             return;
+        }
+
 
         List<String> commandMessage;
         final String message = event.getMessage().getContentRaw();
@@ -46,20 +49,29 @@ public class GuildMessageCommandListener extends ListenerAdapter {
 
 
             if (command != null) {
-                final CommandEvent commandEvent = new CommandEvent(event, noPrefixMessage, commandMessage, settings, command);
+                final CommandEvent commandEvent = new CommandEvent(
+                        event,
+                        noPrefixMessage,
+                        commandMessage,
+                        settings,
+                        command
+                );
 
                 logger.info("commandEvent executed: Command [{}] executed by [{}] in Guild [{}] - [{}]",
                         command.getName(),
                         event.getAuthor().getAsTag(),
                         event.getGuild().getName(),
-                        event.getGuild().getId());
+                        event.getGuild().getId()
+                );
 
                 try {
                     command.executeCommand(commandEvent);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     commandEvent.sendErrorResponseToOriginatingChannel(
                             "There was an exception while processing your request!",
-                            "Check the logs and message the bot author if this seems unexpected.");
+                            "Check the logs and message the bot author if this seems unexpected."
+                    );
 
                     commandEvent.printStackTraceToChannelFromThrowable(event.getChannel(), e);
                 }

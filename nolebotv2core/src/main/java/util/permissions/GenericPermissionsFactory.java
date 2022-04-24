@@ -22,12 +22,16 @@ public class GenericPermissionsFactory {
     private static final Logger logger = LogManager.getLogger(GenericPermissionsFactory.class);
 
     /**
-     * Gets the set of permissions stored that are greater than or equal to permission
+     * Gets the set of permissions stored that are greater than or equal to permission.
+     *
      * @param guild The guild object that the user to check is a member of
      * @param permission The permission to check against
      * @return The int permissionLevel for the specified user in the specified guild
      */
-    public static TreeSet<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(Guild guild, GenericPermission permission) {
+    public static TreeSet<GenericPermission> getPermissionsHigherOrEqualToGivenPermission(
+            final Guild guild,
+            final GenericPermission permission
+    ) {
         final Settings settings = SettingsFactory.getSettings(guild);
 
         return settings.getPermissionList()
@@ -37,46 +41,73 @@ public class GenericPermissionsFactory {
     }
 
     /**
-     * Gets the int permissionLevel for the user in the current guild, if there is one
+     * Gets the int permissionLevel for the user in the current guild, if there is one.
+     *
      * @param userId The ID of the user to check permissions for
      * @param guild The guild object that the user to check is a member of
      * @return The int permissionLevel for the specified user in the specified guild
      */
-    public static int getHighestPermissionForUser(String userId, Guild guild) {
+    public static int getHighestPermissionForUser(
+            final String userId,
+            final Guild guild
+    ) {
         return getHighestPermissionObjectForUser(userId, guild).getPermissionLevel();
     }
 
     /**
-     * Gets the GenericPermission object for specified user in the specified guild, if there is one
+     * Gets the GenericPermission object for specified user in the specified guild, if there is one.
+     *
      * @param userId The ID of the user to check permissions for
      * @param guild The guild object that the user to check is a member of
      * @return The GenericPermission for the specified user in the specified guild
      */
-    public static GenericPermission getHighestPermissionObjectForUser(String userId, Guild guild) {
+    public static GenericPermission getHighestPermissionObjectForUser(
+            final String userId,
+            final Guild guild
+    ) {
         return PermissionCache.getPermissionForUser(userId, guild.getId());
     }
 
     /**
-     * Gets the set of permissions for the user in the current guild, if there is one
+     * Gets the set of permissions for the user in the current guild, if there is one.
+     *
      * @param userId The ID of the user to check permissions for
      * @param guild The guild object that the user to check is a member of
      * @return The Set of permissions for the specified user in the specified guild if it exists, otherwise null
      */
-    public static TreeSet<GenericPermission> getPermissionsForUser(String userId, Guild guild) {
+    public static TreeSet<GenericPermission> getPermissionsForUser(
+            final String userId,
+            final Guild guild
+    ) {
         final Settings settings = SettingsFactory.getSettings(guild);
         //This should never be evaluated as null, either it has a member or an exception is thrown
-        Member member = null;
+        Member member;
         try {
             member = guild.retrieveMemberById(userId).complete();
         }
         catch (ErrorResponseException e) {
-            if (e.getErrorResponse().equals(ErrorResponse.UNKNOWN_MEMBER)) {
-                logger.error("Tried to get permissions for user {} in Guild {} with ID [{}] but user did not exist in Guild!", userId, guild
-                        .getName(), guild.getId());
-            }
-            if (e.getErrorResponse().equals(ErrorResponse.UNKNOWN_USER)) {
-                logger.error("Tried to get permissions for user {} in Guild {} with ID [{}] but user did not exist!", userId, guild
-                        .getName(), guild.getId());
+            final String errorMessage = "Tried to get permissions for user {} " +
+                    "in Guild {} with ID [{}] but user did not exist";
+            switch (e.getErrorResponse()) {
+                case UNKNOWN_MEMBER -> logger.error(
+                        errorMessage + " in Guild!",
+                        userId,
+                        guild.getName(),
+                        guild.getId()
+                );
+                case UNKNOWN_USER -> logger.error(
+                        errorMessage + "!",
+                        userId,
+                        guild.getName(),
+                        guild.getId()
+                );
+                default -> logger.error(
+                        errorMessage + " in an unknown scenario {}!",
+                        userId,
+                        guild.getName(),
+                        guild.getId(),
+                        e.getErrorResponse().getMeaning()
+                );
             }
             return null;
         }

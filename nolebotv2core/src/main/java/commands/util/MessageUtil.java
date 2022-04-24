@@ -14,15 +14,39 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class MessageUtil {
+    /**
+     * Send an error message to the channel.
+     *
+     * @param errorMessageContent Content of the error message
+     * @param channel MessageChannel to send it in
+     */
     public static void sendErrorResponseToChannel(String errorMessageContent, MessageChannel channel) {
-        channel.sendMessage(EmojiCodes.DOUBLE_BANG.unicodeValue + "     " + errorMessageContent + "     " + EmojiCodes.DOUBLE_BANG.unicodeValue)
+        channel.sendMessage(
+                EmojiCodes.DOUBLE_BANG.unicodeValue
+                        + "     "
+                        + errorMessageContent
+                        + "     "
+                        + EmojiCodes.DOUBLE_BANG.unicodeValue
+                )
                 .queue();
     }
 
+    /**
+     * Send an error message to the channel.
+     *
+     * @param channel MessageChannel to send it in
+     * @param errorMessages Error messages to send
+     */
     public static void sendErrorResponseToChannel(MessageChannel channel, String ...errorMessages) {
         sendErrorResponseToChannel(channel, Arrays.asList(errorMessages));
     }
 
+    /**
+     * Send an error message to the channel.
+     *
+     * @param channel MessageChannel to send it in
+     * @param errorMessageContent Error messages to send
+     */
     public static void sendErrorResponseToChannel(MessageChannel channel, List<String> errorMessageContent) {
         MessageBuilder builder = new MessageBuilder();
 
@@ -38,11 +62,32 @@ public class MessageUtil {
         channel.sendMessage(builder.build()).queue();
     }
 
+    /**
+     * Send a success message to the channel.
+     *
+     * @param successMessageContent Success message to send
+     * @param channel MessageChannel to send it in
+     */
     public static void sendSuccessResponseToChannel(final String successMessageContent, final MessageChannel channel) {
-        channel.sendMessage(EmojiCodes.CHECK_MARK.unicodeValue + " " + EmojiCodes.DASH.unicodeValue + " " + successMessageContent).queue();
+        channel.sendMessage(
+                EmojiCodes.CHECK_MARK.unicodeValue
+                        + " "
+                        + EmojiCodes.DASH.unicodeValue
+                        + " "
+                        + successMessageContent
+        ).queue();
     }
 
-    public static void sendSuccessResponseToChannel(final MessageChannel channel, final List<String> successMessageContent) {
+    /**
+     * Send a success message to the channel.
+     *
+     * @param successMessageContent Success messages to send
+     * @param channel MessageChannel to send it in
+     */
+    public static void sendSuccessResponseToChannel(
+            final MessageChannel channel,
+            final List<String> successMessageContent
+    ) {
         MessageBuilder builder = new MessageBuilder();
 
         builder.append(EmojiCodes.CHECK_MARK.unicodeValue)
@@ -63,6 +108,12 @@ public class MessageUtil {
         channel.sendMessage(builder.build()).queue();
     }
 
+    /**
+     * Send a stack trace to the channel in an escape block.
+     *
+     * @param channel MessageChannel to send it in
+     * @param e Throwable to parse
+     */
     public static void printStackTraceToChannelFromThrowable(final MessageChannel channel, final Throwable e) {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw  = new PrintWriter(sw);
@@ -75,6 +126,12 @@ public class MessageUtil {
         channel.sendMessage("```java\n" + firstTenLinesOfStackTrace + "...```").queue();
     }
 
+    /**
+     * Send a message to a channel.
+     *
+     * @param message Queue containing a message to send
+     * @param channel Channel to send it in
+     */
     public static void sendMessageToChannel(Queue<Message> message, final MessageChannel channel) {
         while (message.peek() != null) {
             channel.sendMessage(message.poll()).queue();

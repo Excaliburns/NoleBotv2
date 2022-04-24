@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GuildJoinListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildJoinListener.class);
+
     //Logs when bot joins a new guild
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {

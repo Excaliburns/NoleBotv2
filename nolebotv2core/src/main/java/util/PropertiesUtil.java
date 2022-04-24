@@ -35,7 +35,8 @@ public class PropertiesUtil {
 
         try {
             inputStream = new BufferedInputStream(Files.newInputStream(defaultFile));
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("Could not create Input Stream from properties file. {}", e.getMessage());
         }
 
@@ -55,7 +56,8 @@ public class PropertiesUtil {
                 }
 
                 logger.info("Successfully loaded all properties.");
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 logger.error("Could not load Input Stream from property file into Properties. {}", e.getMessage());
             }
         }

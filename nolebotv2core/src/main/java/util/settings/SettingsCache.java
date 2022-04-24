@@ -20,14 +20,15 @@ public class SettingsCache {
             .expireAfterAccess(4, TimeUnit.HOURS)
             .build(new CacheLoader<>() {
                 @Override
-                public Settings load(@NotNull String key) {
+                public @NotNull Settings load(@NotNull String key) {
                     logger.info("Settings not in cache for guild {} - loading from disk.", key);
                     return SettingsFactory.getSettingsForGuildFromFile(key);
                 }
             });
 
     /**
-     * Save guild settings to file
+     * Save guild settings to file.
+     *
      * @param guild guild
      * @param settings Settings object for Guild
      */

@@ -7,10 +7,14 @@ import util.settings.SettingsCache;
 import java.util.Collections;
 
 public class SetPrefix extends Command {
+    /**
+     * Default Constructor.
+     */
     public SetPrefix() {
         name                    = "setprefix";
         description             = "Set the prefix used by NoleBot for your Guild";
-        helpDescription         = "Set the prefix used by NoleBot for your Guild. This can be any combination of characters, up to 5 characters in length.";
+        helpDescription         = "Set the prefix used by NoleBot for your Guild. " +
+                                  "This can be any combination of characters, up to 5 characters in length.";
         requiredPermissionLevel = 1000;
         setUsages(Collections.singletonList("setprefix <prefix>"));
     }
