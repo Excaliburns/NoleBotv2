@@ -14,11 +14,11 @@ import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.BroadcastType;
 import io.micronaut.http.annotation.QueryValue;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
