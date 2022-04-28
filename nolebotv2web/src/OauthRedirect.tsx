@@ -36,43 +36,19 @@ function OauthRedirect() {
 
     React.useEffect( () => {
         if (clientCode) {
-            axiosNolebotInstance.post('/oauth/discord', {
-                clientCode: clientCode
+            console.log(clientCode)
+            axiosNolebotInstance.post('/login', {
+                auth_token: clientCode
+            }).then( response => {
+                axiosNolebotInstance.defaults.headers.common['Authorization'] = "Bearer " + response.data.access_token
             })
-                .then( response => {
-                    const data: {
-                        access_token: string,
-                        expires_in: number,
-                        refresh_token: string,
-                        scope: string[],
-                        token_type: string
-                    } = response.data ;
-
-                    const tokenResponse: AccessToken = {
-                        access_token: data.access_token,
-                        expires_in: data.expires_in,
-                        refresh_token: data.refresh_token,
-                        scope: data.scope[0].split(' '),
-                        token_type: data.token_type
-                    }
-
-                    actions.updateUserToken(tokenResponse)
-                })
         }
 
     }, [clientCode])
 
     React.useEffect(() => {
         if (state?.userToken) {
-            axiosDiscordInstance.get('/users/@me', {
-                headers: {
-                    Authorization: `Bearer ${state.userToken.access_token}`
-                }
-            })
-            .then ( response => {
-                actions.updateUserDetails(response.data)
-                navigate('/');
-            })
+
         }
     }, [state?.userToken])
 

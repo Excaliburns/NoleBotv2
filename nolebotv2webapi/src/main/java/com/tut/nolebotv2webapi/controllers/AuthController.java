@@ -1,5 +1,6 @@
 package com.tut.nolebotv2webapi.controllers;
 
+
 import com.tut.nolebotv2webapi.client.DiscordApiClient;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
 import io.micronaut.context.annotation.Property;
@@ -43,8 +44,9 @@ public class AuthController {
                 "authorization_code",
                 clientCode,
                 baseUiUrl
-        ).blockingSingle();
+        ).blockFirst();
 
         return HttpResponse.ok(token);
     }
+
 }
