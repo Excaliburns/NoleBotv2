@@ -40,7 +40,7 @@ function MainPage() {
     return (
         <Wrapper>
             {
-                state?.userToken?.access_token ? <GuildListing />
+                state?.accessToken ? <GuildListing />
                 :
                 <>
                     <a href={discordOauthUri}>

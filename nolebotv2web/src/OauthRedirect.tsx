@@ -6,12 +6,9 @@ import { APIUser } from "discord-api-types";
 import { useLocation, useNavigate } from "react-router";
 import Spinner from "./shared/components/Spinner";
 
-const updateUserToken = (state: GlobalState, payload: AccessToken) => ({
+const updateUserToken = (state: GlobalState, newToken: string) => ({
     ...state,
-    userToken: {
-        ...state.userToken,
-        ...payload
-    }
+    accessToken: newToken
 });
 
 const updateUserDetails = (state: GlobalState, payload: APIUser) => (
@@ -41,16 +38,29 @@ function OauthRedirect() {
                 auth_token: clientCode
             }).then( response => {
                 axiosNolebotInstance.defaults.headers.common['Authorization'] = "Bearer " + response.data.access_token
+                axiosNolebotInstance.get("/oauth/token").then(response => {
+                    console.log(response.data)
+                    actions.updateUserToken(response.data)
+                })
             })
+
         }
 
     }, [clientCode])
 
     React.useEffect(() => {
-        if (state?.userToken) {
-
+        if (state?.accessToken) {
+            axiosDiscordInstance.get('/users/@me', {
+                headers: {
+                    Authorization: `Bearer ${state.accessToken}`
+                }
+            })
+            .then ( response => {
+                actions.updateUserDetails(response.data)
+                navigate('/');
+            })
         }
-    }, [state?.userToken])
+    }, [state?.accessToken])
 
 
     return (

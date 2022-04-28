@@ -33,22 +33,13 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
             try {
                 log.info(authenticationRequest.getSecret().toString());
                 DiscordAccessToken token = discordApiClient.getAccessToken(clientId, clientSecret, "authorization_code", (String) authenticationRequest.getSecret().toString(), baseUiUrl).blockFirst();
-                DiscordUser user = authWithDiscord(token);
                 log.info("Success");
-                emitter.success(AuthenticationResponse.success(user.id()));
+                emitter.success(AuthenticationResponse.success(token.getAccess_token()));
             }
             catch (Exception e) {
                 emitter.error(AuthenticationResponse.exception());
             }
 
         });
-    }
-
-    private DiscordUser authWithDiscord(final DiscordAccessToken authToken) {
-        DiscordUser user = discordApiClient.getDiscordUser("Bearer " + authToken.getAccess_token()).blockFirst();
-        if (user == null) {
-            throw new UnsupportedOperationException(String.format("Discord user was invalid. Auth token: %s", authToken.toString()));
-        }
-        return user;
     }
 }

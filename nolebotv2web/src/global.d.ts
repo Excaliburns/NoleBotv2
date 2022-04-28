@@ -5,7 +5,7 @@ import { APIUser } from "discord-api-types";
 // little state machine state
 declare module 'little-state-machine' {
     interface GlobalState {
-        userToken?: AccessToken,
+        accessToken?: string,
         userDetails?: APIUser
     }
 }

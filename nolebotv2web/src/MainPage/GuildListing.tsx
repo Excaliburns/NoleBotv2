@@ -15,10 +15,10 @@ export default function GuildListing() {
     const { state } = useStateMachine();
 
     React.useEffect(() => {
-        if (state?.userToken) {
+        if (state?.accessToken) {
             axiosDiscordInstance.get('/users/@me/guilds', {
                 headers: {
-                    Authorization: `Bearer ${state.userToken.access_token}`
+                    Authorization: `Bearer ${state.accessToken}`
                 }
             })
                 .then ( response => {
@@ -40,7 +40,7 @@ export default function GuildListing() {
                     }
                 })
         }
-    }, [state?.userToken])
+    }, [state?.accessToken])
 
     return (
         <div>

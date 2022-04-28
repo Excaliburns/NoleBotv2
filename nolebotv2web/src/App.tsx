@@ -8,7 +8,7 @@ import RolePage from "./RolePage/RolePage";
 
 createStore({
     userDetails: undefined,
-    userToken: undefined
+    accessToken: undefined
 },{
     name: 'nolebot-lsm-store',
     storageType: sessionStorage
