@@ -12,6 +12,7 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,7 @@ import java.util.function.Consumer;
 
 @ServerWebSocket("/internalApi/{clientSecret}")
 @Secured(SecurityRule.IS_ANONYMOUS)
+@Singleton
 public class CoreWebSocketServer {
     private static final Logger logger = LogManager.getLogger(CoreWebSocketServer.class);
     private final String secret;

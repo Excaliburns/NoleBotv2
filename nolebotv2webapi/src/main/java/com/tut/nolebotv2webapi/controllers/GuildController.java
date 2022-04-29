@@ -61,6 +61,16 @@ public class GuildController {
 
         return HttpResponse.ok(guilds);
     }
+
+    @Post("{guildId}/me")
+    public HttpResponse<GuildUser> getCurrentUserGuildUser(
+            @PathVariable final String guildId,
+            @NonNull Authentication authentication
+    ) {
+        final String userId = authentication.getName();
+        return getFsuUser(guildId, userId);
+    }
+
     /**
      * Gets a guild user from core and returns it to the client.
      *
