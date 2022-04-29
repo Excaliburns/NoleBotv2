@@ -10,7 +10,8 @@ import {AxiosProvider} from "./util/AxiosProvider";
 
 createStore({
     jwt: undefined,
-    userDetails: undefined
+    userDetails: undefined,
+    accessToken: undefined
 }, {
     name: 'nolebot-lsm-store',
     storageType: sessionStorage
@@ -32,16 +33,15 @@ function App() {
                             </ul>
                         </nav>
 
-                        {/* A <Switch> looks through its children <Route>s and
+                    {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
-                        <Routes>
-                            <Route path="/auth/redirect" element={<OauthRedirect/>}/>
-                            <Route path="/" element={<MainPage/>}/>
-                            <Route path={"/roles"} element={<RolePage/>}/>
-                        </Routes>
-                    </div>
-                </BrowserRouter>
-            </AxiosProvider>
+                    <Routes>
+                        <Route path="/auth/redirect" element={<OauthRedirect />} />
+                        <Route path="/" element={<MainPage />} />
+                        <Route path={"/roles"} element={<RolePage/>}/>
+                    </Routes>
+                </div>
+            </BrowserRouter>
         </StateMachineProvider>
     )
 }

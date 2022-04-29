@@ -1,6 +1,10 @@
 // CHECKSTYLE:OFF
 package com.tut.nolebotv2webapi.client;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.tut.nolebotshared.entities.DiscordUser;
 import com.tut.nolebotshared.entities.DiscordUser;
 import com.tut.nolebotshared.entities.Guild;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
@@ -12,8 +16,6 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.MediaType;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 @Header(name = "User-Agent", value = "Micronaut")
 @Client("https://discord.com/api/")
