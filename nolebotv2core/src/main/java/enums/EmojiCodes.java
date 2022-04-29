@@ -8,15 +8,16 @@ public enum EmojiCodes {
     NEXT_ARROW("\u27A1"), // ➡
 
     // Misc
-    DASH("\u2014"),
+    DASH("\u2014"), // —
     HEART("\u2764"), // ❤
-    PLEADING("\uD83E\uDD7A"),
+    PLEADING("\uD83E\uDD7A"), // 🥺
     WARNING_ARROW("\u26A0"), // ⚠
     WAVING_HAND("\uD83D\uDC4B"), // 👋
+    THINKING("\uD83E\uDD14"), // 🤔
 
     // Error / Success
     DOUBLE_BANG("\u203C"), //‼
-    CHECK_MARK("\u2705");
+    CHECK_MARK("\u2705"); //✅
 
     public final String unicodeValue;
 

@@ -13,6 +13,8 @@ import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -161,6 +163,6 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
         });
 
          */
-        
+
     }
 }

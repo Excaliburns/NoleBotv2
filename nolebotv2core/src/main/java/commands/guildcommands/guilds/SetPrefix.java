@@ -2,6 +2,7 @@ package commands.guildcommands.guilds;
 
 import commands.util.Command;
 import commands.util.CommandEvent;
+import enums.EmojiCodes;
 import util.settings.SettingsCache;
 
 import java.util.Collections;
@@ -24,7 +25,7 @@ public class SetPrefix extends Command {
         final String oldPrefix       = event.getSettings().getPrefix();
         final String newPrefix       = event.getMessageContent().get(1);
         if (oldPrefix.equals(newPrefix)) {
-            event.sendErrorResponseToOriginatingChannel("\uD83E\uDD14 Those prefixes are the same!");
+            event.sendErrorResponseToOriginatingChannel(EmojiCodes.THINKING + " Those prefixes are the same!");
         }
         else if (newPrefix.length() > 5) {
             event.sendErrorResponseToOriginatingChannel("Prefix length is restricted to 5 characters.");

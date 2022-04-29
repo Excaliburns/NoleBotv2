@@ -6,6 +6,7 @@ import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
+import com.tut.nolebotshared.exceptions.MemberNotFoundException;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
 import com.tut.nolebotv2webapi.client.DiscordApiClient;
@@ -25,6 +26,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;

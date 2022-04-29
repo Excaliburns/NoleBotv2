@@ -42,6 +42,13 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api")
 
     implementation("io.micronaut:micronaut-validation:3.3.0")
+
+    //DB stuff
+    annotationProcessor('io.micronaut.data:micronaut-data-processor')
+    implementation('io.micronaut.data:micronaut-data-jdbc')
+    implementation('io.micronaut.sql:micronaut-jdbc-hikari')
+    implementation'mysql:mysql-connector-java:8.0.22'
+
 }
 
 

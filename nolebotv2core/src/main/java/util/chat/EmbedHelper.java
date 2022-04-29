@@ -51,7 +51,6 @@ public class EmbedHelper {
 
         return embedBuilder.build();
     }
-
     /**
      * Builds the default exit message embed.
      *
