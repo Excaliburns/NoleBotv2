@@ -3,24 +3,25 @@ import {GlobalState, useStateMachine} from "little-state-machine";
 import {useLocation, useNavigate} from "react-router";
 import Spinner from "./shared/components/Spinner";
 import {useAxios} from "./util/AxiosProvider";
+import {DiscordUser} from "./entities/JavaGenerated";
 
-function updateJwt(state: GlobalState, payload: string) {
-    return {
-        ...state,
-        jwt: payload
+const updateJwt = (state: GlobalState, newJwt: string) => ({
+    ...state,
+    jwt: newJwt
+});
+
 const updateUserToken = (state: GlobalState, newToken: string) => ({
     ...state,
     accessToken: newToken
 });
 
-const updateUserDetails = (state: GlobalState, payload: APIUser) => (
-    {
+const updateUserDetails = (state: GlobalState, payload: DiscordUser) => ({
     ...state,
     userDetails: {
         ...state.userDetails,
         ...payload
-
-}
+    }
+});
 
 function OauthRedirect() {
     const location = useLocation();
@@ -37,41 +38,18 @@ function OauthRedirect() {
 
     React.useEffect(() => {
         if (clientCode) {
-            axios.post('/oauth/discord', {
-                clientCode: clientCode
             console.log(clientCode)
-            axiosNolebotInstance.post('/login', {
+            axios.post('/login', {
                 auth_token: clientCode
             }).then( response => {
-                axiosNolebotInstance.defaults.headers.common['Authorization'] = "Bearer " + response.data.access_token
-                axiosNolebotInstance.get("/oauth/token").then(response => {
-                    console.log(response.data)
-                    actions.updateUserToken(response.data)
-                })
+                actions.updateJwt(response.data.access_token)
+                navigate("/")
             })
-                .then(response => {
-                    actions.updateJwt(response.data);
-                    console.log(response.data);
-                    navigate('/');
-                })
-
         }
 
     }, [clientCode])
 
-    React.useEffect(() => {
-        if (state?.accessToken) {
-            axiosDiscordInstance.get('/users/@me', {
-                headers: {
-                    Authorization: `Bearer ${state.accessToken}`
-                }
-            })
-            .then ( response => {
-                actions.updateUserDetails(response.data)
-                navigate('/');
-            })
-        }
-    }, [state?.accessToken])
+
 
 
     return (

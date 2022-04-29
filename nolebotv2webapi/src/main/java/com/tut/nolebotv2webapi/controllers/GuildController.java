@@ -56,7 +56,7 @@ public class GuildController {
             @NonNull Authentication authentication
     ) {
         final List<Guild> guilds = discordApiClient.getDiscordUserGuilds(
-                "Bearer " + authentication.getAttributes().get("auth_token").toString()
+                "Bearer " + authentication.getAttributes().get("discord_access_token").toString()
         ).blockFirst();
 
         return HttpResponse.ok(guilds);

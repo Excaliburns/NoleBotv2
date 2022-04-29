@@ -17,6 +17,8 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.MediaType;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+
 @Header(name = "User-Agent", value = "Micronaut")
 @Client("https://discord.com/api/")
 public interface DiscordApiClient {

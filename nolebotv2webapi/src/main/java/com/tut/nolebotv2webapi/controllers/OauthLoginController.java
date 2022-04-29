@@ -62,7 +62,6 @@ public class OauthLoginController {
     @Post
     @SingleResult
     public Publisher<MutableHttpResponse<?>> login(@Body(value = "auth_token") String authToken, HttpRequest<?> request) throws JOSEException {
-        log.info(authToken);
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials("",  authToken);
 
         // This code is mostly taken from LoginController

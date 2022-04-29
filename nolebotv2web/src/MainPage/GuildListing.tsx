@@ -2,7 +2,7 @@ import { useStateMachine } from "little-state-machine";
 import { APIGuild, APIPartialGuild } from "discord-api-types";
 import React from "react";
 import { AxiosResponse } from "axios";
-import { GuildUser } from "../entities/JavaGenerated";
+import {DiscordUser, GuildUser} from "../entities/JavaGenerated";
 import {useAxios} from "../util/AxiosProvider";
 
 
@@ -12,6 +12,7 @@ export default function GuildListing() {
     const [fsuGuildMemberInfo, setFsuGuildMemberInfo] = React.useState<GuildUser>()
 
     const [guilds, setGuilds] = React.useState<APIPartialGuild[]>([]);
+    const [userDetails, setUserDetails] = React.useState<DiscordUser>();
     const { state } = useStateMachine();
     const axios = useAxios();
 
@@ -26,7 +27,6 @@ export default function GuildListing() {
                     axios.post(`guilds/${process.env.REACT_APP_MAIN_SERVER_ID}/me`)
                         .then((r: AxiosResponse<GuildUser>) => {
                             const gameMasterRole = r.data.roles.find( any => {
-                                console.log(any);
                                 console.log(any.id === '454011610445643806');
                                 return any.id === '454011610445643806'
                             });
@@ -34,6 +34,14 @@ export default function GuildListing() {
                             setFsuGuildMemberInfo(r.data);
                         })
                 }
+            })
+    }, [state.jwt])
+
+    React.useEffect(() => {
+        axios.get('/discord/user_info')
+            .then((response) => {
+                console.log(response.data)
+                setUserDetails(response.data)
             })
     }, [state.jwt])
 
@@ -54,7 +62,7 @@ export default function GuildListing() {
                 </p>
                 Your user data:
                 <pre>
-                           {JSON.stringify(state.userDetails, null, 2)}
+                           {JSON.stringify(userDetails, null, 2)}
                         </pre>
 
                 FSU Guild data:

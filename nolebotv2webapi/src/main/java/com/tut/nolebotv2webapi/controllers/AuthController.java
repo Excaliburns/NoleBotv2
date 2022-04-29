@@ -22,6 +22,6 @@ import java.security.Principal;
 public class AuthController {
     @Get("/token")
     public HttpResponse<String> getAccessToken(@Nullable Authentication authentication) {
-        return HttpResponse.ok().body(authentication.getName());
+        return HttpResponse.ok().body(authentication.getAttributes().get("discord_access_token").toString());
     }
 }

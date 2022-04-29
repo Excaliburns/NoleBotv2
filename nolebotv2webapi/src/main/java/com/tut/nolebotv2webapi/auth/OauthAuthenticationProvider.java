@@ -13,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 @Slf4j
 public class OauthAuthenticationProvider implements AuthenticationProvider {
     @Property(name = "micronaut.security.oauth2.clients.discord.client-id")
@@ -31,10 +34,11 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
     public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest, AuthenticationRequest<?, ?> authenticationRequest) {
         return Mono.<AuthenticationResponse>create(emitter -> {
             try {
-                log.info(authenticationRequest.getSecret().toString());
                 DiscordAccessToken token = discordApiClient.getAccessToken(clientId, clientSecret, "authorization_code", (String) authenticationRequest.getSecret().toString(), baseUiUrl).blockFirst();
-                log.info("Success");
-                emitter.success(AuthenticationResponse.success(token.getAccess_token()));
+                DiscordUser user = discordApiClient.getDiscordUser("Bearer " + token.getAccess_token()).blockFirst();
+                HashMap<String, Object> claims = new HashMap<>();
+                claims.put("discord_access_token", token.getAccess_token());
+                emitter.success(AuthenticationResponse.success(user.id(), new HashSet<String>(), claims));
             }
             catch (Exception e) {
                 emitter.error(AuthenticationResponse.exception());

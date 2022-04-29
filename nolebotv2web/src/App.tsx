@@ -33,16 +33,18 @@ function App() {
                             </ul>
                         </nav>
 
-                    {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-                    <Routes>
-                        <Route path="/auth/redirect" element={<OauthRedirect />} />
-                        <Route path="/" element={<MainPage />} />
-                        <Route path={"/roles"} element={<RolePage/>}/>
-                    </Routes>
-                </div>
-            </BrowserRouter>
+                        {/* A <Switch> looks through its children <Route>s and
+                renders the first one that matches the current URL. */}
+                        <Routes>
+                            <Route path="/auth/redirect" element={<OauthRedirect />} />
+                            <Route path="/" element={<MainPage />} />
+                            <Route path={"/roles"} element={<RolePage/>}/>
+                        </Routes>
+                    </div>
+                </BrowserRouter>
+            </AxiosProvider>
         </StateMachineProvider>
+
     )
 }
 

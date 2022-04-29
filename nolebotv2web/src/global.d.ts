@@ -1,11 +1,11 @@
 import 'little-state-machine';
-import { APIUser } from "discord-api-types";
+import {DiscordUser} from "./entities/JavaGenerated";
 
 // little state machine state
 declare module 'little-state-machine' {
     interface GlobalState {
         jwt?: string
         accessToken?: string,
-        userDetails?: APIUser
+        userDetails?: DiscordUser
     }
 }

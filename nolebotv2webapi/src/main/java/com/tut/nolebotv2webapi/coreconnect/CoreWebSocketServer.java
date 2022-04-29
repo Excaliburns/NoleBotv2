@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-@Secured(SecurityRule.IS_ANONYMOUS)
 @ServerWebSocket("/internalApi/{clientSecret}")
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Singleton
