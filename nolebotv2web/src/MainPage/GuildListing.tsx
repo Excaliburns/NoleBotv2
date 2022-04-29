@@ -1,9 +1,9 @@
 import { useStateMachine } from "little-state-machine";
 import { APIGuild, APIPartialGuild } from "discord-api-types";
 import React from "react";
-import { axiosDiscordInstance, axiosNolebotInstance } from "../util/AxiosNolebotInstance";
 import { AxiosResponse } from "axios";
 import { GuildUser } from "../entities/JavaGenerated";
+import {useAxios} from "../util/AxiosProvider";
 
 
 export default function GuildListing() {
@@ -13,34 +13,29 @@ export default function GuildListing() {
 
     const [guilds, setGuilds] = React.useState<APIPartialGuild[]>([]);
     const { state } = useStateMachine();
+    const axios = useAxios();
 
     React.useEffect(() => {
-        if (state?.userToken) {
-            axiosDiscordInstance.get('/users/@me/guilds', {
-                headers: {
-                    Authorization: `Bearer ${state.userToken.access_token}`
+        axios.get('/guilds')
+            .then( (response) => {
+                setGuilds(response.data)
+                const fsu = response.data.find( (each: APIGuild) => each.id === process.env.REACT_APP_MAIN_SERVER_ID );
+                setFsuGuild(fsu)
+
+                if (fsu) {
+                    axios.post(`guilds/${process.env.REACT_APP_MAIN_SERVER_ID}/me`)
+                        .then((r: AxiosResponse<GuildUser>) => {
+                            const gameMasterRole = r.data.roles.find( any => {
+                                console.log(any);
+                                console.log(any.id === '454011610445643806');
+                                return any.id === '454011610445643806'
+                            });
+                            setIsGameAdmin(!!gameMasterRole)
+                            setFsuGuildMemberInfo(r.data);
+                        })
                 }
             })
-                .then ( response => {
-                    setGuilds(response.data)
-                    const fsu = response.data.find( (each: APIGuild) => each.id === process.env.REACT_APP_MAIN_SERVER_ID );
-                    setFsuGuild(fsu)
-
-                    if (fsu) {
-                        axiosNolebotInstance.post(`guilds/${process.env.REACT_APP_MAIN_SERVER_ID}/${state.userDetails?.id}`)
-                            .then((r: AxiosResponse<GuildUser>) => {
-                                const gameMasterRole = r.data.roles.find( any => {
-                                    console.log(any);
-                                    console.log(any.id === '454011610445643806');
-                                    return any.id === '454011610445643806'
-                                });
-                                setIsGameAdmin(!!gameMasterRole)
-                                setFsuGuildMemberInfo(r.data);
-                            })
-                    }
-                })
-        }
-    }, [state?.userToken])
+    }, [state.jwt])
 
     return (
         <div>

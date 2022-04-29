@@ -1,4 +1,4 @@
-export type AccessToken = {
+export type DiscordAccessToken = {
     access_token: string,
     expires_in: number,
     refresh_token: string,

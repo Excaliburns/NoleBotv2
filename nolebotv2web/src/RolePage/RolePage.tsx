@@ -1,17 +1,14 @@
-import {axiosNolebotInstance} from "../util/AxiosNolebotInstance";
 import {GuildUser} from "../entities/JavaGenerated";
 import React, {useEffect, useState} from "react";
 import {optimizeSelect} from "../util/OptimizedMenuList";
 import AsyncSelect from "react-select/async";
+import {useStateMachine} from "little-state-machine";
+import {useAxios} from "../util/AxiosProvider";
 
-type RolePageProps = {
-
-}
-export default function RolePage(props: RolePageProps) {
-    useEffect(() => {
-
-    }, [])
+export default function RolePage() {
+    const { state } = useStateMachine();
     const [debounce, setDebounce] = useState<{ cb?: () => void, delay?: number; }>({})
+    const axios = useAxios();
 
     useEffect(() => {
         const {cb, delay} = debounce;
@@ -28,7 +25,7 @@ export default function RolePage(props: RolePageProps) {
     ) => {
         setDebounce({
             cb: async () => {
-                const response = await axiosNolebotInstance.get('/guilds/' + process.env.REACT_APP_MAIN_SERVER_ID + '/users/', {params: {"name": searchValue}})
+                const response = await axios.get('/guilds/' + process.env.REACT_APP_MAIN_SERVER_ID + '/users/', {params: {"name": searchValue}})
                 let entries: {value: string, label: string}[] = []
                 response.data.forEach((u: GuildUser) => {
                     entries.push({

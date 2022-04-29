@@ -3,6 +3,8 @@ package com.tut.nolebotv2webapi.coreconnect;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.websocket.CloseReason;
 import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 @ServerWebSocket("/internalApi/{clientSecret}")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class CoreWebSocketServer {
     private static final Logger logger = LogManager.getLogger(CoreWebSocketServer.class);
     private final String secret;

@@ -2,7 +2,7 @@ import React from 'react';
 import logo from '../logo.svg';
 import '../App.css';
 import styled from "styled-components";
-import { AccessToken } from "../entities/AccessToken";
+import { DiscordAccessToken } from "../entities/DiscordAccessToken";
 import { useStateMachine } from "little-state-machine";
 import GuildListing from "./GuildListing";
 
@@ -40,7 +40,7 @@ function MainPage() {
     return (
         <Wrapper>
             {
-                state?.userToken?.access_token ? <GuildListing />
+                state?.jwt ? <GuildListing />
                 :
                 <>
                     <a href={discordOauthUri}>
