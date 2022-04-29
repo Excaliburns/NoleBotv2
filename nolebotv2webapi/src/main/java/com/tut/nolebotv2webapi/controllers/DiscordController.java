@@ -16,9 +16,16 @@ public class DiscordController {
     @Inject
     DiscordApiClient discordApiClient;
 
+    /**
+     * Gets user info from Discord API.
+     *
+     * @param authentication The authentication of the current user
+     * @return A DiscordUser response from Discord
+     */
     @Get("/user_info")
     public HttpResponse<DiscordUser> getUserInfo(Authentication authentication) {
-        DiscordUser user = discordApiClient.getDiscordUser("Bearer " + authentication.getAttributes().get("discord_access_token").toString()).blockFirst();
+        DiscordUser user = discordApiClient.getDiscordUser("Bearer " + authentication.getAttributes()
+                .get("discord_access_token").toString()).blockFirst();
         return HttpResponse.ok(user);
     }
 }

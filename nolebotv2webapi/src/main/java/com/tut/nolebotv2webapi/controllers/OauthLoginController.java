@@ -48,30 +48,46 @@ public class OauthLoginController {
     private ApplicationEventPublisher eventPublisher;
 
     /**
+     * A Controller for the /login endpoint, handles all authentication.
+     *
      * @param authenticator  {@link Authenticator} collaborator
      * @param loginHandler   A collaborator which helps to build HTTP response depending on success or failure.
      * @param eventPublisher The application event publisher
      */
-    public OauthLoginController(Authenticator authenticator, LoginHandler loginHandler, ApplicationEventPublisher eventPublisher) {
+    public OauthLoginController(
+            Authenticator authenticator,
+            LoginHandler loginHandler,
+            ApplicationEventPublisher eventPublisher) {
         this.authenticator = authenticator;
         this.loginHandler = loginHandler;
         this.eventPublisher = eventPublisher;
     }
 
+    /**
+     * Authenticates a user with an authorization code from Discord.
+     *
+     * @param authToken The authorization code received from Discord's redirect
+     * @param request The HTTP request for the login
+     */
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_JSON})
     @Post
     @SingleResult
-    public Publisher<MutableHttpResponse<?>> login(@Body(value = "auth_token") String authToken, HttpRequest<?> request) throws JOSEException {
+    public Publisher<MutableHttpResponse<?>> login(
+            @Body(value = "auth_token") String authToken,
+            HttpRequest<?> request
+    ) throws JOSEException {
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials("",  authToken);
 
         // This code is mostly taken from LoginController
         return Flux.from(authenticator.authenticate(request, creds))
                 .map(authenticationResponse -> {
-                    if (authenticationResponse.isAuthenticated() && authenticationResponse.getAuthentication().isPresent()) {
+                    if (authenticationResponse.isAuthenticated()
+                            && authenticationResponse.getAuthentication().isPresent()) {
                         Authentication authentication = authenticationResponse.getAuthentication().get();
                         eventPublisher.publishEvent(new LoginSuccessfulEvent(authentication));
                         return loginHandler.loginSuccess(authentication, request);
-                    } else {
+                    }
+                    else {
                         eventPublisher.publishEvent(new LoginFailedEvent(authenticationResponse));
                         return loginHandler.loginFailed(authenticationResponse, request);
                     }

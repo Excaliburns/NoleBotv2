@@ -50,6 +50,12 @@ public class GuildController {
     @Inject
     private CoreWebSocketServer websocketServer;
 
+    /**
+     * Gets a guild user from core and returns it to the client.
+     *
+     * @param authentication The authentication of the user, to get Discord Token
+     * @return A List of Guilds the authenticated user is in
+     */
     @SneakyThrows
     @Get
     public HttpResponse<List<Guild>> getUserGuilds(

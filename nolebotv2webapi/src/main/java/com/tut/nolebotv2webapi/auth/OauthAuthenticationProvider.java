@@ -31,11 +31,20 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
     protected DiscordApiClient discordApiClient;
 
     @Override
-    public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest, AuthenticationRequest<?, ?> authenticationRequest) {
+    public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                          AuthenticationRequest<?, ?> authenticationRequest) {
         return Mono.<AuthenticationResponse>create(emitter -> {
             try {
-                DiscordAccessToken token = discordApiClient.getAccessToken(clientId, clientSecret, "authorization_code", (String) authenticationRequest.getSecret().toString(), baseUiUrl).blockFirst();
-                DiscordUser user = discordApiClient.getDiscordUser("Bearer " + token.getAccess_token()).blockFirst();
+                DiscordAccessToken token = discordApiClient.getAccessToken(
+                        clientId,
+                        clientSecret,
+                        "authorization_code",
+                        (String) authenticationRequest.getSecret().toString(),
+                        baseUiUrl
+                ).blockFirst();
+                DiscordUser user = discordApiClient.getDiscordUser(
+                        "Bearer " + token.getAccess_token()
+                ).blockFirst();
                 HashMap<String, Object> claims = new HashMap<>();
                 claims.put("discord_access_token", token.getAccess_token());
                 emitter.success(AuthenticationResponse.success(user.id(), new HashSet<String>(), claims));

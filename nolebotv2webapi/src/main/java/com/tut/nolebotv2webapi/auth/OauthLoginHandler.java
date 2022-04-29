@@ -19,7 +19,11 @@ public class OauthLoginHandler implements LoginHandler {
     }
 
     @Override
-    public MutableHttpResponse<?> loginRefresh(Authentication authentication, String refreshToken, HttpRequest<?> request) {
+    public MutableHttpResponse<?> loginRefresh(
+            Authentication authentication,
+            String refreshToken,
+            HttpRequest<?> request
+    ) {
         return HttpResponse.ok().body("Success");
     }
 
