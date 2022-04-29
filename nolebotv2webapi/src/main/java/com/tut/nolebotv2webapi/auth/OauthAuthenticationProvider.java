@@ -46,6 +46,7 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
                 ).blockFirst();
                 HashMap<String, Object> claims = new HashMap<>();
                 claims.put("discord_access_token", token.getAccess_token());
+                claims.put("discord_username", user.username());
                 emitter.success(AuthenticationResponse.success(user.id(), claims));
             }
             catch (Exception e) {

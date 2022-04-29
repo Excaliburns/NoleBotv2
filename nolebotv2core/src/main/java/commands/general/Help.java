@@ -5,9 +5,13 @@ import commands.util.Command;
 import commands.util.CommandEvent;
 import commands.util.CommandUtil;
 import commands.util.ReactionCommand;
+import enums.EmojiCodes;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import util.chat.EmbedHelper;
 import util.reactions.ReactionMessage;
+import util.reactions.ReactionMessageCache;
 import util.reactions.ReactionMessageType;
 
 import java.util.ArrayList;
@@ -51,59 +55,6 @@ public class Help extends ReactionCommand {
         }
     }
 
-    //TODO: Add generic paginated command
-    @Override
-    public void handleReaction(
-            GuildMessageReactionAddEvent event,
-            ReactionMessage message,
-            Message retrievedDiscordMessage) {
-        int nextPage;
-
-        // if left arrow
-        if (event.getReactionEmote().getEmoji().equals(EmojiCodes.PREVIOUS_ARROW.unicodeValue)) {
-            nextPage = message.getCurrentEmbedPage() - 1;
-        }
-        // if right arrow
-        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.NEXT_ARROW.unicodeValue)) {
-            nextPage = message.getCurrentEmbedPage() + 1;
-        }
-        else if (event.getReactionEmote().getEmoji().equals(EmojiCodes.EXIT.unicodeValue)) {
-            retrievedDiscordMessage.editMessageEmbeds(EmbedHelper.getDefaultExitMessage()).queue();
-            retrievedDiscordMessage.clearReactions().queue();
-            ReactionMessageCache.expireReactionMessage(retrievedDiscordMessage.getId());
-            return;
-        }
-        // if other reaction
-        else {
-            return;
-        }
-        // If the next page is between 0 and the number of help pages
-        if (nextPage > -1 && nextPage < message.getEmbedList().size()) {
-            //Set the help message to the next page
-            message.setCurrentEmbedPage(nextPage);
-            //Clear previous reactions
-            retrievedDiscordMessage.editMessageEmbeds(message.getEmbedList().get(nextPage)).queue(editDone -> {
-                editDone.clearReactions().queue();
-
-                for (EmojiCodes emojiCode : message.getReactionsUsed()) {
-                    // If the last embed page had a next arrow and we are on the last embed page
-                    // Is checking the emojiCode necessary here?
-                    boolean isLastPage = emojiCode ==
-                            EmojiCodes.NEXT_ARROW && nextPage == message.getEmbedList().size() - 1;
-                    // If the last embed page had a next arrow and we are on the first embed page
-                    // Is checking the emojiCode necessary here?
-                    boolean isFirstPage = emojiCode == EmojiCodes.PREVIOUS_ARROW && nextPage == 0;
-                    //If we aren't on the first page or last page, add the reaction we are checking
-                    //I think it would make more sense to check emojiCodes here.
-                    if (!isLastPage && !isFirstPage) {
-                        editDone.addReaction(emojiCode.unicodeValue).queue();
-                    }
-                }
-
-                ReactionMessageCache.setReactionMessage(message.getMessageId(), message);
-            });
-        }
-    }
     //CHECKSTYLE:OFF
     private MessageEmbed sendSpecificCommandHelp(CommandEvent event) {
         // Uses the map of commands in CommandUtil to match the second word of the message to a command
