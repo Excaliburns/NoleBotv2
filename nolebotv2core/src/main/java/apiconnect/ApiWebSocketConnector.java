@@ -97,7 +97,7 @@ public class ApiWebSocketConnector {
     }
 
     /**
-     * Attempts to connect to nolebotwv2webapi
+     * Attempts to connect to nolebotv2webapi.
      *
      * @return A future that gives the WS connector
      */
