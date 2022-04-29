@@ -123,7 +123,7 @@ public class NoleBot {
             logger.info("Websocket enabled? {}", WEBSOCKET_ENABLED);
             if (WEBSOCKET_ENABLED) {
                 try {
-                    final ApiWebSocketConnector connector = tryConnectApi().get();
+                    final ApiWebSocketConnector connector = ApiWebSocketConnector.tryConnectApi().get();
                     connector.addMessageHandler(new ApiMessageHandler(jda, connector));
                     NoleBotUtil.setApiWebSocketConnector(connector);
                 }
@@ -137,26 +137,6 @@ public class NoleBot {
         }
     }
 
-    static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-    private static CompletableFuture<ApiWebSocketConnector> tryConnectApi() {
-        CompletableFuture<ApiWebSocketConnector> completableFuture = new CompletableFuture<>();
-        final ScheduledFuture<?> checkFuture = executorService.scheduleAtFixedRate(() -> {
-            try {
-                final ApiWebSocketConnector connector = new ApiWebSocketConnector(URI.create(
-                        "ws://localhost:8080/internalApi/" + PropertiesUtil.getProperty(
-                                PropEnum.API_WEBSOCKET_SECRET
-                        )
-                ));
-                completableFuture.complete(connector);
-            }
-            catch (Exception e) {
-                logger.info("Swallowing exception, will attempt to reconnect api in 10 seconds.");
-            }
-        }, 0, 10, TimeUnit.SECONDS);
-        completableFuture.whenComplete((result, thrown) -> checkFuture.cancel(true));
-        return completableFuture;
-    }
 
 
 }
