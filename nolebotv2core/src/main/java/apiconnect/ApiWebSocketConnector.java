@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import util.PropertiesUtil;
 
 import javax.websocket.ClientEndpoint;
+import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -23,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * This class handles incoming connections from the Nolebot Webserver.
@@ -64,15 +64,11 @@ public class ApiWebSocketConnector {
      * @throws InterruptedException if the future was interrupted
      */
     @OnClose
-    public void onClose(Session userSession) throws ExecutionException, InterruptedException {
+    public void onClose(Session userSession, CloseReason reason) throws ExecutionException, InterruptedException {
         logger.info("Closed WS connection to: {}", () -> userSession.getRequestURI().toString());
+        logger.info("Reason: {}", reason.toString());
+
         this.userSession = null;
-        try {
-            tryConnectApi().get(60, TimeUnit.SECONDS);
-        }
-        catch (TimeoutException e) {
-            logger.error("Couldn't reopen WS connection");
-        }
     }
 
     @OnMessage
