@@ -66,7 +66,7 @@ public class ApiWebSocketConnector {
     @OnClose
     public void onClose(Session userSession, CloseReason reason) throws ExecutionException, InterruptedException {
         logger.info("Closed WS connection to: {}", () -> userSession.getRequestURI().toString());
-        logger.info("Reason: {}", reason.toString());
+        logger.info("Reason: {}", reason::toString);
 
         this.userSession = null;
     }
