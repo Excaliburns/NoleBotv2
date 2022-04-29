@@ -1,10 +1,6 @@
 package com.tut.nolebotv2webapi.controllers;
 
 import com.nimbusds.jose.JOSEException;
-import com.tut.nolebotshared.entities.DiscordUser;
-import com.tut.nolebotv2webapi.client.DiscordApiClient;
-import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
-import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -17,9 +13,7 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.Authenticator;
@@ -29,8 +23,6 @@ import io.micronaut.security.event.LoginFailedEvent;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.handlers.LoginHandler;
 import io.micronaut.security.rules.SecurityRule;
-import io.micronaut.security.token.jwt.cookie.JwtCookieLoginHandler;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -43,9 +35,9 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class OauthLoginController {
 
-    private Authenticator authenticator;
-    private LoginHandler loginHandler;
-    private ApplicationEventPublisher eventPublisher;
+    private final Authenticator authenticator;
+    private final LoginHandler loginHandler;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * A Controller for the /login endpoint, handles all authentication.

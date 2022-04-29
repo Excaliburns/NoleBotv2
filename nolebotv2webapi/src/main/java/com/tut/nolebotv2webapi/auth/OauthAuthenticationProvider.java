@@ -14,7 +14,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 @Slf4j
 public class OauthAuthenticationProvider implements AuthenticationProvider {
@@ -33,13 +32,13 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
                                                           AuthenticationRequest<?, ?> authenticationRequest) {
-        return Mono.<AuthenticationResponse>create(emitter -> {
+        return Mono.create(emitter -> {
             try {
                 DiscordAccessToken token = discordApiClient.getAccessToken(
                         clientId,
                         clientSecret,
                         "authorization_code",
-                        (String) authenticationRequest.getSecret().toString(),
+                        authenticationRequest.getSecret().toString(),
                         baseUiUrl
                 ).blockFirst();
                 DiscordUser user = discordApiClient.getDiscordUser(
@@ -47,10 +46,10 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
                 ).blockFirst();
                 HashMap<String, Object> claims = new HashMap<>();
                 claims.put("discord_access_token", token.getAccess_token());
-                emitter.success(AuthenticationResponse.success(user.id(), new HashSet<String>(), claims));
+                emitter.success(AuthenticationResponse.success(user.id(), claims));
             }
             catch (Exception e) {
-                emitter.error(AuthenticationResponse.exception());
+                emitter.error(AuthenticationResponse.exception()); //NOPMD
             }
 
         });
