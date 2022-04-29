@@ -69,7 +69,13 @@ public class NoleBotExceptionWrapper {
     public String getUser() {
         return user;
     }
-    //Micronaut doesnt like things passed in through constructors that arent persistent
+
+    /**
+     * Since exceptions aren't serializable, we use this ExceptionWrapper to save them to our DB.
+     *
+     * @param ex The exception we are wrapping
+     * @return A wrapper for ex
+     */
     public static NoleBotExceptionWrapper getWrapperForException(Exception ex) {
         NoleBotExceptionWrapper result = new NoleBotExceptionWrapper();
         StackTraceElement rootCause = ex.getStackTrace()[0];

@@ -1,19 +1,17 @@
 package apiconnect;
 
-import com.tut.nolebotshared.payloads.GetMembersPayload;
-import com.tut.nolebotshared.payloads.MembersPayload;
-import lombok.AllArgsConstructor;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
+import com.tut.nolebotshared.payloads.GetMembersPayload;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.requests.ErrorResponse;
+import com.tut.nolebotshared.payloads.MembersPayload;
+import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

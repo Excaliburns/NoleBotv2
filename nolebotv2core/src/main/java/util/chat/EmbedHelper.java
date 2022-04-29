@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import util.PropertiesUtil;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 
 public class EmbedHelper {
@@ -51,6 +51,7 @@ public class EmbedHelper {
 
         return embedBuilder.build();
     }
+
     /**
      * Builds the default exit message embed.
      *

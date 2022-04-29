@@ -1,10 +1,10 @@
 package apiconnect;
 
+import com.tut.nolebotshared.entities.BroadcastPackage;
+import com.tut.nolebotshared.enums.MessageType;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.tut.nolebotshared.entities.BroadcastPackage;
-import com.tut.nolebotshared.enums.MessageType;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
