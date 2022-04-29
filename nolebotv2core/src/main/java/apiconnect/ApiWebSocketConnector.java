@@ -96,6 +96,11 @@ public class ApiWebSocketConnector {
         void handleMessage(BroadcastPackage message);
     }
 
+    /**
+     * Attempts to connect to nolebotwv2webapi
+     *
+     * @return A future that gives the WS connector
+     */
     public static CompletableFuture<ApiWebSocketConnector> tryConnectApi() {
         CompletableFuture<ApiWebSocketConnector> completableFuture = new CompletableFuture<>();
         final ScheduledFuture<?> checkFuture = executorService.scheduleAtFixedRate(() -> {
