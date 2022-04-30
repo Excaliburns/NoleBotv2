@@ -20,7 +20,7 @@ public class Category {
     @Id
     @MappedProperty("CategoryID")
     @GeneratedValue(value = GeneratedValue.Type.UUID)
-    private String id;
+    private int id;
 
     @Nullable
     @Relation(value = Relation.Kind.ONE_TO_MANY, cascade = Relation.Cascade.ALL, mappedBy = "categoryId")

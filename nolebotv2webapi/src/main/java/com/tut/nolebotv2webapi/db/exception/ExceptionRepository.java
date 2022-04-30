@@ -6,5 +6,4 @@ import io.micronaut.data.repository.CrudRepository;
 
 @JdbcRepository(dialect = Dialect.MYSQL)
 public interface ExceptionRepository extends CrudRepository<NoleBotExceptionWrapper, Integer> {
-
 }

@@ -30,7 +30,7 @@ public class TempController {
     @Get("/get_categories")
     public HttpResponse<String> getCategories() {
         StringBuilder result = new StringBuilder();
-        categoryRepository.findById("temp").ifPresent(category -> {
+        categoryRepository.findById(0).ifPresent(category -> {
             category.getOwners().forEach(owner -> {
                 result.append(owner.getOwnerId());
             });
