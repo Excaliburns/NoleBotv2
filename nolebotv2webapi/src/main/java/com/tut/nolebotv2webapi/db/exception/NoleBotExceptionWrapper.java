@@ -1,74 +1,51 @@
-package com.tut.nolebotv2webapi.exception;
+package com.tut.nolebotv2webapi.db.exception;
 
+import io.micronaut.data.annotation.DateCreated;
+import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.UUID;
 
 @MappedEntity(value = "NolebotExceptions")
 @Slf4j
+@Getter
 @Setter
+@NoArgsConstructor
 //This is a wrapper class for NoleBotExceptions, JPA entities need to be in webapi for Micronaut to compile them
 public class NoleBotExceptionWrapper {
-    private String id;
-    private Timestamp timestamp;
-    private String origClass;
-    private int lineNum;
-    private String methodName;
-    private String rootCause;
-    private String message;
-    private String user;
-
-    private NoleBotExceptionWrapper() {
-        id = UUID.randomUUID().toString();
-        timestamp = Timestamp.from(Instant.now());
-    }
-
     @Id
     @MappedProperty(value = "Id")
-    public String getId() {
-        return id;
-    }
+    @GeneratedValue(value = GeneratedValue.Type.UUID)
+    private int id;
 
     @MappedProperty(value = "Timestamp")
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
+    @DateCreated
+    private Instant timestamp;
 
     @MappedProperty(value = "OrigClass")
-    public String getOrigClass() {
-        return origClass;
-    }
+    private String origClass;
 
     @MappedProperty(value = "LineNum")
-    public int getLineNum() {
-        return lineNum;
-    }
+    private int lineNum;
 
     @MappedProperty(value = "MethodName")
-    public String getMethodName() {
-        return methodName;
-    }
+    private String methodName;
 
     @MappedProperty(value = "RootCause")
-    public String getRootCause() {
-        return rootCause;
-    }
+    private String rootCause;
 
     @MappedProperty(value = "Message")
-    public String getMessage() {
-        return message;
-    }
+    private String message;
 
     @MappedProperty(value = "Username")
-    public String getUser() {
-        return user;
-    }
+    private String user;
+
 
     /**
      * Since exceptions aren't serializable, we use this ExceptionWrapper to save them to our DB.

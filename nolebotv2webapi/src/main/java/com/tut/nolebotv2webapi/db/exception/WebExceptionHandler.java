@@ -1,4 +1,4 @@
-package com.tut.nolebotv2webapi.exception;
+package com.tut.nolebotv2webapi.db.exception;
 
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -19,9 +19,10 @@ public class WebExceptionHandler implements ExceptionHandler<Exception, HttpResp
         NoleBotExceptionWrapper wrapper = NoleBotExceptionWrapper.getWrapperForException(exception);
         Optional<Object> username = request.getAttribute("discord_user_name");
         username.ifPresent(o -> wrapper.setUser((String) o));
+
         repo.save(wrapper);
 
-        return HttpResponse.serverError(wrapper.getId());
+        return HttpResponse.serverError("" + wrapper.getId());
     }
 
 }

@@ -2,7 +2,7 @@ plugins {
     id 'application'
     id 'nolebotv2.common-dependencies'
     id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("io.micronaut.application") version "3.3.0"
+    id("io.micronaut.application") version "3.3.2"
     id 'checkstyle'
     id 'pmd'
 }
@@ -44,9 +44,9 @@ dependencies {
     implementation("io.micronaut:micronaut-validation:3.3.0")
 
     //DB stuff
-    annotationProcessor('io.micronaut.data:micronaut-data-processor')
-    implementation('io.micronaut.data:micronaut-data-jdbc')
-    implementation('io.micronaut.sql:micronaut-jdbc-hikari')
+    annotationProcessor('io.micronaut.data:micronaut-data-processor:3.3.0')
+    implementation('io.micronaut.data:micronaut-data-jdbc:3.3.0')
+    implementation('io.micronaut.sql:micronaut-jdbc-hikari:3.3.0')
     implementation'mysql:mysql-connector-java:8.0.22'
 
 }
