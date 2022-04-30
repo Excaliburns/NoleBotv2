@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-// We should use this controller to get information about guilds
+// We should use this controller to get information about guilds, or user information that is guild specific
 @Slf4j
 @Controller("/guilds")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -56,7 +56,7 @@ public class GuildController {
      * @param userId UserId to search.
      * @return A GuildUser, if found.
      */
-    @Post("/{guildId}/{userId}")
+    @Get("/{guildId}/{userId}")
     public HttpResponse<GuildUser> getFsuUser(
             @PathVariable final String guildId,
             @PathVariable final String userId

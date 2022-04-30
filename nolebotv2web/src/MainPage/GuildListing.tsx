@@ -17,7 +17,7 @@ export default function GuildListing() {
     const axios = useAxios();
 
     React.useEffect(() => {
-        axios.get('/guilds')
+        axios.get('/user/guilds')
             .then( (response) => {
                 setGuilds(response.data)
                 const fsu = response.data.find( (each: APIGuild) => each.id === process.env.REACT_APP_MAIN_SERVER_ID );
@@ -38,7 +38,7 @@ export default function GuildListing() {
     }, [state.jwt])
 
     React.useEffect(() => {
-        axios.get('/discord/user_info')
+        axios.get('/user/info')
             .then((response) => {
                 console.log(response.data)
                 setUserDetails(response.data)
