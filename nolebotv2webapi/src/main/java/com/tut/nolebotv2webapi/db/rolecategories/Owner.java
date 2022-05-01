@@ -8,15 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @MappedEntity(value = "CategoryOwners")
 @Getter
 @Setter
 @AllArgsConstructor
 public class Owner {
-    @MappedProperty("id")
+    @MappedProperty("Id")
     @Id
     @GeneratedValue
-    private int id;
+    private UUID id;
 
     @MappedProperty("CategoryID")
     private String categoryId;

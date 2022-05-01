@@ -2,8 +2,8 @@ import { useStateMachine } from "little-state-machine";
 import { APIGuild, APIPartialGuild } from "discord-api-types";
 import React from "react";
 import { AxiosResponse } from "axios";
-import {DiscordUser, GuildUser} from "../entities/JavaGenerated";
 import {useAxios} from "../util/AxiosProvider";
+import {DiscordUser, GuildUser} from "../entities/JavaGenerated";
 
 
 export default function GuildListing() {

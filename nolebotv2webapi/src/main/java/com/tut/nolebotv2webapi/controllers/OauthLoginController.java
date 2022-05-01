@@ -1,6 +1,5 @@
 package com.tut.nolebotv2webapi.controllers;
 
-import com.nimbusds.jose.JOSEException;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -49,7 +48,8 @@ public class OauthLoginController {
     public OauthLoginController(
             Authenticator authenticator,
             LoginHandler loginHandler,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.authenticator = authenticator;
         this.loginHandler = loginHandler;
         this.eventPublisher = eventPublisher;
@@ -67,7 +67,7 @@ public class OauthLoginController {
     public Publisher<MutableHttpResponse<?>> login(
             @Body(value = "auth_token") String authToken,
             HttpRequest<?> request
-    ) throws JOSEException {
+    ) {
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials("",  authToken);
 
         // This code is mostly taken from LoginController

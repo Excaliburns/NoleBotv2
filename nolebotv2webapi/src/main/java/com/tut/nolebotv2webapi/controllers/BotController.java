@@ -16,6 +16,8 @@ import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Inject;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 // This controller should contain endpoints that cause the bot to do something.
 @Controller("/bot")
@@ -40,9 +42,9 @@ public class BotController {
         String assignerId = authentication.getName();
         List<String> roleIds = requestBody.roleIds();
         String guildId = requestBody.guildId();
-        List<String> allowedRoleIds = categoryRepository.getRoleIdsByOwnerIdAndGuildId(assignerId, guildId);
-        for (String r : roleIds) {
-            if (!allowedRoleIds.contains(r)) {
+        List<UUID> allowedRoleIds = categoryRepository.getRoleIdsByOwnerIdAndGuildId(assignerId, guildId);
+        for (final String r : roleIds) {
+            if (!allowedRoleIds.stream().map(UUID::toString).collect(Collectors.toList()).contains(r)) {
                 return HttpResponse.unauthorized().body("Unauthorized role assignment");
             }
         }

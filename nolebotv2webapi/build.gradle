@@ -47,7 +47,6 @@ dependencies {
     annotationProcessor('io.micronaut.data:micronaut-data-processor:3.3.0')
     implementation('io.micronaut.data:micronaut-data-jdbc:3.3.0')
     implementation('io.micronaut.sql:micronaut-jdbc-hikari:3.3.0')
-    implementation'mysql:mysql-connector-java:8.0.22'
 
 }
 

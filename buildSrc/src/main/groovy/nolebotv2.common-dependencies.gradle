@@ -8,6 +8,9 @@ repositories {
 }
 
 dependencies {
+    implementation "com.microsoft.sqlserver:mssql-jdbc:9.2.1.jre8"
+    implementation'mysql:mysql-connector-java:8.0.22'
+
     // Log4J
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.16.0'

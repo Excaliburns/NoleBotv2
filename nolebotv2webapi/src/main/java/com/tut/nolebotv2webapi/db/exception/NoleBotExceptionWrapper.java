@@ -1,7 +1,6 @@
 package com.tut.nolebotv2webapi.db.exception;
 
 import io.micronaut.data.annotation.DateCreated;
-import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
@@ -10,7 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 @MappedEntity(value = "NolebotExceptions")
 @Slf4j
@@ -21,12 +21,11 @@ import java.time.Instant;
 public class NoleBotExceptionWrapper {
     @Id
     @MappedProperty(value = "Id")
-    @GeneratedValue(value = GeneratedValue.Type.UUID)
-    private int id;
+    private UUID id;
 
     @MappedProperty(value = "Timestamp")
     @DateCreated
-    private Instant timestamp;
+    private Timestamp timestamp;
 
     @MappedProperty(value = "OrigClass")
     private String origClass;

@@ -39,9 +39,6 @@ dependencies {
     // Guava
     implementation "com.google.guava:guava:31.0.1-jre"
 
-    // Mysql Connector
-    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
-
     // Websocket
     implementation group: 'org.glassfish.tyrus.bundles', name: 'tyrus-standalone-client', version: '1.9'
     compileOnly group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'

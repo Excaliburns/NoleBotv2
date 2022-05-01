@@ -1,0 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.flywaydb:flyway-sqlserver:8.2.2"
+        classpath 'com.microsoft.sqlserver:mssql-jdbc:9.2.1.jre8'
+        classpath 'mysql:mysql-connector-java:8.0.22'
+    }
+}
+
+plugins {
+    id "org.flywaydb.flyway" version "8.5.10"
+    id 'java'
+}
+
+flyway {
+    url = project.ext['flyway.url']
+    user = project.ext['flyway.user']
+    password = project.ext['flyway.password']
+    defaultSchema = project.ext['flyway.defaultSchema']
+    locations = ['filesystem:./database']
+}

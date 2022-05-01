@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @MappedEntity("GuildCategories")
 @Getter
@@ -18,9 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Category {
     @Id
-    @MappedProperty("CategoryID")
-    @GeneratedValue(value = GeneratedValue.Type.UUID)
-    private int id;
+    @GeneratedValue
+    private UUID id;
 
     @Nullable
     @Relation(value = Relation.Kind.ONE_TO_MANY, cascade = Relation.Cascade.ALL, mappedBy = "categoryId")
