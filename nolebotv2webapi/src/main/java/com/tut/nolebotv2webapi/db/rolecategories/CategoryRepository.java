@@ -19,4 +19,11 @@ public interface CategoryRepository extends CrudRepository<Category, Integer> {
             "AND GuildID=:guildId",
             nativeQuery = true)
     public List<Role> getRolesByOwnerIdAAndGuildId(String ownerId, String guildId);
+
+    @Query(value = "SELECT RoleID FROM GuildCategories " +
+            "INNER JOIN CategoryOwners ON GuildCategories.CategoryID=CategoryOwners.CategoryID " +
+            "INNER JOIN CategoryRoles ON GuildCategories.CategoryID=CategoryRoles.CategoryID WHERE OwnerID=:ownerId " +
+            "AND GuildID=:guildId",
+            nativeQuery = true)
+    public List<String> getRoleIdsByOwnerIdAndGuildId(String ownerId, String guildId);
 }

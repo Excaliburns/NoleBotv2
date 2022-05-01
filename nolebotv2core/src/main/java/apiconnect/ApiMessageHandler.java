@@ -5,6 +5,7 @@ import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
+import com.tut.nolebotshared.payloads.AssignRolePayload;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
@@ -61,6 +62,11 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                     sendUsers(payload.guildId(), broadcastPackageBuilder, payload.search());
                     break;
                 }
+                case ASSIGN_ROLES: {
+                    final AssignRolePayload payload = (AssignRolePayload) message.getPayload();
+                    assignRoles(payload.roleIds(), payload.userIds(), payload.guildId());
+                    break;
+                }
                 default: {
                     logger.warn(
                             "Message broadcast type {} did not have matching case",
@@ -111,6 +117,16 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 ).collect(Collectors.toList()),
                 member.getEffectiveAvatarUrl()
         );
+    }
+
+    private void assignRoles(List<String> roleIds, List<String> userIds, String guildId) {
+        Guild g = jda.getGuildById(guildId);
+        userIds.forEach(u -> {
+            roleIds.forEach(r -> {
+                g.addRoleToMember(u, g.getRoleById(r)).queue();
+            });
+        });
+
     }
 
     private void sendUsers(

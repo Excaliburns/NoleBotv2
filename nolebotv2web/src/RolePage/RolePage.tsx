@@ -21,8 +21,19 @@ export default function RolePage() {
         setSelectedUsers(newOptions)
     }
     const clickButton = () => {
-        console.log(selectedUsers)
-        console.log(selectedRoles)
+        let roleIds: string[] = []
+        let userIds: string[] = []
+        selectedRoles.forEach(r => {
+            roleIds.push(r.value)
+        })
+        selectedUsers.forEach(u => {
+            userIds.push(u.value)
+        })
+        axios.post("/bot/assign_roles", {
+            roleIds: roleIds,
+            userIds: userIds,
+            guildId: process.env.REACT_APP_MAIN_SERVER_ID
+        })
     }
     useEffect(() => {
         const {cb, delay} = debounce;
@@ -43,7 +54,7 @@ export default function RolePage() {
                 let entries: {value: string, label: string}[] = []
                 response.data.forEach((u: GuildUser) => {
                     entries.push({
-                        value: u.nickname.toLowerCase(),
+                        value: u.id,
                         label: u.nickname
                     })
                 })
