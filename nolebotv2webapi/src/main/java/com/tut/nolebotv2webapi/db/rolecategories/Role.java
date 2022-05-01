@@ -19,6 +19,9 @@ public class Role {
     @MappedProperty("CategoryID")
     private int categoryId;
 
+    @MappedProperty("RoleName")
+    private String roleName;
+
     @Id
     @GeneratedValue
     @MappedProperty("Id")

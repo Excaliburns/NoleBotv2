@@ -13,9 +13,10 @@ import java.util.List;
 @Join(value = "roleIds")
 public interface CategoryRepository extends CrudRepository<Category, Integer> {
 
-    @Query(value = "SELECT RoleID FROM GuildCategories " +
+    @Query(value = "SELECT RoleID,RoleName,GuildCategories.CategoryID,CategoryRoles.id FROM GuildCategories " +
             "INNER JOIN CategoryOwners ON GuildCategories.CategoryID=CategoryOwners.CategoryID " +
-            "INNER JOIN CategoryRoles ON GuildCategories.CategoryID=CategoryRoles.CategoryID WHERE OwnerID=:ownerId",
+            "INNER JOIN CategoryRoles ON GuildCategories.CategoryID=CategoryRoles.CategoryID WHERE OwnerID=:ownerId " +
+            "AND GuildID=:guildId",
             nativeQuery = true)
-    public List<String> getRoleIdsByOwnerId(String ownerId);
+    public List<Role> getRolesByOwnerIdAAndGuildId(String ownerId, String guildId);
 }

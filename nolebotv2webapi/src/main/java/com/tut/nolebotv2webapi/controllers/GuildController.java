@@ -1,6 +1,7 @@
 package com.tut.nolebotv2webapi.controllers;
 
 import com.tut.nolebotshared.entities.BroadcastPackage;
+import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
@@ -9,6 +10,7 @@ import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
 import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import com.tut.nolebotv2webapi.db.rolecategories.CategoryRepository;
+import com.tut.nolebotv2webapi.db.rolecategories.Role;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
@@ -116,15 +118,22 @@ public class GuildController {
     }
 
     /**
-     * Gets the list of roles a user is able to assign.
+     * Gets the list of roles the authed user is able to assign.
      *
      * @param authentication The authentication of the logged in user
      * @return A list of roles
      */
-    @Get("/{guildId}/{userId}/assignable_roles/")
-    public HttpResponse<List<String>> getAssignableRoles(Authentication authentication) {
+    @Get("/{guildId}/assignable_roles/")
+    public HttpResponse<List<GuildRole>> getAssignableRoles(
+            Authentication authentication,
+            @PathVariable String guildId
+    ) {
         String discordUserId = authentication.getName();
-        List<String> optionalRoleIds = categoryRepository.getRoleIdsByOwnerId(discordUserId);
-        return HttpResponse.ok().body(optionalRoleIds);
+        List<Role> roles = categoryRepository.getRolesByOwnerIdAAndGuildId(discordUserId, guildId);
+        List<GuildRole> guildRoles = new ArrayList<>();
+        roles.forEach(role -> {
+            guildRoles.add(new GuildRole(role.getRoleId(), role.getRoleName(), null, null));
+        });
+        return HttpResponse.ok().body(guildRoles);
     }
 }

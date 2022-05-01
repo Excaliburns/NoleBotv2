@@ -1,15 +1,29 @@
-import {GuildUser} from "../entities/JavaGenerated";
+import {GuildRole, GuildUser} from "../entities/JavaGenerated";
 import React, {useEffect, useState} from "react";
 import {optimizeSelect} from "../util/OptimizedMenuList";
 import AsyncSelect from "react-select/async";
 import {useStateMachine} from "little-state-machine";
 import {useAxios} from "../util/AxiosProvider";
+import Select from "react-select";
 
 export default function RolePage() {
     const { state } = useStateMachine();
     const [debounce, setDebounce] = useState<{ cb?: () => void, delay?: number; }>({})
+    const [selectedUsers, setSelectedUsers] = useState<ReadonlyArray<any>>([])
+    const [roleOptions, setRoleOptions] = useState<{value: string, label: string}[]>([])
+    const [selectedRoles, setSelectedRoles] = useState<ReadonlyArray<any>>([])
     const axios = useAxios();
 
+    const onRoleChange = (newOptions: ReadonlyArray<any>) => {
+        setSelectedRoles(newOptions)
+    }
+    const onUserChange = (newOptions: ReadonlyArray<any>) => {
+        setSelectedUsers(newOptions)
+    }
+    const clickButton = () => {
+        console.log(selectedUsers)
+        console.log(selectedRoles)
+    }
     useEffect(() => {
         const {cb, delay} = debounce;
         if (cb) {
@@ -39,10 +53,28 @@ export default function RolePage() {
         })
     }, []);
 
+    React.useEffect(() => {
+        axios.get('/guilds/' + process.env.REACT_APP_MAIN_SERVER_ID + '/assignable_roles')
+            .then((response) => {
+                let entries: {value: string, label:string}[] = []
+                response.data.forEach((g: GuildRole) => {
+                    entries.push({
+                        value: g.id,
+                        label: g.name
+                    })
+                })
+                setRoleOptions(entries)
+            })
+    }, [state.jwt])
+
 
 
     return (
-        <AsyncSelect loadOptions={loadOptions} components={optimizeSelect.components} isMulti={true}/>
+        <>
+            <Select isMulti={true} onChange={onRoleChange} options={roleOptions}/>
+            <AsyncSelect loadOptions={loadOptions} components={optimizeSelect.components} isMulti={true} onChange={onUserChange}/>
+            <button onClick={clickButton}>Submit</button>
+        </>
     )
 
 }
