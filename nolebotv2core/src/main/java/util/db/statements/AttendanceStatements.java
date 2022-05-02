@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class AttendanceStatements {
-    final String insertAttendance =
+    static final String insertAttendance =
             " INSERT INTO Attendance                              " +
             "   (DateEntered,       UserID, ServerID, Nickname  ) " +
             "   VALUES                                            " +
