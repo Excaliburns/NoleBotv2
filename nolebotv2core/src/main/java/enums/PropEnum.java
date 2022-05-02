@@ -12,6 +12,7 @@ public enum PropEnum {
     DB_USER                      ("db.user"),
     DB_PASS                      ("db.pass"),
     DB_PORT                      ("db.port"),
+    DB_TYPE                      ("db.type"),
     TOKEN                        ("bot.token"),
     API_WEBSOCKET_ENABLED        ("api.websocket.enabled"),
     API_WEBSOCKET_SECRET         ("api.websocket.secret"),

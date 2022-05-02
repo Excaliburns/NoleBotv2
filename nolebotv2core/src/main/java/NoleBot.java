@@ -104,7 +104,7 @@ public class NoleBot {
 
             // TODO: Support multiple dbs? DBConnection should store variations of initializing them.
             // maybe some property like, switch (property) case mysql: initMysql, case postgreSql: initPostgre
-            DBConnection.initMySqlConnection();
+            DBConnection.initDbConnection();
             dbconnection = DBConnection.getConnection();
 
             if (dbconnection == null) {
