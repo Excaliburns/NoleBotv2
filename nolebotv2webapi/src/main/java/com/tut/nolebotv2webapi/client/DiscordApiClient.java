@@ -4,40 +4,36 @@ package com.tut.nolebotv2webapi.client;
 import com.tut.nolebotshared.entities.DiscordUser;
 import com.tut.nolebotshared.entities.Guild;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
-import io.micronaut.http.HttpHeaders;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Header;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Produces;
-import io.micronaut.http.client.annotation.Client;
-import reactor.core.publisher.Flux;
+import feign.Body;
+import feign.Headers;
+import feign.Param;
+import feign.RequestLine;
 
 import java.util.List;
 
-@Header(name = "User-Agent", value = "Micronaut")
-@Client("https://discord.com/api/")
+@Headers("User-Agent: Micronaut")
 public interface DiscordApiClient {
 
-    @Post("oauth2/token")
-    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
-    Flux<DiscordAccessToken> getAccessToken(
-            String client_id,
-            String client_secret,
-            String grant_type,
-            String code,
-            String redirect_uri
+    @RequestLine("POST /oauth2/token")
+    @Body("client_id={client_id}&client_secret={client_secret}" +
+            "&grant_type={grant_type}&code={code}&redirect_uri={redirect_uri}")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    DiscordAccessToken getAccessToken(
+            @Param String client_id,
+            @Param String client_secret,
+            @Param String grant_type,
+            @Param String code,
+            @Param String redirect_uri
+    );
+    @RequestLine("GET /users/@me")
+    @Headers("Authorization: Bearer {authToken}")
+    DiscordUser getDiscordUser(
+            @Param String authToken
     );
 
-    @Get("users/@me")
-    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
-    Flux<DiscordUser> getDiscordUser(
-            @Header(HttpHeaders.AUTHORIZATION) String authToken
-    );
-
-    @Get("users/@me/guilds")
-    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
-    Flux<List<Guild>> getDiscordUserGuilds(
-            @Header(HttpHeaders.AUTHORIZATION) String authToken
+    @RequestLine("GET /users/@me/guilds")
+    @Headers("Authorization: Bearer {authToken}")
+    List<Guild> getDiscordUserGuilds(
+            @Param String authToken
     );
 }

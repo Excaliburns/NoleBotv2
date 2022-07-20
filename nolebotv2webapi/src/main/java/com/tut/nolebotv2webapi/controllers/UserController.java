@@ -36,8 +36,8 @@ public class UserController {
             @NonNull Authentication authentication
     ) {
         final List<Guild> guilds = discordApiClient.getDiscordUserGuilds(
-                "Bearer " + authentication.getAttributes().get("discord_access_token").toString()
-        ).blockFirst();
+                authentication.getAttributes().get("discord_access_token").toString()
+        );
 
         return HttpResponse.ok(guilds);
     }
@@ -55,8 +55,8 @@ public class UserController {
      */
     @Get("/info")
     public HttpResponse<DiscordUser> getUserInfo(Authentication authentication) {
-        DiscordUser user = discordApiClient.getDiscordUser("Bearer " + authentication.getAttributes()
-                .get("discord_access_token").toString()).blockFirst();
+        DiscordUser user = discordApiClient.getDiscordUser(authentication.getAttributes()
+                .get("discord_access_token").toString());
         return HttpResponse.ok(user);
     }
 }

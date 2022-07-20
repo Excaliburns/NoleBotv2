@@ -2,9 +2,8 @@ import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
 import MainPage from "./MainPage/MainPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
-import {createStore, StateMachineProvider, useStateMachine} from "little-state-machine";
+import {createStore, StateMachineProvider} from "little-state-machine";
 import RolePage from "./RolePage/RolePage";
-import axios from "axios";
 import {AxiosProvider} from "./util/AxiosProvider";
 
 

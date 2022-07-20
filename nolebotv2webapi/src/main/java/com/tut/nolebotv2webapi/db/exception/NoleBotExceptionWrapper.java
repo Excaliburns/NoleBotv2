@@ -60,6 +60,7 @@ public class NoleBotExceptionWrapper {
         result.setMethodName(rootCause.getMethodName());
         result.setRootCause(rootCause.toString());
         result.setMessage(ex.getMessage());
+        result.setId(UUID.randomUUID());
         return result;
     }
 

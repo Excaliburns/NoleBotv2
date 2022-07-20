@@ -1,5 +1,5 @@
 import {GroupBase} from "react-select/dist/declarations/src/types";
-import { Virtuoso } from 'react-virtuoso'
+import {Virtuoso} from 'react-virtuoso'
 import {MenuListProps} from "react-select";
 import React from "react";
 

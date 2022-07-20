@@ -34,16 +34,22 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
                                                           AuthenticationRequest<?, ?> authenticationRequest) {
         return Mono.create(emitter -> {
             try {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("client_id", clientId);
+                params.put("client_secret", clientSecret);
+                params.put("grant_type", "authorization_code");
+                params.put("code", authenticationRequest.getSecret().toString());
+                params.put("redirect_uri", baseUiUrl);
                 DiscordAccessToken token = discordApiClient.getAccessToken(
                         clientId,
                         clientSecret,
                         "authorization_code",
                         authenticationRequest.getSecret().toString(),
                         baseUiUrl
-                ).blockFirst();
+                );
                 DiscordUser user = discordApiClient.getDiscordUser(
-                        "Bearer " + token.getAccess_token()
-                ).blockFirst();
+                        token.getAccess_token()
+                );
                 HashMap<String, Object> claims = new HashMap<>();
                 claims.put("discord_access_token", token.getAccess_token());
                 claims.put("discord_username", user.username());

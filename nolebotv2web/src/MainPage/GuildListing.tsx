@@ -1,7 +1,7 @@
-import { useStateMachine } from "little-state-machine";
-import { APIGuild, APIPartialGuild } from "discord-api-types";
+import {useStateMachine} from "little-state-machine";
+import {APIGuild, APIPartialGuild} from "discord-api-types";
 import React from "react";
-import { AxiosResponse } from "axios";
+import {AxiosResponse} from "axios";
 import {useAxios} from "../util/AxiosProvider";
 import {DiscordUser, GuildUser} from "../entities/JavaGenerated";
 
