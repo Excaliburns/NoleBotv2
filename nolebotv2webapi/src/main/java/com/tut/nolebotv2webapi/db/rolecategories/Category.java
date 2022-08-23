@@ -30,7 +30,7 @@ public class Category {
     @Relation(value = Relation.Kind.ONE_TO_MANY, cascade = Relation.Cascade.ALL, mappedBy = "categoryId")
     private List<Role> roleIds;
 
-    @MappedProperty("GuildID")
+    @MappedProperty("GuildId")
     private String guildId;
 
     @MappedProperty("CategoryName")

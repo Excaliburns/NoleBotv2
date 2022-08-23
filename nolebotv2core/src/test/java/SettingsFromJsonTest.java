@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import util.gson.GsonDuration;
-import util.settings.Settings;
+import com.tut.nolebotv2core.util.gson.GsonDuration;
+import com.tut.nolebotv2core.util.settings.Settings;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 // We should use this controller to get information about guilds, or user information that is guild specific
 @Slf4j
@@ -76,8 +77,11 @@ public class GuildController {
             final GuildUser guildUser = (GuildUser) broadcastPackage.getPayload();
             return HttpResponse.ok(guildUser);
         }
+        catch (TimeoutException e) {
+            logger.error("Timed out while waiting for WebSocket response");
+        }
         catch (Exception e) {
-            logger.error("Exception occurred getting FSU User: {}", e::getMessage);
+            logger.error("Error received from core {}", e::toString);
         }
 
         return HttpResponse.serverError();

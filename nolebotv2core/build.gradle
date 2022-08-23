@@ -45,7 +45,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("NoleBot")
+    mainClass.set("com.tut.nolebotv2core.NoleBot")
 }
 
 java {

@@ -1,0 +1,49 @@
+Configuration:
+  status: warn
+  name: YAMLConfigTest
+  properties:
+    property:
+      name: filename
+      value: target/test-yaml.log
+  thresholdFilter:
+    level: debug
+  appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%highlight{%d [%t] %-5level %c{1} - %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=black, DEBUG=green bold, TRACE=blue, disableAnsi=false}"
+    RollingFile:
+      name: File
+      fileName: logs/app.log
+      filePattern: logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz
+      policies:
+        SizeBasedTriggeringPolicy:
+          size: 10MB
+      DefaultRolloverStrategy:
+        max: 10
+      PatternLayout:
+        Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+      Filters:
+        ThresholdFilter:
+          level: error
+
+  Loggers:
+    logger:
+      -
+        name: com.tut
+        level: trace
+        AppenderRef:
+          - ref: STDOUT
+          - ref: File
+      -
+        name: io.micronaut.http
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: STDOUT
+
+    Root:
+      level: error
+      AppenderRef:
+        ref: STDOUT

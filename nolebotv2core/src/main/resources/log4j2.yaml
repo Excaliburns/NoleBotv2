@@ -1,0 +1,38 @@
+Configuration:
+  status: info
+  name: NoleBotConfig
+  thresholdFilter:
+    level: debug
+  appenders:
+    Console:
+      name: LogToConsole
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%highlight{%d [%t] %-5level %c{1} - %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=black, DEBUG=green bold, TRACE=blue, disableAnsi=false}"
+    RollingFile:
+      name: LogFile
+      fileName: logs/app.log
+      filePattern: logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz
+      policies:
+        SizeBasedTriggeringPolicy:
+          size: 10MB
+      DefaultRolloverStrategy:
+        max: 10
+      PatternLayout:
+        Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+      Filters:
+        ThresholdFilter:
+          level: error
+
+  Loggers:
+    logger:
+        name: com.tut
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsole
+          - ref: LogFile
+    Root:
+      level: info
+      AppenderRef:
+        ref: LogToConsole

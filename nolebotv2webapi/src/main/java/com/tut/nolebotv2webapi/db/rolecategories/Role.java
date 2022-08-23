@@ -8,16 +8,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @MappedEntity("CategoryRoles")
 @Setter
 @Getter
 @NoArgsConstructor
 public class Role {
-    @MappedProperty("RoleID")
+    @MappedProperty("RoleId")
     private String roleId;
 
-    @MappedProperty("CategoryID")
-    private int categoryId;
+    @MappedProperty("CategoryId")
+    private UUID categoryId;
 
     @MappedProperty("RoleName")
     private String roleName;
@@ -25,5 +27,5 @@ public class Role {
     @Id
     @GeneratedValue
     @MappedProperty("Id")
-    private int id;
+    private UUID id;
 }

@@ -20,10 +20,10 @@ public class Owner {
     @GeneratedValue
     private UUID id;
 
-    @MappedProperty("CategoryID")
-    private String categoryId;
+    @MappedProperty("CategoryId")
+    private UUID categoryId;
 
-    @MappedProperty("OwnerID")
+    @MappedProperty("OwnerId")
     private String ownerId;
 
 

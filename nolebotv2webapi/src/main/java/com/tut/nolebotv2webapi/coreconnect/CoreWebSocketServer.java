@@ -1,6 +1,7 @@
 package com.tut.nolebotv2webapi.coreconnect;
 
 import com.tut.nolebotshared.entities.BroadcastPackage;
+import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.http.MediaType;
@@ -11,6 +12,7 @@ import io.micronaut.websocket.CloseReason;
 import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import io.micronaut.websocket.annotation.OnClose;
+import io.micronaut.websocket.annotation.OnError;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
@@ -55,10 +57,13 @@ public class CoreWebSocketServer {
         requests = new ConcurrentHashMap<>();
     }
 
-    public void send(
-            final BroadcastPackage broadcastPackage
-    ) {
-        broadcaster.broadcastSync(SerializationUtils.serialize(broadcastPackage), MediaType.MULTIPART_FORM_DATA_TYPE);
+    public void send(final BroadcastPackage broadcastPackage) {
+        try {
+            broadcaster.broadcastSync(SerializationUtils.serialize(broadcastPackage), MediaType.MULTIPART_FORM_DATA_TYPE);
+        }
+        catch (Exception e) {
+            logger.error("Error sending data through WebSocket: {}", e::getMessage);
+        }
     }
 
     /**
@@ -70,9 +75,8 @@ public class CoreWebSocketServer {
      * @throws InterruptedException if future's thread is interrupted
      * @throws TimeoutException if future is not completed within 60000ms
      */
-    public BroadcastPackage sendWithResponse(
-            final BroadcastPackage broadcastPackage
-    ) throws ExecutionException, InterruptedException, TimeoutException {
+    public BroadcastPackage sendWithResponse(final BroadcastPackage broadcastPackage)
+            throws ExecutionException, InterruptedException, TimeoutException {
         broadcastPackage.setMessageType(MessageType.REQUEST);
 
         final UUID correlationId = UUID.randomUUID();
@@ -82,6 +86,7 @@ public class CoreWebSocketServer {
         requests.put(correlationId, future);
 
         this.send(broadcastPackage);
+
         return future.get(60000, TimeUnit.MILLISECONDS);
     }
 
@@ -98,6 +103,9 @@ public class CoreWebSocketServer {
             session.close(CloseReason.POLICY_VIOLATION);
         }
         else {
+            BroadcastPackage ack = BroadcastPackage.builder().broadcastType(BroadcastType.ACK)
+                    .messageType(MessageType.REQUEST).payload("Successfully established WS connection").build();
+            broadcaster.broadcastSync(SerializationUtils.serialize(ack), MediaType.MULTIPART_FORM_DATA_TYPE);
             logger.info("Established a WS connection: {}", session::getRequestURI);
         }
     }
@@ -111,6 +119,7 @@ public class CoreWebSocketServer {
      */
     @OnMessage
     public void onMessage(byte[] message, WebSocketSession session, @PathVariable String clientSecret) {
+        logger.debug("Received message from websocket");
         if (!Objects.equals(clientSecret, this.secret)) {
             session.close(CloseReason.POLICY_VIOLATION);
         }
@@ -121,6 +130,8 @@ public class CoreWebSocketServer {
 
         switch (broadcastPackage.getMessageType()) {
             case RESPONSE: {
+                logger.debug("Message had message type RESPONSE");
+                logger.debug("Message had broadcast type: {}", broadcastPackage::getBroadcastType);
                 Optional<CompletableFuture<BroadcastPackage>> correlatingOutstandingMessage = Optional.ofNullable(
                         this.requests.remove(broadcastPackage.getCorrelationId())
                 );
@@ -140,5 +151,10 @@ public class CoreWebSocketServer {
     @OnClose
     public void onClose(WebSocketSession session, @PathVariable String clientSecret) {
         logger.info("WS connection: {} has disconnected.", session::getRequestURI);
+    }
+
+    @OnError
+    public void onError(WebSocketSession session, Throwable t) {
+        logger.error("WS errored out with error {}", t.getMessage());
     }
 }

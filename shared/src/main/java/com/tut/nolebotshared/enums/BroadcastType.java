@@ -5,5 +5,6 @@ public enum BroadcastType {
     EXCEPTION,
     GET_GUILD_USERS,
     GET_USER_GUILDS,
-    ASSIGN_ROLES
+    ASSIGN_ROLES,
+    ACK
 }
