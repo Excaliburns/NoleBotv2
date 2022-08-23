@@ -76,6 +76,11 @@ public class ApiWebSocketConnector {
         messageHandler.handleMessage((BroadcastPackage) SerializationUtils.deserialize(message));
     }
 
+    /**
+     * Sends a message to the server.
+     *
+     * @param broadcastPackage The package to send
+     */
     public void sendMessage(BroadcastPackage broadcastPackage) {
         broadcastPackage.setMessageType(MessageType.RESPONSE);
         logger.debug("Sending broadcast package");
@@ -102,13 +107,10 @@ public class ApiWebSocketConnector {
         CompletableFuture<ApiWebSocketConnector> completableFuture = new CompletableFuture<>();
         final ScheduledFuture<?> checkFuture = executorService.scheduleAtFixedRate(() -> {
             try {
-                logger.debug("Trying to connect to {}",
-                        "ws://" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENDPOINT) + "/internalApi/"
-                                + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET));
-                final ApiWebSocketConnector connector = new ApiWebSocketConnector(URI.create(
-                        "ws://" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENDPOINT) + "/internalApi/"
-                                + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET)
-                ));
+                final String socketPath = "ws://" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENDPOINT) +
+                        "/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET);
+                logger.debug("Trying to connect to {}", socketPath);
+                final ApiWebSocketConnector connector = new ApiWebSocketConnector(URI.create(socketPath));
                 completableFuture.complete(connector);
             }
             catch (Exception e) {

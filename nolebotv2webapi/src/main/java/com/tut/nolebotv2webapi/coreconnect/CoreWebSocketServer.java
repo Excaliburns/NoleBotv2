@@ -57,9 +57,16 @@ public class CoreWebSocketServer {
         requests = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Sends a message to the client without expecting a response.
+     *
+     * @param broadcastPackage The package to send
+     */
     public void send(final BroadcastPackage broadcastPackage) {
         try {
-            broadcaster.broadcastSync(SerializationUtils.serialize(broadcastPackage), MediaType.MULTIPART_FORM_DATA_TYPE);
+            broadcaster.broadcastSync(
+                    SerializationUtils.serialize(broadcastPackage), MediaType.MULTIPART_FORM_DATA_TYPE)
+            ;
         }
         catch (Exception e) {
             logger.error("Error sending data through WebSocket: {}", e::getMessage);
@@ -155,6 +162,6 @@ public class CoreWebSocketServer {
 
     @OnError
     public void onError(WebSocketSession session, Throwable t) {
-        logger.error("WS errored out with error {}", t.getMessage());
+        logger.error("WS errored out with error {}", t::getMessage);
     }
 }
