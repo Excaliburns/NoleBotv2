@@ -1,20 +1,16 @@
 Configuration:
   status: warn
-  name: YAMLConfigTest
-  properties:
-    property:
-      name: filename
-      value: target/test-yaml.log
+  name: NoleBotAPIConfig
   thresholdFilter:
     level: debug
   appenders:
     Console:
-      name: STDOUT
+      name: LogToConsole
       target: SYSTEM_OUT
       PatternLayout:
         Pattern: "%highlight{%d [%t] %-5level %c{1} - %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=black, DEBUG=green bold, TRACE=blue, disableAnsi=false}"
     RollingFile:
-      name: File
+      name: LogToFile
       fileName: logs/app.log
       filePattern: logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz
       policies:
@@ -26,24 +22,24 @@ Configuration:
         Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
       Filters:
         ThresholdFilter:
-          level: error
+          level: debug
 
   Loggers:
     logger:
       -
         name: com.tut
-        level: trace
+        level: debug
         AppenderRef:
-          - ref: STDOUT
-          - ref: File
+          - ref: LogToConsole
+          - ref: LogToFile
       -
         name: io.micronaut.http
-        level: debug
+        level: fatal
         additivity: false
         AppenderRef:
-          - ref: STDOUT
+          - ref: LogToConsole
 
     Root:
       level: error
       AppenderRef:
-        ref: STDOUT
+        ref: LogToConsole

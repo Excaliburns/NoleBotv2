@@ -1,6 +1,6 @@
 Configuration:
   status: info
-  name: NoleBotConfig
+  name: NoleBotCoreConfig
   thresholdFilter:
     level: debug
   appenders:
@@ -22,7 +22,7 @@ Configuration:
         Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
       Filters:
         ThresholdFilter:
-          level: error
+          level: debug
 
   Loggers:
     logger:
