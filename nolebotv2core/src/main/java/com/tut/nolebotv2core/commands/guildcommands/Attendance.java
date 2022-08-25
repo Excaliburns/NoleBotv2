@@ -70,6 +70,7 @@ public class Attendance extends ReactionCommand {
         usages.add("attendance start");
         usages.add("attendance timer [time][s/m]");
         usages.add("attendance stop");
+        usages.add("attendance add [mention list]");
     }
 
     @Override
@@ -109,6 +110,26 @@ public class Attendance extends ReactionCommand {
                     event.sendErrorResponseToOriginatingChannel(
                             "Attendance is not currently being taken."
                     );
+                }
+                break;
+            }
+            case "add": {
+                List<Member> mentionedMembers = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
+                final List<AttendanceEntity> attendanceList = mentionedMembers
+                        .stream()
+                        .map(member -> new AttendanceEntity(
+                                member.getId(),
+                                member.getGuild().getId(),
+                                member.getEffectiveName())
+                        )
+                        .collect(Collectors.toList());
+
+                try {
+                    Arrays.stream(statements.insertAttendanceList(attendanceList))
+                            .noneMatch(returnCode -> returnCode == -1);
+                }
+                catch (SQLException e) {
+                    logger.error("Error inserting into DB: {}", e::getMessage);
                 }
                 break;
             }
