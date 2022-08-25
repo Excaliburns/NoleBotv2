@@ -364,7 +364,7 @@ public class Attendance extends ReactionCommand {
             final List<AttendanceEntity> attendanceList = countedMembers
                     .get(guild.getId())
                     .stream()
-                    .map(member -> new AttendanceEntity(member.getId(), guild.getId(), member.getNickname()))
+                    .map(member -> new AttendanceEntity(member.getId(), guild.getId(), member.getEffectiveName()))
                     .collect(Collectors.toList());
 
             return Arrays.stream(statements.insertAttendanceList(attendanceList))
