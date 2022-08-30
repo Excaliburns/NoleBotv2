@@ -1,6 +1,7 @@
 package com.tut.nolebotv2core.util.settings;
 
 import com.tut.nolebotv2core.util.permissions.GenericPermission;
+import com.tut.nolebotv2core.util.social.SocialMediaEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,12 @@ public class Settings {
     private Map<String, Integer> commandPermissionMap;
     private Set<GenericPermission> permissionList;
     private List<String> bannedUserIds;
+    private List<SocialMediaEnum> enabledSocials;
+    private String socialMediaChannel;
+    private String twitterApiKey;
+    private String twitterApiSecret;
+    private String twitterAccessToken;
+    private String twitterAccessSecret;
 
     // First String = roleID id to be assigned.
     // String List = roleIDs that can assign the role
@@ -36,6 +43,12 @@ public class Settings {
         bannedUserIds        = new ArrayList<>();
         roleOverrides        = new HashMap<>();
         lockedRoles          = new HashSet<>();
+        enabledSocials = new ArrayList<>();
+        socialMediaChannel = "";
+        twitterApiKey = "";
+        twitterApiSecret = "";
+        twitterAccessToken = "";
+        twitterAccessSecret = "";
     }
 
     public Settings() {

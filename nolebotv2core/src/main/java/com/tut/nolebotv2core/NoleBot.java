@@ -21,9 +21,11 @@ import com.tut.nolebotv2core.listeners.BanListListener;
 import com.tut.nolebotv2core.listeners.GuildMessageCommandListener;
 import com.tut.nolebotv2core.listeners.GuildMessageReactionListener;
 import com.tut.nolebotv2core.listeners.OnReadyListener;
+import com.tut.nolebotv2core.listeners.SocialMediaEventListener;
 import com.tut.nolebotv2core.util.NoleBotUtil;
 import com.tut.nolebotv2core.util.PropertiesUtil;
 import com.tut.nolebotv2core.util.db.DBConnection;
+import com.tut.nolebotv2core.util.social.SocialMediaManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -45,6 +47,9 @@ public class NoleBot {
     private static final GuildMessageCommandListener guildMessageCommandListener = new GuildMessageCommandListener();
     private static final GuildMessageReactionListener guildMessageReactionListener = new GuildMessageReactionListener();
     private static final BanListListener banListListener = new BanListListener();
+
+    private static SocialMediaEventListener socialMediaEventListener;
+    private static SocialMediaManager socialMediaManager;
 
     private static Connection dbconnection;
 
@@ -128,6 +133,13 @@ public class NoleBot {
                 catch (InterruptedException | ExecutionException e) {
                     logger.error("Fatal exception when connecting to API: {} ", e::getMessage);
                 }
+            }
+            if (Boolean.parseBoolean(PropertiesUtil.getProperty(PropEnum.ENABLE_SOCIAL_MEDIA_INTEGRATION))) {
+                socialMediaManager = new SocialMediaManager();
+                socialMediaManager.createConnectors();
+
+                socialMediaEventListener = new SocialMediaEventListener(socialMediaManager);
+                jda.addEventListener(socialMediaEventListener);
             }
         }
         catch (LoginException e) {

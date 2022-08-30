@@ -123,13 +123,14 @@ public class Attendance extends ReactionCommand {
                                 member.getEffectiveName())
                         )
                         .collect(Collectors.toList());
-
+                event.sendMessageToOriginatingChannel("Members successfully added");
                 try {
                     Arrays.stream(statements.insertAttendanceList(attendanceList))
                             .noneMatch(returnCode -> returnCode == -1);
                 }
                 catch (SQLException e) {
                     logger.error("Error inserting into DB: {}", e::getMessage);
+                    event.sendErrorResponseToOriginatingChannel(e.getMessage());
                 }
                 break;
             }

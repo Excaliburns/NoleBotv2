@@ -6,18 +6,19 @@ import java.util.Map;
 
 public enum PropEnum {
     // TOKEN ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    BOT_AVATAR_URL               ("bot.avatar.url"),
-    DB_NAME                      ("db.name"),
-    DB_ADDR                      ("db.addr"),
-    DB_USER                      ("db.user"),
-    DB_PASS                      ("db.pass"),
-    DB_PORT                      ("db.port"),
-    DB_TYPE                      ("db.type"),
-    TOKEN                        ("bot.token"),
-    API_WEBSOCKET_ENABLED        ("api.websocket.enabled"),
-    API_WEBSOCKET_SECRET         ("api.websocket.secret"),
-    ATTENDANCE_LEADER_IN_CHANNEL ("bot.attendance.leader.in.channel"),
-    API_WEBSOCKET_ENDPOINT       ("api.websocket.endpoint");
+    BOT_AVATAR_URL                  ("bot.avatar.url"),
+    DB_NAME                         ("db.name"),
+    DB_ADDR                         ("db.addr"),
+    DB_USER                         ("db.user"),
+    DB_PASS                         ("db.pass"),
+    DB_PORT                         ("db.port"),
+    DB_TYPE                         ("db.type"),
+    TOKEN                           ("bot.token"),
+    API_WEBSOCKET_ENABLED           ("api.websocket.enabled"),
+    API_WEBSOCKET_SECRET            ("api.websocket.secret"),
+    ATTENDANCE_LEADER_IN_CHANNEL    ("bot.attendance.leader.in.channel"),
+    API_WEBSOCKET_ENDPOINT          ("api.websocket.endpoint"),
+    ENABLE_SOCIAL_MEDIA_INTEGRATION ("social.media.enabled");
 
     private final String propertyKey;
 
