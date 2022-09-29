@@ -29,3 +29,5 @@ nolebotv2webapi/.factorypath
 /.gradle/
 /buildSrc/.gradle/
 /buildSrc/build/
+
+gradle.properties
