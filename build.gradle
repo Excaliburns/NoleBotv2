@@ -16,9 +16,9 @@ plugins {
 }
 
 flyway {
-    url = project.ext['flyway.url']
-    user = project.ext['flyway.user']
-    password = project.ext['flyway.password']
-    defaultSchema = project.ext['flyway.defaultSchema']
+    url = project.hasProperty('flyway.url') ? project.ext['flyway.url'] : 'jdbc:sqlserver://localhost:1433;database=nb_dev;encrypt=true;trustServerCertificate=true;'
+    user = project.hasProperty('flyway.user') ? project.ext['flyway.user'] : 'nolebot_user'
+    password = project.hasProperty('flyway.password') ? project.ext['flyway.password'] : 'password'
+    defaultSchema = project.hasProperty('flyway.defaultSchema') ? project.ext['flyway.defaultSchema'] : 'dbo'
     locations = ['filesystem:./database']
 }
