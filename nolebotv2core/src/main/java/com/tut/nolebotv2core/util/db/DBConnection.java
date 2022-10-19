@@ -40,6 +40,11 @@ public class DBConnection {
      * Initializes the database connection.
      */
     public static void initDbConnection() {
+        if (dbType == null) {
+            logger.error("DBType not present - db connection will not work!");
+            return;
+        }
+
         switch (dbType) {
             case ("sqlserver"):
                 initSqlServerConnection();
@@ -48,7 +53,7 @@ public class DBConnection {
                 initMySqlConnection();
                 break;
             default:
-                logger.info("Database type not configured in prop file!");
+                logger.error("Database type not configured in prop file!");
         }
     }
 

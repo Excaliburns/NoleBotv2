@@ -126,7 +126,6 @@ public class CoreWebSocketServer {
      */
     @OnMessage
     public void onMessage(byte[] message, WebSocketSession session, @PathVariable String clientSecret) {
-        logger.debug("Received message from websocket");
         if (!Objects.equals(clientSecret, this.secret)) {
             session.close(CloseReason.POLICY_VIOLATION);
         }
@@ -137,14 +136,24 @@ public class CoreWebSocketServer {
 
         switch (broadcastPackage.getMessageType()) {
             case RESPONSE: {
-                logger.debug("Message had message type RESPONSE");
-                logger.debug("Message had broadcast type: {}", broadcastPackage::getBroadcastType);
+                logger.debug(
+                        "Message - RESPONSE: [BroadcastType: {}, CorrelationId: {}] ",
+                        broadcastPackage::getBroadcastType,
+                        broadcastPackage::getCorrelationId
+                );
                 Optional<CompletableFuture<BroadcastPackage>> correlatingOutstandingMessage = Optional.ofNullable(
                         this.requests.remove(broadcastPackage.getCorrelationId())
                 );
 
                 correlatingOutstandingMessage.ifPresent(packageCompletableFuture);
                 break;
+            }
+            case REQUEST: {
+                logger.debug(
+                        "Message - REQUEST: [BroadcastType: {}, CorrelationId: {}] ",
+                        broadcastPackage::getBroadcastType,
+                        broadcastPackage::getCorrelationId
+                );
             }
             default: {
                 logger.warn(

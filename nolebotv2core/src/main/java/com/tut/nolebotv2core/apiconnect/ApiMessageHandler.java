@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.tut.nolebotshared.enums.BroadcastType.ACK;
@@ -72,13 +73,17 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                     break;
                 }
                 case ACK: {
-                    logger.debug("Received ack");
                     webSocketConnector.sendMessage(
                             broadcastPackageBuilder
                                     .payload(null)
+                                    .correlationId(UUID.randomUUID())
                                     .broadcastType(ACK)
                                     .build()
                     );
+                    break;
+                }
+                case HEARTBEAT: {
+                    logger.debug("Received heartbeat {}", message::getCorrelationId);
                     break;
                 }
                 default: {

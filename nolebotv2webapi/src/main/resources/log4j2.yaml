@@ -26,20 +26,15 @@ Configuration:
 
   Loggers:
     logger:
-      -
-        name: com.tut
+      - name: com.tut
         level: debug
-        AppenderRef:
-          - ref: LogToConsole
-          - ref: LogToFile
-      -
-        name: io.micronaut.http
-        level: fatal
         additivity: false
         AppenderRef:
           - ref: LogToConsole
+          - ref: LogToFile
 
     Root:
       level: error
       AppenderRef:
-        ref: LogToConsole
+        - ref: LogToConsole
+        - ref: LogToFile

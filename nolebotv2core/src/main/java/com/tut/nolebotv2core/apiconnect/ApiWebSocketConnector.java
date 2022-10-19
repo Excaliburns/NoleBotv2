@@ -1,8 +1,10 @@
 package com.tut.nolebotv2core.apiconnect;
 
 import com.tut.nolebotshared.entities.BroadcastPackage;
+import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotv2core.enums.PropEnum;
+import com.tut.nolebotv2core.util.NoleBotUtil;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +20,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -31,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @ClientEndpoint
 public class ApiWebSocketConnector {
     private static final Logger logger = LogManager.getLogger(ApiWebSocketConnector.class);
-    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     Session userSession;
     private MessageHandler messageHandler;
 
@@ -60,7 +63,7 @@ public class ApiWebSocketConnector {
      * Listener for SocketClose event, tries to reconnect.
      *
      * @param userSession Current WS session
-     * @throws ExecutionException if the future completed exceptionally
+     * @throws ExecutionException   if the future completed exceptionally
      * @throws InterruptedException if the future was interrupted
      */
     @OnClose
@@ -83,7 +86,12 @@ public class ApiWebSocketConnector {
      */
     public void sendMessage(BroadcastPackage broadcastPackage) {
         broadcastPackage.setMessageType(MessageType.RESPONSE);
-        logger.debug("Sending broadcast package");
+        logger.debug(
+                "WEBSOCKET MESSAGE: [MessageType: {}, BroadcastType: {}, CorrelationId: {}]",
+                broadcastPackage::getMessageType,
+                broadcastPackage::getBroadcastType,
+                broadcastPackage::getCorrelationId
+        );
         this.userSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(SerializationUtils.serialize(broadcastPackage)));
     }
 
@@ -118,7 +126,20 @@ public class ApiWebSocketConnector {
                 logger.info("Swallowing exception, will attempt to reconnect api in 10 seconds.");
             }
         }, 0, 10, TimeUnit.SECONDS);
-        completableFuture.whenComplete((result, thrown) -> checkFuture.cancel(true));
+        completableFuture.whenComplete((result, thrown) -> {
+            checkFuture.cancel(true);
+
+            executorService.scheduleAtFixedRate(() -> {
+                final UUID correlationId = UUID.randomUUID();
+                NoleBotUtil.getApiWebSocketConnector().sendMessage(
+                        BroadcastPackage.builder()
+                                .messageType(MessageType.REQUEST)
+                                .broadcastType(BroadcastType.HEARTBEAT)
+                                .correlationId(correlationId)
+                                .build()
+                );
+            }, 0, 5, TimeUnit.SECONDS);
+        });
         return completableFuture;
     }
 }

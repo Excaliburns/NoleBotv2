@@ -6,5 +6,6 @@ public enum BroadcastType {
     GET_GUILD_USERS,
     GET_USER_GUILDS,
     ASSIGN_ROLES,
-    ACK
+    ACK,
+    HEARTBEAT
 }
