@@ -6,8 +6,10 @@ import lombok.extern.log4j.Log4j2;
 import net.dv8tion.jda.api.entities.Role;
 import com.tut.nolebotv2core.util.db.entities.CategoryEntity;
 import com.tut.nolebotv2core.util.db.statements.CategoryStatements;
+import net.dv8tion.jda.api.entities.User;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 @Log4j2
@@ -26,6 +28,8 @@ public class Category extends Command {
         usages.add("category create [name]");
         usages.add("category delete [name]");
         usages.add("category assign [name] [roles]");
+        usages.add("category setowner [name] [owner]");
+        usages.add("category list");
     }
 
     @Override
@@ -43,6 +47,9 @@ public class Category extends Command {
             }
             case ("list") -> {
                 listCategories(event);
+            }
+            case ("setowner") -> {
+                setOwner(event);
             }
             default -> {
                 event.sendErrorResponseToOriginatingChannel("Category command not found");
@@ -89,7 +96,10 @@ public class Category extends Command {
     private void assignRoleToCategory(CommandEvent event) throws SQLException {
         List<Role> roleList = event.getMentionedRoles();
         String origMsg = event.getRawMessageContent();
-        String roleName = origMsg.substring(16, origMsg.indexOf("<")).trim();
+        String roleName = origMsg.substring(
+                event.getSettings().getPrefix().length() + "category".length() + "assign".length(),
+                origMsg.indexOf("<")
+        ).trim();
         if (statements.checkExists(new CategoryEntity(roleName, event.getGuildId()))) {
             for (Role r : roleList) {
                 try {
@@ -100,7 +110,7 @@ public class Category extends Command {
                             + " already assigned to category");
                 }
             }
-
+            event.sendSuccessResponseToOriginatingChannel("Roles added to category!");
         }
         else {
             event.sendErrorResponseToOriginatingChannel("Category doesn't exist");
@@ -114,5 +124,31 @@ public class Category extends Command {
             builder.append(s).append("\n");
         }
         event.sendMessageToOriginatingChannel(builder.toString());
+    }
+    private void setOwner(CommandEvent event) throws SQLException {
+        boolean success = true;
+        List<User> userList = event.getMentionedUsers();
+        String origMsg = event.getRawMessageContent();
+        String prefix = event.getSettings().getPrefix();
+        String catName = origMsg.substring(
+                prefix.length() + "category".length() + "setowner".length(),
+                origMsg.indexOf("<")
+        ).trim();
+        for (User u : userList) {
+            try {
+                success = Arrays.stream(statements.setOwnerOfCategory(u.getId(), event.getGuildId(), catName)).anyMatch((i) -> {
+                    return i >= 0;
+                });
+            }
+            catch (SQLException e) {
+                event.printStackTraceToChannelFromThrowable(event.getChannel(), e);
+            }
+        }
+        if (success) {
+            event.sendSuccessResponseToOriginatingChannel("Successfully set owner");
+        }
+        else {
+            event.sendErrorResponseToOriginatingChannel("Error setting owner");
+        }
     }
 }

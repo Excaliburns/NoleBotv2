@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 public class CategoryStatements {
@@ -48,6 +49,10 @@ public class CategoryStatements {
     static final String selectCategoriesByGuild =
             "SELECT CategoryName FROM GuildCategories gc             " +
             "     WHERE gc.GuildId=?                                 ";
+
+    static final String insertCategoryOwner =
+            "INSERT INTO CategoryOwners(Id, CategoryId, OwnerId)     " +
+            "   VALuES (?, ?, ?)                                     ";
 
     /**
      * Executes an insert into the GuildCategories table.
@@ -165,5 +170,19 @@ public class CategoryStatements {
             categoryNames.add(rs.getString(1));
         }
         return categoryNames;
+    }
+    public int[] setOwnerOfCategory(String ownerId, String guildId, String categoryName) throws SQLException {
+        PreparedStatement preparedStatement = DBConnection.getConnection().prepareStatement(getIdByGuildIdAndCategoryName);
+        preparedStatement.setString(1, guildId);
+        preparedStatement.setString(2, categoryName);
+        ResultSet rs = preparedStatement.executeQuery();
+        preparedStatement = DBConnection.getConnection().prepareStatement(insertCategoryOwner);
+        while (rs.next()) {
+            preparedStatement.setString(1, UUID.randomUUID().toString());
+            preparedStatement.setString(2, rs.getString(1));
+            preparedStatement.setString(3, ownerId);
+            preparedStatement.addBatch();
+        }
+        return preparedStatement.executeBatch();
     }
 }
