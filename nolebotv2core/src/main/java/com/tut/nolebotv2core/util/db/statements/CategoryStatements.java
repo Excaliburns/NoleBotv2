@@ -171,8 +171,19 @@ public class CategoryStatements {
         }
         return categoryNames;
     }
+
+    /**
+     * Sets the owner of a role category.
+     *
+     * @param ownerId The new owner's ID
+     * @param guildId The ID of the guild the category is in
+     * @param categoryName The name of the category
+     * @return an int array representing the number of rows updated in each statement
+     * @throws SQLException if there is an error accessing the db
+     */
     public int[] setOwnerOfCategory(String ownerId, String guildId, String categoryName) throws SQLException {
-        PreparedStatement preparedStatement = DBConnection.getConnection().prepareStatement(getIdByGuildIdAndCategoryName);
+        PreparedStatement preparedStatement = DBConnection.getConnection()
+                .prepareStatement(getIdByGuildIdAndCategoryName);
         preparedStatement.setString(1, guildId);
         preparedStatement.setString(2, categoryName);
         ResultSet rs = preparedStatement.executeQuery();

@@ -125,6 +125,7 @@ public class Category extends Command {
         }
         event.sendMessageToOriginatingChannel(builder.toString());
     }
+
     private void setOwner(CommandEvent event) throws SQLException {
         boolean success = true;
         List<User> userList = event.getMentionedUsers();
@@ -136,9 +137,10 @@ public class Category extends Command {
         ).trim();
         for (User u : userList) {
             try {
-                success = Arrays.stream(statements.setOwnerOfCategory(u.getId(), event.getGuildId(), catName)).anyMatch((i) -> {
-                    return i >= 0;
-                });
+                success = Arrays.stream(statements.setOwnerOfCategory(u.getId(), event.getGuildId(), catName))
+                        .anyMatch((i) -> {
+                            return i >= 0;
+                        });
             }
             catch (SQLException e) {
                 event.printStackTraceToChannelFromThrowable(event.getChannel(), e);
