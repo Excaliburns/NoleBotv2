@@ -5,7 +5,7 @@
     <scripts>
       <script value="start" />
     </scripts>
-    <node-interpreter value="project" />
+    <node-interpreter value="wsl://Ubuntu-20.04@/home/apion/.nvm/versions/node/v15.14.0/bin/node" />
     <package-manager value="npm" />
     <envs />
     <method v="2">

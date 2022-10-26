@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @ClientEndpoint
 public class ApiWebSocketConnector {
     private static final Logger logger = LogManager.getLogger(ApiWebSocketConnector.class);
-    private static final ScheduledExecutorService executorService  = Executors.newScheduledThreadPool(16,
+    private static final ScheduledExecutorService executorService  = Executors.newScheduledThreadPool(4,
         new ThreadFactory() {
             private static int num = 0;
             @Override
@@ -115,13 +115,19 @@ public class ApiWebSocketConnector {
     public Future<Boolean> sendMessage(BroadcastPackage broadcastPackage) {
         broadcastPackage.setMessageType(MessageType.RESPONSE);
         byte[] arr = SerializationUtils.serialize(broadcastPackage);
-        logger.debug(
-                "WEBSOCKET MESSAGE: [MessageType: {}, BroadcastType: {}, CorrelationId: {}, size: {}]",
-                broadcastPackage::getMessageType,
-                broadcastPackage::getBroadcastType,
-                broadcastPackage::getCorrelationId,
-                (Supplier<Integer>) () -> arr.length
-        );
+        if (broadcastPackage.getBroadcastType() == BroadcastType.HEARTBEAT) {
+            logger.debug(
+                    "WEBSOCKET MESSAGE: [MessageType: {}, BroadcastType: {}, CorrelationId: {}, size: {}]",
+                    broadcastPackage::getMessageType,
+                    broadcastPackage::getBroadcastType,
+                    broadcastPackage::getCorrelationId,
+                    (Supplier<Integer>) () -> arr.length
+            );
+        }
+        else {
+            logger.trace("Heartbeat received");
+        }
+
         return executorService.submit(() -> {
             try {
                 this.userSession.getBasicRemote().sendBinary(ByteBuffer.wrap(arr));

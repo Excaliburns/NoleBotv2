@@ -2,16 +2,49 @@ micronaut:
   server:
     cors:
       enabled: true
+    idle-timeout: -1m
+    host: "${MICRONAUT_SERVER_HOST:localhost}"
+    thread-selection: auto
+  executors:
+    io:
+      type: fixed
+      n-threads: 75
   application:
     name: nolebotv2webapi
-    base-ui-url: http://localhost:3000/auth/redirect
+    base-ui-url: "${MICRONAUT_BASE_URL:http://localhost:3000/auth/redirect"
   security:
+    authentication: bearer
+    token:
+      jwt:
+        signatures:
+          secret:
+            generator:
+              secret: SECRET
+              jws-algorithm: SECRET
     oauth2:
       clients:
         discord:
-          client-id:
-          client-secret:
-    enabled: false
+          client-id: 000000000000000000
+          client-secret: XXXXXXXXXXXXXXXXXXXXXXX
+          enabled: false
+    reject-not-found: true/false
+    redirect:
+      enabled: true/false
+
+datasources:
+  default:
+    url: JDBC_CONNECTION_STR
+    username: ${JDBC_USER:defaultUsr}
+    password: password
+    driverClassName: ${JDBC_DRIVER:com.microsoft.sqlserver.jdbc.SQLServerDriver}
+jpa:
+  default:
+    entity-scan:
+      packages: 'com.tut.nolebotshared'
+    properties:
+      hibernate:
+        bytecode:
+          provider: none
 nolebot:
   websocket:
-    secret:
+    secret: ''

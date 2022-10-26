@@ -8,14 +8,14 @@ function AxiosProvider({ children }: {children: JSX.Element}) {
     const { state } = useStateMachine();
     const [axiosState, setAxiosState] = React.useState(() => axios.create({
         //Fix so this comes from env vars
-        baseURL: "http://esportsatfsu.com/api/"
+        baseURL: process.env.REACT_APP_API_BASE_URL
     }));
 
     React.useEffect(() => {
         if (state?.jwt) {
             setAxiosState(() => axios.create({
                 //Fix so this comes from env vars
-                baseURL: "http://esportsatfsu.com/api/",
+                baseURL: process.env.REACT_APP_API_BASE_URL,
                 headers: {
                     'Authorization': 'Bearer ' + state.jwt
                 }
