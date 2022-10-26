@@ -7,13 +7,15 @@ const AxiosContext = React.createContext<AxiosInstance | null>(null);
 function AxiosProvider({ children }: {children: JSX.Element}) {
     const { state } = useStateMachine();
     const [axiosState, setAxiosState] = React.useState(() => axios.create({
-        baseURL: 'http://localhost:8080/'
+        //Fix so this comes from env vars
+        baseURL: "http://esportsatfsu.com/api/"
     }));
 
     React.useEffect(() => {
         if (state?.jwt) {
             setAxiosState(() => axios.create({
-                baseURL: 'http://localhost:8080/',
+                //Fix so this comes from env vars
+                baseURL: "http://esportsatfsu.com/api/",
                 headers: {
                     'Authorization': 'Bearer ' + state.jwt
                 }

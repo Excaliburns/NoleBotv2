@@ -9,13 +9,13 @@ import io.micronaut.security.authentication.AuthenticationProvider;
 import io.micronaut.security.authentication.AuthenticationRequest;
 import io.micronaut.security.authentication.AuthenticationResponse;
 import jakarta.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 
-@Slf4j
+@Log4j2
 public class OauthAuthenticationProvider implements AuthenticationProvider {
     @Property(name = "micronaut.security.oauth2.clients.discord.client-id")
     protected String clientId;
@@ -56,6 +56,7 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
                 emitter.success(AuthenticationResponse.success(user.id(), claims));
             }
             catch (Exception e) {
+                log.error("{}", e::getMessage);
                 emitter.error(AuthenticationResponse.exception()); //NOPMD
             }
 

@@ -1,9 +1,9 @@
 package com.tut.nolebotv2webapi.coreconnect;
 
 import com.tut.nolebotshared.entities.BroadcastPackage;
-import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import io.micronaut.context.annotation.Property;
+import io.micronaut.core.annotation.Blocking;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
@@ -82,8 +82,10 @@ public class CoreWebSocketServer {
      * @throws InterruptedException if future's thread is interrupted
      * @throws TimeoutException if future is not completed within 60000ms
      */
+    @Blocking
     public BroadcastPackage sendWithResponse(final BroadcastPackage broadcastPackage)
             throws ExecutionException, InterruptedException, TimeoutException {
+        logger.debug("Sending package and awaiting response");
         broadcastPackage.setMessageType(MessageType.REQUEST);
 
         final UUID correlationId = UUID.randomUUID();
@@ -110,9 +112,6 @@ public class CoreWebSocketServer {
             session.close(CloseReason.POLICY_VIOLATION);
         }
         else {
-            BroadcastPackage ack = BroadcastPackage.builder().broadcastType(BroadcastType.ACK)
-                    .messageType(MessageType.REQUEST).payload("Successfully established WS connection").build();
-            broadcaster.broadcastSync(SerializationUtils.serialize(ack), MediaType.MULTIPART_FORM_DATA_TYPE);
             logger.info("Established a WS connection: {}", session::getRequestURI);
         }
     }
@@ -129,7 +128,6 @@ public class CoreWebSocketServer {
         if (!Objects.equals(clientSecret, this.secret)) {
             session.close(CloseReason.POLICY_VIOLATION);
         }
-
         final BroadcastPackage broadcastPackage = (BroadcastPackage) SerializationUtils.deserialize(message);
         final Consumer<? super CompletableFuture<BroadcastPackage>> packageCompletableFuture =
                 broadcastPackageCompletableFuture -> broadcastPackageCompletableFuture.complete(broadcastPackage);
@@ -154,6 +152,7 @@ public class CoreWebSocketServer {
                         broadcastPackage::getBroadcastType,
                         broadcastPackage::getCorrelationId
                 );
+                break;
             }
             default: {
                 logger.warn(

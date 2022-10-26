@@ -4,11 +4,12 @@ import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotv2core.enums.PropEnum;
-import com.tut.nolebotv2core.util.NoleBotUtil;
+import com.tut.nolebotv2core.util.PropertiesUtil;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.tut.nolebotv2core.util.PropertiesUtil;
+import org.apache.logging.log4j.util.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -18,14 +19,16 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,7 +37,17 @@ import java.util.concurrent.TimeUnit;
 @ClientEndpoint
 public class ApiWebSocketConnector {
     private static final Logger logger = LogManager.getLogger(ApiWebSocketConnector.class);
-    private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+    private static final ScheduledExecutorService executorService  = Executors.newScheduledThreadPool(16,
+        new ThreadFactory() {
+            private static int num = 0;
+            @Override
+            public Thread newThread(@NotNull Runnable r) {
+                num++;
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setName("API-WS-" + (num - 1));
+                return t;
+            }
+        });
     Session userSession;
     private MessageHandler messageHandler;
 
@@ -47,6 +60,21 @@ public class ApiWebSocketConnector {
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, endpointURI);
+            executorService.scheduleAtFixedRate(() -> {
+                final UUID correlationId = UUID.randomUUID();
+                try {
+                    sendMessage(
+                            BroadcastPackage.builder()
+                                    .messageType(MessageType.REQUEST)
+                                    .broadcastType(BroadcastType.HEARTBEAT)
+                                    .correlationId(correlationId)
+                                    .build()
+                    ).get();
+                }
+                catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }, 0, 10, TimeUnit.SECONDS);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -84,15 +112,26 @@ public class ApiWebSocketConnector {
      *
      * @param broadcastPackage The package to send
      */
-    public void sendMessage(BroadcastPackage broadcastPackage) {
+    public Future<Boolean> sendMessage(BroadcastPackage broadcastPackage) {
         broadcastPackage.setMessageType(MessageType.RESPONSE);
+        byte[] arr = SerializationUtils.serialize(broadcastPackage);
         logger.debug(
-                "WEBSOCKET MESSAGE: [MessageType: {}, BroadcastType: {}, CorrelationId: {}]",
+                "WEBSOCKET MESSAGE: [MessageType: {}, BroadcastType: {}, CorrelationId: {}, size: {}]",
                 broadcastPackage::getMessageType,
                 broadcastPackage::getBroadcastType,
-                broadcastPackage::getCorrelationId
+                broadcastPackage::getCorrelationId,
+                (Supplier<Integer>) () -> arr.length
         );
-        this.userSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(SerializationUtils.serialize(broadcastPackage)));
+        return executorService.submit(() -> {
+            try {
+                this.userSession.getBasicRemote().sendBinary(ByteBuffer.wrap(arr));
+                return true;
+            }
+            catch (IOException e) {
+                logger.catching(e);
+                return false;
+            }
+        });
     }
 
     public void addMessageHandler(MessageHandler messageHandler) {
@@ -112,34 +151,29 @@ public class ApiWebSocketConnector {
      * @return A future that gives the WS connector
      */
     public static CompletableFuture<ApiWebSocketConnector> tryConnectApi() {
-        CompletableFuture<ApiWebSocketConnector> completableFuture = new CompletableFuture<>();
-        final ScheduledFuture<?> checkFuture = executorService.scheduleAtFixedRate(() -> {
-            try {
-                final String socketPath = "ws://" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENDPOINT) +
-                        "/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET);
+        final String socketPath = "ws://" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_ENDPOINT) +
+                "/internalApi/" + PropertiesUtil.getProperty(PropEnum.API_WEBSOCKET_SECRET);
+        CompletableFuture<ApiWebSocketConnector> connectionFuture = CompletableFuture.supplyAsync(() -> {
+            ApiWebSocketConnector c = null;
+            while (c == null) {
                 logger.debug("Trying to connect to {}", socketPath);
-                final ApiWebSocketConnector connector = new ApiWebSocketConnector(URI.create(socketPath));
-                completableFuture.complete(connector);
+                try {
+                    c = new ApiWebSocketConnector(URI.create(socketPath));
+                }
+                catch (Exception e) {
+                    logger.error("{}", e::getMessage);
+                    logger.info("Swallowing exception, will attempt to reconnect api in 10 seconds.");
+                    try {
+                        Thread.sleep(10000);
+                    }
+                    catch (InterruptedException ex) {
+                        logger.catching(ex);
+                    }
+                }
             }
-            catch (Exception e) {
-                logger.error("{}", e::getMessage);
-                logger.info("Swallowing exception, will attempt to reconnect api in 10 seconds.");
-            }
-        }, 0, 10, TimeUnit.SECONDS);
-        completableFuture.whenComplete((result, thrown) -> {
-            checkFuture.cancel(true);
+            return c;
+        }, executorService);
 
-            executorService.scheduleAtFixedRate(() -> {
-                final UUID correlationId = UUID.randomUUID();
-                NoleBotUtil.getApiWebSocketConnector().sendMessage(
-                        BroadcastPackage.builder()
-                                .messageType(MessageType.REQUEST)
-                                .broadcastType(BroadcastType.HEARTBEAT)
-                                .correlationId(correlationId)
-                                .build()
-                );
-            }, 0, 5, TimeUnit.SECONDS);
-        });
-        return completableFuture;
+        return connectionFuture;
     }
 }

@@ -2,7 +2,6 @@ package com.tut.nolebotv2core.util.social;
 
 import com.tut.nolebotv2core.util.settings.Settings;
 import com.tut.nolebotv2core.util.settings.SettingsFactory;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Message;
@@ -15,6 +14,11 @@ public class SocialMediaEvent {
     private Message message;
     private Settings guildSettings;
 
+    /**
+     * An event representing a post to be posted to social media.
+     *
+     * @param event The message to convert into a post
+     */
     public SocialMediaEvent(GuildMessageReceivedEvent event) {
         origEvent = event;
         message = event.getMessage();

@@ -43,14 +43,18 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
 
     @Override
     public void handleMessage(BroadcastPackage message) {
-        logger.debug("Got WS message");
+        logger.debug(
+                "Message - REQUEST: [BroadcastType: {}, CorrelationId: {}] ",
+                message::getBroadcastType,
+                message::getCorrelationId
+        );
 
         final BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder = BroadcastPackage.builder()
                 .correlationId(message.getCorrelationId())
                 .messageType(MessageType.RESPONSE);
 
         try {
-            logger.warn("Got WS message of type {}", message::getBroadcastType);
+
             switch (message.getBroadcastType()) {
                 case GET_FSU_USER: {
                     final MemberAndGuildPayload payload = (MemberAndGuildPayload) message.getPayload();
@@ -75,7 +79,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 case ACK: {
                     webSocketConnector.sendMessage(
                             broadcastPackageBuilder
-                                    .payload(null)
+                                    .payload(" ")
                                     .correlationId(UUID.randomUUID())
                                     .broadcastType(ACK)
                                     .build()
