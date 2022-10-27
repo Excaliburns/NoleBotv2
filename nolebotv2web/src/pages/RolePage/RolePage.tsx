@@ -5,6 +5,7 @@ import AsyncSelect from "react-select/async";
 import {useStateMachine} from "little-state-machine";
 import {useAxios} from "../../util/AxiosProvider";
 import Select from "react-select";
+import {useNavigate} from "react-router";
 
 export default function RolePage() {
     const { state } = useStateMachine();
@@ -13,6 +14,7 @@ export default function RolePage() {
     const [roleOptions, setRoleOptions] = useState<{value: string, label: string}[]>([])
     const [selectedRoles, setSelectedRoles] = useState<ReadonlyArray<any>>([])
     const axios = useAxios();
+    const navigate = useNavigate()
 
     const onRoleChange = (newOptions: ReadonlyArray<any>) => {
         setSelectedRoles(newOptions)
@@ -77,6 +79,12 @@ export default function RolePage() {
                 setRoleOptions(entries)
             })
     }, [state.jwt])
+
+    React.useEffect(() => {
+        if (!state?.jwt) {
+            navigate("/login")
+        }
+    })
 
 
 

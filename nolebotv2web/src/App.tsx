@@ -1,5 +1,5 @@
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import TestPage from "./pages/MainPage/TestPage";
+import TestPage from "./pages/TestPage/TestPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
 import {createStore, StateMachineProvider} from "little-state-machine";

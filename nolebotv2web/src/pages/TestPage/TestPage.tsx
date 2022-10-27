@@ -25,12 +25,18 @@ function TestPage() {
 
     console.log(process.env);
 
+    React.useEffect(() => {
+        if (!state?.jwt) {
+            navigate("/login")
+        }
+    })
+
     return (
         <Wrapper>
             {
                 state?.jwt ? <GuildListing />
                 :
-                navigate("/")
+                <></>
             }
         </Wrapper>
     );
