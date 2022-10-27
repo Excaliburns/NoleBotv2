@@ -4,6 +4,7 @@ import React from "react";
 import {AxiosResponse} from "axios";
 import {useAxios} from "../util/AxiosProvider";
 import {DiscordUser, GuildUser} from "../entities/JavaGenerated";
+import NavBar from "../shared/components/NavBar";
 
 
 export default function GuildListing() {

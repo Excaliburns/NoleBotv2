@@ -6,9 +6,14 @@ const AxiosContext = React.createContext<AxiosInstance | null>(null);
 
 function AxiosProvider({ children }: {children: JSX.Element}) {
     const { state } = useStateMachine();
+    //JWT might be set when doing a page refresh
+    const initJwt: string = state?.jwt;
     const [axiosState, setAxiosState] = React.useState(() => axios.create({
         //Fix so this comes from env vars
-        baseURL: process.env.REACT_APP_API_BASE_URL
+        baseURL: process.env.REACT_APP_API_BASE_URL,
+        headers: {
+            'Authorization': 'Bearer ' + initJwt
+        }
     }));
 
     React.useEffect(() => {

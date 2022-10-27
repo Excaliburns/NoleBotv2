@@ -3,8 +3,10 @@ import MainPage from "./MainPage/MainPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
 import {createStore, StateMachineProvider} from "little-state-machine";
+import {DevTool} from "little-state-machine-devtools";
 import RolePage from "./RolePage/RolePage";
 import {AxiosProvider} from "./util/AxiosProvider";
+import NavBar from "./shared/components/NavBar";
 
 
 createStore({
@@ -13,25 +15,18 @@ createStore({
     accessToken: undefined
 }, {
     name: 'nolebot-lsm-store',
-    storageType: sessionStorage
+    storageType: sessionStorage,
+    persist: 'beforeUnload'
 })
+
 function App() {
     return (
         <StateMachineProvider>
             <AxiosProvider>
                 <BrowserRouter>
                     <div>
-                        <nav>
-                            <ul>
-                                <li>
-                                    <Link to="/">Home</Link>
-                                </li>
-                                <li>
-                                    <Link to={"/roles"}>Roles</Link>
-                                </li>
-                            </ul>
-                        </nav>
-
+                        <NavBar></NavBar>
+                        {process.env.NODE_ENV !== 'production' && <DevTool />}
                         {/* A <Switch> looks through its children <Route>s and
                 renders the first one that matches the current URL. */}
                         <Routes>

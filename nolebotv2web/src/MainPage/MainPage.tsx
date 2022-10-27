@@ -3,6 +3,7 @@ import '../App.css';
 import styled from "styled-components";
 import {useStateMachine} from "little-state-machine";
 import GuildListing from "./GuildListing";
+import NavBar from "../shared/components/NavBar";
 
 const Wrapper = styled.div`
   display: flex;
