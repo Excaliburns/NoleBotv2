@@ -8,6 +8,9 @@ config/*
 /build/
 /nolebotv2webapi/src/main/resources/application.yml
 /nolebotv2web/src/entities/JavaGenerated.ts
+/nolebotv2web/public/logo192.png
+/nolebotv2web/public/logo512.png
+/nolebotv2web/public/favicon.ico
 
 
 nolebotv2webapi/Thumbs.db
