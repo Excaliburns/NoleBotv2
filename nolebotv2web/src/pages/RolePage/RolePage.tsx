@@ -1,9 +1,9 @@
-import {GuildRole, GuildUser} from "../entities/JavaGenerated";
+import {GuildRole, GuildUser} from "../../entities/JavaGenerated";
 import React, {useEffect, useState} from "react";
-import {optimizeSelect} from "../util/OptimizedMenuList";
+import {optimizeSelect} from "../../util/OptimizedMenuList";
 import AsyncSelect from "react-select/async";
 import {useStateMachine} from "little-state-machine";
-import {useAxios} from "../util/AxiosProvider";
+import {useAxios} from "../../util/AxiosProvider";
 import Select from "react-select";
 
 export default function RolePage() {

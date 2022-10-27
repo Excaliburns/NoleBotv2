@@ -1,13 +1,15 @@
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
-import MainPage from "./MainPage/MainPage";
+import TestPage from "./pages/MainPage/TestPage";
 import OauthRedirect from "./OauthRedirect";
 import React from "react";
 import {createStore, StateMachineProvider} from "little-state-machine";
 import {DevTool} from "little-state-machine-devtools";
-import RolePage from "./RolePage/RolePage";
+import RolePage from "./pages/RolePage/RolePage";
 import {AxiosProvider} from "./util/AxiosProvider";
 import NavBar from "./shared/components/NavBar";
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import HomePage from "./pages/HomePage/HomePage";
+import LoginPage from "./pages/LoginPage/LoginPage";
 
 
 createStore({
@@ -54,8 +56,10 @@ function App() {
                     renders the first one that matches the current URL. */}
                             <Routes>
                                 <Route path="/auth/redirect" element={<OauthRedirect />} />
-                                <Route path="/" element={<MainPage />} />
-                                <Route path={"/roles"} element={<RolePage/>}/>
+                                <Route path="/" element={<HomePage />} />
+                                <Route path="/login" element={<LoginPage/>} />
+                                <Route path="/roles" element={<RolePage/>}/>
+                                <Route path={"/test"} element={<TestPage/>} />
                             </Routes>
                         </div>
                     </ThemeProvider>

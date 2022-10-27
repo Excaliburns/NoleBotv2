@@ -5,19 +5,6 @@ import React from "react";
 import {Avatar, Box, Button, createTheme, useTheme} from "@mui/material";
 import {useNavigate} from "react-router";
 
-const Wrapper = styled.div`
-    display: flex;
-    flex-direction: row;
-    height: 20%;
-    width: 100%
-`
-const NavElement = styled.div`
-    background-color: white;
-    text-align: center;
-    flex-grow: 1;
-    border: 1% solid black
-`
-
 function getNavButton(link: string, name: String): JSX.Element{
     return (
         <Button variant={"contained"} href={link} sx={{
@@ -36,6 +23,7 @@ function NavBar() {
     let navButtons = [getNavButton("/", "Home")]
     if (state?.jwt) {
         navButtons.push(getNavButton("/roles", "Game Managers"))
+        navButtons.push(getNavButton("/test", "Test"))
     }
 
     return (
@@ -49,7 +37,7 @@ function NavBar() {
                 marginLeft: "0.25%"
             }}/>
             <Box sx={{
-                flex: 10,
+                flex: 20,
                 display: "flex"
             }}>
                 {navButtons}
@@ -59,8 +47,9 @@ function NavBar() {
                 flex: 30,
                 justifyContent: "flex-end"
             }}>
+                {!state?.jwt ? <Button variant={"contained"} href={"/login"} sx={{boxShadow: 0}}>Login</Button> : <></>}
                 <Avatar alt={"User Profile"} src={""} sx={{
-                    marginRight: "0.25%"
+                    marginX: "0.25%"
                 }}/>
             </Box>
         </Box>
