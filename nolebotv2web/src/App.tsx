@@ -15,7 +15,7 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 createStore({
     jwt: undefined,
     userDetails: undefined,
-    accessToken: undefined
+    guildUserDetails: undefined
 }, {
     name: 'nolebot-lsm-store',
     storageType: sessionStorage,
@@ -52,6 +52,7 @@ function App() {
                         <CssBaseline/>
                         <div>
                             <NavBar></NavBar>
+                            {process.env.NODE_ENV !== 'production' && <DevTool />}
                             {/* A <Switch> looks through its children <Route>s and
                     renders the first one that matches the current URL. */}
                             <Routes>

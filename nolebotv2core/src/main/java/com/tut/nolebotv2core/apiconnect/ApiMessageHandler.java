@@ -9,6 +9,8 @@ import com.tut.nolebotshared.payloads.AssignRolePayload;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
+import com.tut.nolebotv2core.util.settings.Settings;
+import com.tut.nolebotv2core.util.settings.SettingsCache;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.tut.nolebotshared.enums.BroadcastType.ACK;
@@ -119,7 +122,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
     private GuildUser getMemberDetails(
             final String memberSnowflakeId,
             final String guildSnowflakeId
-    ) throws GuildNotFoundException, ErrorResponseException {
+    ) throws GuildNotFoundException, ErrorResponseException, ExecutionException {
 
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
                 .orElseThrow(() -> new GuildNotFoundException(
@@ -127,6 +130,8 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 ));
         //This SHOULD throw an error if member doesn't exist or isnt a member of the guild
         Member member = guild.retrieveMemberById(memberSnowflakeId).complete();
+
+        Settings settings = SettingsCache.settingsCache.get(guildSnowflakeId);
 
         return new GuildUser(
                 member.getId(),
@@ -139,7 +144,13 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                                 role.getColorRaw(), role.isPublicRole()
                         )
                 ).collect(Collectors.toList()),
-                member.getEffectiveAvatarUrl()
+                member.getEffectiveAvatarUrl(),
+                member.getRoles().stream().anyMatch((role -> {
+                    return role.getId().equals(settings.getAdminRole());
+                })),
+                member.getRoles().stream().anyMatch((role -> {
+                    return role.getId().equals(settings.getGameManagerRole());
+                }))
         );
     }
 
@@ -168,7 +179,9 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                     u.getEffectiveName(),
                     null,
                     null,
-                    u.getEffectiveAvatarUrl()
+                    u.getEffectiveAvatarUrl(),
+                    false,
+                    false
             )).collect(Collectors.toList());
             webSocketConnector.sendMessage(
                     broadcastPackageBuilder

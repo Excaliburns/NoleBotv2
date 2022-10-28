@@ -34,6 +34,8 @@ public class Settings {
     // String List = roleIDs that can assign the role
     private Map<String, List<String>> roleOverrides;
     private Set<String> lockedRoles;
+    private String adminRole;
+    private String gameManagerRole;
 
     // TODO: Name Verification
     //Initializes defaults that don't need to read anything from the server
@@ -49,6 +51,8 @@ public class Settings {
         twitterApiSecret = "";
         twitterAccessToken = "";
         twitterAccessSecret = "";
+        adminRole = "";
+        gameManagerRole = "";
     }
 
     public Settings() {

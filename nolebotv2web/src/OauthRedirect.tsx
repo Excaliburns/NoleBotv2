@@ -9,12 +9,6 @@ const updateJwt = (state: GlobalState, newJwt: string) => ({
     ...state,
     jwt: newJwt
 });
-
-const updateUserToken = (state: GlobalState, newToken: string) => ({
-    ...state,
-    accessToken: newToken
-});
-
 const updateUserDetails = (state: GlobalState, payload: DiscordUser) => ({
     ...state,
     userDetails: {
@@ -29,8 +23,7 @@ function OauthRedirect() {
 
     const {actions, state} = useStateMachine({
         updateJwt,
-        updateUserDetails,
-        updateUserToken
+        updateUserDetails
     });
     const axios = useAxios();
     const navigate = useNavigate();
@@ -46,11 +39,7 @@ function OauthRedirect() {
                 navigate("/")
             })
         }
-
     }, [clientCode])
-
-
-
 
     return (
         <div>

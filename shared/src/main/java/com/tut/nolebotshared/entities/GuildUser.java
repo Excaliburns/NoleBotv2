@@ -8,5 +8,7 @@ public record GuildUser(
         String nickname,
         String discordTag,
         List<GuildRole> roles,
-        String avatarUrl
+        String avatarUrl,
+        boolean isAdmin,
+        boolean isGameManager
 ) implements Serializable { }
