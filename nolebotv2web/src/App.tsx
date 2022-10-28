@@ -4,12 +4,14 @@ import OauthRedirect from "./OauthRedirect";
 import React from "react";
 import {createStore, StateMachineProvider} from "little-state-machine";
 import {DevTool} from "little-state-machine-devtools";
-import RolePage from "./pages/RolePage/RolePage";
+import RoleAssigner from "./shared/components/RoleAssigner";
 import {AxiosProvider} from "./util/AxiosProvider";
 import NavBar from "./shared/components/NavBar";
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/LoginPage/LoginPage";
+import GameManagerPage from "./pages/GameManagerPage/GameManagerPage";
+import AdminPage from "./pages/AdminPage/AdminPage";
 
 
 createStore({
@@ -59,7 +61,8 @@ function App() {
                                 <Route path="/auth/redirect" element={<OauthRedirect />} />
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/login" element={<LoginPage/>} />
-                                <Route path="/roles" element={<RolePage/>}/>
+                                <Route path="/gm" element={<GameManagerPage/>}/>
+                                <Route path="/admin" element={<AdminPage/>}/>
                                 <Route path={"/test"} element={<TestPage/>} />
                             </Routes>
                         </div>

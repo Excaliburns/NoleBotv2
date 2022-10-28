@@ -22,7 +22,12 @@ function NavBar() {
 
     let navButtons = [getNavButton("/", "Home")]
     if (state?.jwt) {
-        navButtons.push(getNavButton("/roles", "Game Managers"))
+        if(state?.guildUserDetails?.isGameManager) {
+            navButtons.push(getNavButton("/gm", "Game Managers"))
+        }
+        if (state?.guildUserDetails?.isAdmin) {
+            navButtons.push(getNavButton("/admin", "Officers"))
+        }
         navButtons.push(getNavButton("/test", "Test"))
     }
 

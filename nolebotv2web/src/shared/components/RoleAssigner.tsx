@@ -7,7 +7,7 @@ import {useAxios} from "../../util/AxiosProvider";
 import Select from "react-select";
 import {useNavigate} from "react-router";
 
-export default function RolePage() {
+export default function RoleAssigner() {
     const { state } = useStateMachine();
     const [debounce, setDebounce] = useState<{ cb?: () => void, delay?: number; }>({})
     const [selectedUsers, setSelectedUsers] = useState<ReadonlyArray<any>>([])
