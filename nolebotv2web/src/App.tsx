@@ -4,7 +4,6 @@ import OauthRedirect from "./OauthRedirect";
 import React from "react";
 import {createStore, StateMachineProvider} from "little-state-machine";
 import {DevTool} from "little-state-machine-devtools";
-import RoleAssigner from "./shared/components/RoleAssigner";
 import {AxiosProvider} from "./util/AxiosProvider";
 import NavBar from "./shared/components/NavBar";
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
