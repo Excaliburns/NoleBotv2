@@ -3,7 +3,7 @@ import {useTheme, Theme} from '@mui/material/styles';
 import {Virtuoso} from 'react-virtuoso'
 import {GuildRole, GuildUser} from "../../entities/JavaGenerated";
 import {useAxios} from "../../util/AxiosProvider";
-import {Autocomplete, Box, Button, List, ListItemText, SvgIcon, TextField} from "@mui/material";
+import {Autocomplete, Avatar, Box, Button, TextField} from "@mui/material";
 import {useStateMachine} from "little-state-machine";
 import React, {useState} from "react";
 
@@ -17,7 +17,9 @@ const Listbox = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLElemen
     );
     return <div {...other} ref={ref}>
         <Virtuoso
-            style={{ height: '400px' }}
+            style={{
+                height: "60vh"
+            }}
             totalCount={itemData.length}
             itemContent={(index) => {
                 return itemData[index]
@@ -30,13 +32,12 @@ export default function RoleAssigner() {
     const mainBoxStyle = {
         margin: "1vh",
         "& .MuiFormControl-root": {
-            margin: "1vh"
-        }
+            margin: "1vh",
+        },
     }
-    const [memberOptions, setMemberOptions] = useState<{value: string, id: string}[]>([])
+    const [memberOptions, setMemberOptions] = useState<{value: string, id: string, iconUrl: string}[]>([])
     const [roleOptions, setRoleOptions] = useState<{value: string, id: string}[]>([])
     const [search, setSearch] = useState<string>("")
-    const theme: Theme = useTheme()
     let [selectedMembers, setSelectedMembers] = React.useState<{value: string, id: string}[]>([])
     let [selectedRoles, setSelectedRoles] = React.useState<{value: string, id: string}[]>([])
     const {state} = useStateMachine()
@@ -60,11 +61,12 @@ export default function RoleAssigner() {
     React.useEffect(() => {
         if (search != ""){
             axios.get('/guilds/' + process.env.REACT_APP_MAIN_SERVER_ID + '/users/', {params: {"name": search}}).then((response) => {
-                let entries: {value: string, id: string}[] = []
+                let entries: {value: string, id: string, iconUrl: string}[] = []
                 response.data.forEach((u: GuildUser) => {
                     entries.push({
                         value: u.nickname,
-                        id: u.id
+                        id: u.id,
+                        iconUrl: u.avatarUrl
                     })
                 })
                 setMemberOptions(entries)
@@ -99,14 +101,6 @@ export default function RoleAssigner() {
                     return option.value
                 }}
                 ListboxComponent={Listbox}
-                renderOption={(props:object, option:{value: string, id:string}) => {
-                    return <Box {...props}>
-                        <SvgIcon>
-                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                        </SvgIcon>
-                        {option.value}
-                    </Box>
-                }}
                 onInputChange={(event, newVal, reason) => {
                     setSearch(newVal)
                 }}
@@ -126,11 +120,14 @@ export default function RoleAssigner() {
                     return option.value
                 }}
                 ListboxComponent={Listbox}
-                renderOption={(props:object, option:{value: string, id:string}) => {
-                    return <Box {...props}>
-                        <SvgIcon>
-                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                        </SvgIcon>
+                renderOption={(props:object, option:{value: string, id:string, iconUrl: string}) => {
+                    return <Box {...props} sx={{
+                        display: "flex",
+                        paddingX: "0!important",
+                    }}>
+                        <Avatar src={option.iconUrl} sx={{
+                            marginX: "1vw"
+                        }}/>
                         {option.value}
                     </Box>
                 }}

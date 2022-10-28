@@ -5,12 +5,13 @@ import React from "react";
 import {Avatar, Box, Button, createTheme, useTheme} from "@mui/material";
 import {useNavigate} from "react-router";
 
-function getNavButton(link: string, name: String): JSX.Element{
+function getNavButton(link: string, name: String, relSize: number): JSX.Element{
     return (
         <Button variant={"contained"} href={link} sx={{
             flex: 1,
+            flexGrow: relSize,
             borderRadius: 0,
-            boxShadow: 0
+            boxShadow: 0,
         }}>{name}</Button>
     )
 }
@@ -20,21 +21,21 @@ function NavBar() {
     const theme = useTheme()
 
 
-    let navButtons = [getNavButton("/", "Home")]
+    let navButtons = [getNavButton("/", "Home", 1)]
     if (state?.jwt) {
         if(state?.guildUserDetails?.isGameManager) {
-            navButtons.push(getNavButton("/gm", "Game Managers"))
+            navButtons.push(getNavButton("/gm", "Game Managers", 2))
         }
         if (state?.guildUserDetails?.isAdmin) {
-            navButtons.push(getNavButton("/admin", "Officers"))
+            navButtons.push(getNavButton("/admin", "Officers", 2))
         }
-        navButtons.push(getNavButton("/test", "Test"))
+        navButtons.push(getNavButton("/test", "Test", 1))
     }
 
     return (
         <Box sx={{
-            width: "100%",
-            height: "10%",
+            width: "100vw",
+            height: "6vh",
             display: "flex",
             backgroundColor: theme.palette.primary.main
         }}>
