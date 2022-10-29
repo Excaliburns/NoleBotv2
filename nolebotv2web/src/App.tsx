@@ -11,6 +11,8 @@ import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import GameManagerPage from "./pages/GameManagerPage/GameManagerPage";
 import AdminPage from "./pages/AdminPage/AdminPage";
+import RoleAssigner from "./shared/components/RoleAssigner";
+import CategoryPage from "./pages/CategoryPage/CategoryPage";
 
 
 createStore({
@@ -60,9 +62,9 @@ function App() {
                                 <Route path="/auth/redirect" element={<OauthRedirect />} />
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/login" element={<LoginPage/>} />
-                                <Route path="/gm" element={<GameManagerPage/>}/>
-                                <Route path="/admin" element={<AdminPage/>}/>
-                                <Route path={"/test"} element={<TestPage/>} />
+                                <Route path="/roleassign" element={<RoleAssigner/>}/>
+                                <Route path="/categories" element={<CategoryPage/>}/>
+                                <Route path="/test" element={<TestPage/>} />
                             </Routes>
                         </div>
                     </ThemeProvider>

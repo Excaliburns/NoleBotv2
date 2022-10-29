@@ -6,28 +6,9 @@ import {useAxios} from "../../util/AxiosProvider";
 import {Autocomplete, Avatar, Box, Button, TextField} from "@mui/material";
 import {useStateMachine} from "little-state-machine";
 import React, {useState} from "react";
+import getListbox from "./VirtualizedListbox";
 
-const Listbox = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLElement>>((props, ref) => {
-    const {children, ...other} = props;
-    const itemData: React.ReactChild[] = [];
-    (children as React.ReactChild[]).forEach(
-        (item: React.ReactChild ) => {
-            itemData.push(item);
-        },
-    );
-    return <div {...other} ref={ref}>
-        <Virtuoso
-            style={{
-                height: "60vh"
-            }}
-            totalCount={itemData.length}
-            itemContent={(index) => {
-                return itemData[index]
-            }
-        }
-        />
-    </div>
-})
+
 export default function RoleAssigner() {
     const mainBoxStyle = {
         margin: "1vh",
@@ -100,7 +81,7 @@ export default function RoleAssigner() {
                 getOptionLabel={(option) => {
                     return option.value
                 }}
-                ListboxComponent={Listbox}
+                ListboxComponent={getListbox()}
                 onInputChange={(event, newVal, reason) => {
                     setSearch(newVal)
                 }}
@@ -119,7 +100,7 @@ export default function RoleAssigner() {
                 getOptionLabel={(option) => {
                     return option.value
                 }}
-                ListboxComponent={Listbox}
+                ListboxComponent={getListbox()}
                 renderOption={(props:object, option:{value: string, id:string, iconUrl: string}) => {
                     return <Box {...props} sx={{
                         display: "flex",

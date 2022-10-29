@@ -3,6 +3,7 @@ package com.tut.nolebotv2webapi.controllers;
 import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
+import com.tut.nolebotshared.entities.Role;
 import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
@@ -10,7 +11,6 @@ import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
 import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import com.tut.nolebotv2webapi.db.rolecategories.CategoryRepository;
-import com.tut.nolebotv2webapi.db.rolecategories.Role;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 // We should use this controller to get information about guilds, or user information that is guild specific
@@ -133,7 +134,7 @@ public class GuildController {
             @PathVariable String guildId
     ) {
         String discordUserId = authentication.getName();
-        List<Role> roles = categoryRepository.getRolesByOwnerIdAAndGuildId(discordUserId, guildId);
+        Set<Role> roles = categoryRepository.findRolesByGuildIdAndOwnersOwnerId(guildId, discordUserId);
         List<GuildRole> guildRoles = new ArrayList<>();
         roles.forEach(role -> {
             guildRoles.add(new GuildRole(role.getRoleId(), role.getRoleName(), null, null));
