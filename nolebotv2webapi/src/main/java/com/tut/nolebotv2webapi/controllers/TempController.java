@@ -1,8 +1,8 @@
 package com.tut.nolebotv2webapi.controllers;
 
+import com.tut.nolebotshared.entities.Owner;
 import com.tut.nolebotshared.exceptions.NoleBotException;
 import com.tut.nolebotv2webapi.db.rolecategories.CategoryRepository;
-import com.tut.nolebotv2webapi.db.rolecategories.Owner;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -11,7 +11,7 @@ import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Inject;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 @Controller
 @NoArgsConstructor
@@ -34,7 +34,7 @@ public class TempController {
     public HttpResponse<String> getCategories() {
         StringBuilder result = new StringBuilder();
         categoryRepository.findAll().forEach(category -> {
-            final List<Owner> owners = category.getOwners();
+            final Set<Owner> owners = category.getOwners();
             if (owners != null) {
                 owners.forEach(owner -> result.append(owner.getOwnerId()));
             }

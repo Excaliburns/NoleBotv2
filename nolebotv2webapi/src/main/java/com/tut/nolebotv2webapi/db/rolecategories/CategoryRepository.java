@@ -3,17 +3,14 @@ package com.tut.nolebotv2webapi.db.rolecategories;
 import com.tut.nolebotshared.entities.Category;
 import com.tut.nolebotshared.entities.Role;
 import io.micronaut.data.annotation.Join;
-import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @JdbcRepository(dialect = Dialect.SQL_SERVER)
-@Join(value = "owners")
-@Join(value = "roles")
 public interface CategoryRepository extends CrudRepository<Category, UUID> {
     String GET_ROLES_BY_OWNER_ID_AND_GUILD_ID = //language=sql
             "SELECT [RoleId],                                               " +
@@ -34,9 +31,13 @@ public interface CategoryRepository extends CrudRepository<Category, UUID> {
             "WHERE OwnerId = :ownerId                                     " +
             "AND GuildId = :guildId                                       ";
 
-    @Query(value = GET_ROLES_BY_OWNER_ID_AND_GUILD_ID, nativeQuery = true)
-    List<Role> getRolesByOwnerIdAAndGuildId(String ownerId, String guildId);
+    @Join(value = "owners", type = Join.Type.INNER)
+    @Join(value = "roles", type = Join.Type.INNER)
+    Set<Role> findRolesByGuildIdAndOwnersOwnerId(String guildId, String userId);
 
-    @Query(value = GET_ROLE_IDS_BY_OWNER_ID_AND_GUILD_ID, nativeQuery = true)
-    List<String> findRoleIdsByOwnerIdAndGuildId(String ownerId, String guildId);
+    @Join(value = "owners", type = Join.Type.INNER)
+    @Join(value = "roles", type = Join.Type.INNER)
+    Set<String> findRolesRoleIdByGuildIdAndOwnersOwnerId(String guildId, String ownerId);
+
+    Set<Category> getByGuildId(String guildId);
 }
