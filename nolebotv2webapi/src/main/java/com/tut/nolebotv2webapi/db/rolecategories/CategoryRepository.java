@@ -1,5 +1,7 @@
 package com.tut.nolebotv2webapi.db.rolecategories;
 
+import com.tut.nolebotshared.entities.Category;
+import com.tut.nolebotshared.entities.Role;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;

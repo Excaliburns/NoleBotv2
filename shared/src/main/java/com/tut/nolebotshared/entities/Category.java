@@ -1,4 +1,4 @@
-package com.tut.nolebotv2webapi.db.rolecategories;
+package com.tut.nolebotshared.entities;
 
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.GeneratedValue;
@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @MappedEntity("GuildCategories")
@@ -24,11 +24,11 @@ public class Category {
 
     @Nullable
     @Relation(value = Relation.Kind.ONE_TO_MANY, cascade = Relation.Cascade.ALL, mappedBy = "categoryId")
-    private List<Owner> owners;
+    private Set<Owner> owners;
 
     @Nullable
     @Relation(value = Relation.Kind.ONE_TO_MANY, cascade = Relation.Cascade.ALL, mappedBy = "categoryId")
-    private List<Role> roles;
+    private Set<Role> roles;
 
     @MappedProperty("GuildId")
     private String guildId;

@@ -32,21 +32,21 @@ micronaut {
 
 dependencies {
     implementation project(':shared')
-    implementation("io.micronaut.security:micronaut-security:3.3.0")
-    implementation("io.micronaut.security:micronaut-security-oauth2:3.3.0")
-    implementation("io.micronaut.security:micronaut-security-jwt:3.3.0")
+    implementation("io.micronaut.security:micronaut-security:$micronautVersion")
+    implementation("io.micronaut.security:micronaut-security-oauth2:$micronautVersion")
+    implementation("io.micronaut.security:micronaut-security-jwt:$micronautVersion")
     implementation ('io.projectreactor:reactor-core:3.4.17')
 
-    implementation("io.micronaut:micronaut-http-client:3.3.0")
-    implementation("io.micronaut:micronaut-runtime:3.3.0")
+    implementation("io.micronaut:micronaut-http-client:$micronautVersion")
+    implementation("io.micronaut:micronaut-runtime:$micronautVersion")
     implementation("javax.annotation:javax.annotation-api")
 
-    implementation("io.micronaut:micronaut-validation:3.3.0")
+    implementation("io.micronaut:micronaut-validation:$micronautVersion")
 
     //DB stuff
-    annotationProcessor('io.micronaut.data:micronaut-data-processor:3.3.0')
-    implementation('io.micronaut.data:micronaut-data-jdbc:3.3.0')
-    implementation('io.micronaut.sql:micronaut-jdbc-hikari:3.3.0')
+    implementation("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
+    implementation("io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari:4.7.2")
 
     //HTTP Client
     implementation ('io.github.openfeign:feign-core:11.9')
@@ -64,4 +64,8 @@ application {
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
     targetCompatibility = JavaVersion.toVersion("17")
+}
+
+repositories {
+    mavenCentral()
 }

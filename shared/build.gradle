@@ -13,6 +13,10 @@ plugins {
     id 'checkstyle'
     id 'pmd'
 }
+dependencies {
+    annotationProcessor('io.micronaut:micronaut-inject-java:3.7.1')
+    compileOnly('io.micronaut.data:micronaut-data-model:3.8.1')
+}
 
 checkstyle {
     ignoreFailures = false
@@ -42,4 +46,8 @@ generateTypeScript {
     outputFile = '../nolebotv2web/src/entities/JavaGenerated.ts'
     outputFileType = 'implementationFile'
     outputKind = 'module'
+}
+
+repositories {
+    mavenCentral()
 }
