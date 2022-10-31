@@ -1,9 +1,6 @@
 package com.tut.nolebotv2webapi.controllers;
 
-import com.tut.nolebotshared.entities.BroadcastPackage;
-import com.tut.nolebotshared.entities.GuildRole;
-import com.tut.nolebotshared.entities.GuildUser;
-import com.tut.nolebotshared.entities.Role;
+import com.tut.nolebotshared.entities.*;
 import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
@@ -11,6 +8,7 @@ import com.tut.nolebotshared.payloads.GetRolesPayload;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
 import com.tut.nolebotshared.payloads.RolesPayload;
+import com.tut.nolebotv2webapi.auth.AuthUtil;
 import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import com.tut.nolebotv2webapi.db.rolecategories.CategoryRepository;
 import io.micronaut.core.annotation.NonNull;
@@ -102,30 +100,36 @@ public class GuildController {
     public HttpResponse<List<GuildUser>> getAllUsers(Authentication authentication,
                                                      @PathVariable String guildId,
                                                      @QueryValue String name) {
-        String effectiveName = name.isEmpty() ? "a" : name;
-        try {
-            BroadcastPackage broadcastPackage = websocketServer.sendWithResponse(
-                    BroadcastPackage.builder()
-                            .messageType(MessageType.REQUEST)
-                            .broadcastType(BroadcastType.GET_GUILD_USERS)
-                            .payload(new GetMembersPayload(guildId, authentication.getName(), effectiveName)).build()
-            );
-            if (broadcastPackage.getBroadcastType() == BroadcastType.EXCEPTION) {
-                throw (Exception) broadcastPackage.getPayload();
+        GuildAuthStatus authStatus = AuthUtil.getAuthStatus(authentication, guildId);
+        if (authStatus.isAdmin() || authStatus.isGameManager()) {
+            String effectiveName = name.isEmpty() ? "a" : name;
+            try {
+                BroadcastPackage broadcastPackage = websocketServer.sendWithResponse(
+                        BroadcastPackage.builder()
+                                .messageType(MessageType.REQUEST)
+                                .broadcastType(BroadcastType.GET_GUILD_USERS)
+                                .payload(new GetMembersPayload(guildId, authentication.getName(), effectiveName)).build()
+                );
+                if (broadcastPackage.getBroadcastType() == BroadcastType.EXCEPTION) {
+                    throw (Exception) broadcastPackage.getPayload();
+                }
+                ArrayList<GuildUser> users = ((MembersPayload) broadcastPackage.getPayload()).users();
+                return HttpResponse.ok(users);
             }
-            ArrayList<GuildUser> users = ((MembersPayload) broadcastPackage.getPayload()).users();
-            return HttpResponse.ok(users);
-        }
-        catch (Exception e) {
-            logger.error(
-                    "Exception occurred getting all users from guild {} with search {}: {}",
-                    () -> guildId,
-                    () -> name,
-                    e::getMessage
-            );
-        }
+            catch (Exception e) {
+                logger.error(
+                        "Exception occurred getting all users from guild {} with search {}: {}",
+                        () -> guildId,
+                        () -> name,
+                        e::getMessage
+                );
+            }
 
-        return HttpResponse.serverError();
+            return HttpResponse.serverError();
+        }
+        else {
+            return HttpResponse.unauthorized();
+        }
     }
 
     /**
@@ -162,12 +166,18 @@ public class GuildController {
     public HttpResponse<List<GuildRole>> getAllRoles(Authentication authentication,
                                                      @PathVariable String guildId
     ) throws ExecutionException, InterruptedException, TimeoutException {
-        String userId = authentication.getName();
-        BroadcastPackage returnPackage = websocketServer.sendWithResponse(BroadcastPackage.builder()
-                .broadcastType(BroadcastType.GET_GUILD_ROLES)
-                .payload(new GetRolesPayload(guildId, userId))
-                .messageType(MessageType.REQUEST)
-                .build());
-        return HttpResponse.ok(((RolesPayload) returnPackage.getPayload()).roles());
+        GuildAuthStatus authStatus = AuthUtil.getAuthStatus(authentication, guildId);
+        if (authStatus.isAdmin()) {
+            String userId = authentication.getName();
+            BroadcastPackage returnPackage = websocketServer.sendWithResponse(BroadcastPackage.builder()
+                    .broadcastType(BroadcastType.GET_GUILD_ROLES)
+                    .payload(new GetRolesPayload(guildId, userId))
+                    .messageType(MessageType.REQUEST)
+                    .build());
+            return HttpResponse.ok(((RolesPayload) returnPackage.getPayload()).roles());
+        }
+        else {
+            return HttpResponse.unauthorized();
+        }
     }
 }

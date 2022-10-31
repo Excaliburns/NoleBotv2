@@ -69,7 +69,7 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
                                 .payload(new AuthStatusesPayload(null, user.id()))
                                 .build()
                 ).getPayload();
-                List<GuildAuthStatus> authStatuses = payload.authStatuses();
+                GuildAuthStatus[] authStatuses = payload.authStatuses();
 
                 HashMap<String, Object> claims = new HashMap<>();
                 claims.put("discord_access_token", token.getAccess_token());

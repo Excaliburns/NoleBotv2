@@ -22,10 +22,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -258,7 +255,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
         webSocketConnector.sendMessage(
                 builder.broadcastType(GET_GUILD_AUTH_STATUSES)
                         .messageType(MessageType.RESPONSE)
-                        .payload(new AuthStatusesPayload(authStatuses, userId))
+                        .payload(new AuthStatusesPayload(authStatuses.toArray(new GuildAuthStatus[0]), userId))
                         .build()
         );
     }

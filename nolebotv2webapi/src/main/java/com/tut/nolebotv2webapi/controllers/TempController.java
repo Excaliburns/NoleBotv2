@@ -15,11 +15,11 @@ import java.util.Set;
 
 @Controller
 @NoArgsConstructor
-@Secured(SecurityRule.IS_ANONYMOUS)
 public class TempController {
     @Inject
     private CategoryRepository categoryRepository;
 
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/test")
     public HttpResponse<String> addTestObjToDB() throws NoleBotException {
         throw new NoleBotException("This is a test error!");
