@@ -101,6 +101,7 @@ export default function RoleAssigner() {
                     return option.value
                 }}
                 ListboxComponent={getListbox()}
+                filterOptions={(x) => x}
                 renderOption={(props:object, option:{value: string, id:string, iconUrl: string}) => {
                     return <Box {...props} sx={{
                         display: "flex",

@@ -36,6 +36,7 @@ public class Settings {
     private Set<String> lockedRoles;
     private String adminRole;
     private String gameManagerRole;
+    private int protectedOperationPermissionLevel;
 
     // TODO: Name Verification
     //Initializes defaults that don't need to read anything from the server
@@ -53,6 +54,7 @@ public class Settings {
         twitterAccessSecret = "";
         adminRole = "";
         gameManagerRole = "";
+        protectedOperationPermissionLevel = 10000;
     }
 
     public Settings() {

@@ -39,5 +39,7 @@ public interface CategoryRepository extends CrudRepository<Category, UUID> {
     @Join(value = "roles", type = Join.Type.INNER)
     Set<String> findRolesRoleIdByGuildIdAndOwnersOwnerId(String guildId, String ownerId);
 
+    @Join(value = "roles", type = Join.Type.LEFT_FETCH)
+    @Join(value = "owners", type = Join.Type.LEFT_FETCH)
     Set<Category> getByGuildId(String guildId);
 }

@@ -32,7 +32,11 @@ Configuration:
         AppenderRef:
           - ref: LogToConsole
           - ref: LogToFile
-
+      - name: io.micronaut.data
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsole
     Root:
       level: error
       AppenderRef:

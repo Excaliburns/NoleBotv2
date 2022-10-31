@@ -24,6 +24,12 @@ public class CategoryController {
     @Inject
     private CoreWebSocketServer webSocketServer;
 
+    /**
+     * Lists categories of a guild.
+     *
+     * @param guildId The guild id to get categories for
+     * @return The set of categories a guild has
+     */
     @Get("/{guildId}/list/")
     public HttpResponse<Set<Category>> getCategoryList(@PathVariable String guildId) {
         categoryRepository.getByGuildId(guildId).forEach(category -> {

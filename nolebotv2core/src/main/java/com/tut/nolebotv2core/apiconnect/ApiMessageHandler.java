@@ -5,16 +5,22 @@ import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
+import com.tut.nolebotshared.exceptions.NoleBotException;
 import com.tut.nolebotshared.payloads.AssignRolePayload;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
+import com.tut.nolebotshared.payloads.GetRolesPayload;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
+import com.tut.nolebotshared.payloads.RolesPayload;
+import com.tut.nolebotv2core.util.permissions.GenericPermission;
+import com.tut.nolebotv2core.util.permissions.PermissionCache;
 import com.tut.nolebotv2core.util.settings.Settings;
 import com.tut.nolebotv2core.util.settings.SettingsCache;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.RoleIcon;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.tut.nolebotshared.enums.BroadcastType.ACK;
 import static com.tut.nolebotshared.enums.BroadcastType.EXCEPTION;
 import static com.tut.nolebotshared.enums.BroadcastType.GET_FSU_USER;
+import static com.tut.nolebotshared.enums.BroadcastType.GET_GUILD_ROLES;
 import static com.tut.nolebotshared.enums.BroadcastType.GET_GUILD_USERS;
 
 @AllArgsConstructor
@@ -71,7 +78,12 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 }
                 case GET_GUILD_USERS: {
                     final GetMembersPayload payload = (GetMembersPayload) message.getPayload();
-                    sendUsers(payload.guildId(), broadcastPackageBuilder, payload.search());
+                    sendUsers(payload.guildId(), payload.requesterUserId(), broadcastPackageBuilder, payload.search());
+                    break;
+                }
+                case GET_GUILD_ROLES: {
+                    final GetRolesPayload payload = (GetRolesPayload) message.getPayload();
+                    sendRoles(payload.guildId(), payload.requesterUserId(), broadcastPackageBuilder);
                     break;
                 }
                 case ASSIGN_ROLES: {
@@ -141,7 +153,9 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                         role -> new GuildRole(
                                 role.getId(),
                                 role.getName(),
-                                role.getColorRaw(), role.isPublicRole()
+                                role.getColorRaw(),
+                                null,
+                                role.isPublicRole()
                         )
                 ).collect(Collectors.toList()),
                 member.getEffectiveAvatarUrl(),
@@ -166,54 +180,75 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
 
     private void sendUsers(
             String guildSnowflakeId,
+            String requesterSnowflakeId,
             BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder,
             String search
-    ) throws GuildNotFoundException {
+    ) throws GuildNotFoundException, NoleBotException, ExecutionException {
         final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
                 .orElseThrow(() -> new GuildNotFoundException(
                         String.format(guildNotFound, guildSnowflakeId)
                 ));
-        guild.retrieveMembersByPrefix(search, 100).onSuccess((m) -> {
-            List<GuildUser> users = m.stream().map((u) -> new GuildUser(
-                    u.getId(),
-                    u.getEffectiveName(),
-                    null,
-                    null,
-                    u.getEffectiveAvatarUrl(),
-                    false,
-                    false
-            )).collect(Collectors.toList());
-            webSocketConnector.sendMessage(
-                    broadcastPackageBuilder
-                            .payload(new MembersPayload(new ArrayList<>(users)))
-                            .broadcastType(GET_GUILD_USERS)
-                            .build()
-            );
-        });
-        /*
-        guild.loadMembers().onSuccess((t) -> {
-            ArrayList<GuildUser> users = new ArrayList<>();
-            int numPages = (int) Math.ceil(((double) t.size()) / 300.0);
-            for (int i = 300 * (pageNum - 1); i < 300 * pageNum && i < t.size(); i++) {
-                final Member member = t.get(i);
-                final GuildUser user = new GuildUser(
-                        member.getId(),
-                        member.getEffectiveName(),
+        GenericPermission permission = PermissionCache.getPermissionForUser(requesterSnowflakeId, guildSnowflakeId);
+        int permLevel = permission.getPermissionLevel();
+        if (permLevel >= SettingsCache.settingsCache.get(guildSnowflakeId).getProtectedOperationPermissionLevel()) {
+            guild.retrieveMembersByPrefix(search, 100).onSuccess((m) -> {
+                List<GuildUser> users = m.stream().map((u) -> new GuildUser(
+                        u.getId(),
+                        u.getEffectiveName(),
                         null,
                         null,
-                        member.getEffectiveAvatarUrl()
+                        u.getEffectiveAvatarUrl(),
+                        false,
+                        false
+                )).toList();
+                webSocketConnector.sendMessage(
+                        broadcastPackageBuilder
+                                .payload(new MembersPayload(new ArrayList<>(users)))
+                                .broadcastType(GET_GUILD_USERS)
+                                .build()
                 );
-                users.add(user);
-            }
+            });
+        }
+        else {
+            throw new NoleBotException(String.format("Guild user with id %s tried to retrieve list of members" +
+                    " in guild %s with insufficient permission", requesterSnowflakeId, guildSnowflakeId));
+        }
+    }
+
+    private void sendRoles(
+            String guildSnowflakeId,
+            String requesterSnowflakeId,
+            BroadcastPackage.BroadcastPackageBuilder broadcastPackageBuilder
+    ) throws GuildNotFoundException, NoleBotException, ExecutionException {
+        final Guild guild = Optional.ofNullable(jda.getGuildById(guildSnowflakeId))
+                .orElseThrow(() -> new GuildNotFoundException(
+                        String.format(guildNotFound, guildSnowflakeId)
+                ));
+        GenericPermission permission = PermissionCache.getPermissionForUser(requesterSnowflakeId, guildSnowflakeId);
+        int permLevel = permission.getPermissionLevel();
+        if (permLevel >= SettingsCache.settingsCache.get(guildSnowflakeId).getProtectedOperationPermissionLevel()) {
+            List<GuildRole> roles = guild.getRoles().stream().map((jdaRole) -> {
+                RoleIcon icon = jdaRole.getIcon();
+                String iconLink = icon != null ? icon.getIconUrl() : null;
+
+                return new GuildRole(
+                        jdaRole.getId(),
+                        jdaRole.getName(),
+                        null,
+                        iconLink,
+                        jdaRole.isPublicRole());
+            }).toList();
             webSocketConnector.sendMessage(
                     broadcastPackageBuilder
-                            .payload(new MembersPayload(users, numPages))
-                            .broadcastType(GET_GUILD_USERS)
+                            .payload(new RolesPayload(new ArrayList<GuildRole>(roles)))
+                            .broadcastType(GET_GUILD_ROLES)
                             .build()
             );
-        });
-
-         */
+        }
+        else {
+            throw new NoleBotException(String.format("Guild user with id %s tried to list all roles in guild %s" +
+                    " with insufficient permission", requesterSnowflakeId, guildSnowflakeId));
+        }
 
     }
 }

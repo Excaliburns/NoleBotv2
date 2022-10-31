@@ -137,7 +137,10 @@ public class Category extends Command {
         ).trim();
         for (User u : userList) {
             try {
-                success = Arrays.stream(statements.setOwnerOfCategory(u.getId(), event.getGuildId(), catName))
+                success = Arrays.stream(
+                        statements.setOwnerOfCategory(u.getId(), u.getName(),
+                                event.getGuildId(),
+                                catName))
                         .anyMatch((i) -> {
                             return i >= 0;
                         });

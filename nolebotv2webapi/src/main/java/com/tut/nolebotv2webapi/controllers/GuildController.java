@@ -7,8 +7,10 @@ import com.tut.nolebotshared.entities.Role;
 import com.tut.nolebotshared.enums.BroadcastType;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.payloads.GetMembersPayload;
+import com.tut.nolebotshared.payloads.GetRolesPayload;
 import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
 import com.tut.nolebotshared.payloads.MembersPayload;
+import com.tut.nolebotshared.payloads.RolesPayload;
 import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import com.tut.nolebotv2webapi.db.rolecategories.CategoryRepository;
 import io.micronaut.core.annotation.NonNull;
@@ -29,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 // We should use this controller to get information about guilds, or user information that is guild specific
@@ -96,13 +99,16 @@ public class GuildController {
      * @return A list of GuildUsers, if found.
      */
     @Get("/{guildId}/users/")
-    public HttpResponse<List<GuildUser>> getAllUsers(@PathVariable String guildId, @QueryValue String name) {
+    public HttpResponse<List<GuildUser>> getAllUsers(Authentication authentication,
+                                                     @PathVariable String guildId,
+                                                     @QueryValue String name) {
+        String effectiveName = name.isEmpty() ? "a" : name;
         try {
             BroadcastPackage broadcastPackage = websocketServer.sendWithResponse(
                     BroadcastPackage.builder()
                             .messageType(MessageType.REQUEST)
                             .broadcastType(BroadcastType.GET_GUILD_USERS)
-                            .payload(new GetMembersPayload(guildId, name)).build()
+                            .payload(new GetMembersPayload(guildId, authentication.getName(), effectiveName)).build()
             );
             if (broadcastPackage.getBroadcastType() == BroadcastType.EXCEPTION) {
                 throw (Exception) broadcastPackage.getPayload();
@@ -137,8 +143,31 @@ public class GuildController {
         Set<Role> roles = categoryRepository.findRolesByGuildIdAndOwnersOwnerId(guildId, discordUserId);
         List<GuildRole> guildRoles = new ArrayList<>();
         roles.forEach(role -> {
-            guildRoles.add(new GuildRole(role.getRoleId(), role.getRoleName(), null, null));
+            guildRoles.add(new GuildRole(role.getRoleId(), role.getRoleName(), null, null, null));
         });
         return HttpResponse.ok().body(guildRoles);
+    }
+
+    /**
+     * Gets all roles in a guild.
+     *
+     * @param authentication The Authentication of the current user
+     * @param guildId The guild ID to get roles from
+     * @return All roles in a guild
+     * @throws ExecutionException If the web socket breaks
+     * @throws InterruptedException If the web socket breaks
+     * @throws TimeoutException If the web socket timesout
+     */
+    @Get("/{guildId}/all_roles/")
+    public HttpResponse<List<GuildRole>> getAllRoles(Authentication authentication,
+                                                     @PathVariable String guildId
+    ) throws ExecutionException, InterruptedException, TimeoutException {
+        String userId = authentication.getName();
+        BroadcastPackage returnPackage = websocketServer.sendWithResponse(BroadcastPackage.builder()
+                .broadcastType(BroadcastType.GET_GUILD_ROLES)
+                .payload(new GetRolesPayload(guildId, userId))
+                .messageType(MessageType.REQUEST)
+                .build());
+        return HttpResponse.ok(((RolesPayload) returnPackage.getPayload()).roles());
     }
 }

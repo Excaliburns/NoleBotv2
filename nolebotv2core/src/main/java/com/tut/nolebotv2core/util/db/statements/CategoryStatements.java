@@ -51,8 +51,8 @@ public class CategoryStatements {
             "     WHERE gc.GuildId=?                                 ";
 
     static final String insertCategoryOwner =
-            "INSERT INTO CategoryOwners(Id, CategoryId, OwnerId)     " +
-            "   VALuES (?, ?, ?)                                     ";
+            "INSERT INTO CategoryOwners(Id, CategoryId, OwnerId, OwnerName)     " +
+            "   VALuES (?, ?, ?, ?)                                             ";
 
     /**
      * Executes an insert into the GuildCategories table.
@@ -181,7 +181,10 @@ public class CategoryStatements {
      * @return an int array representing the number of rows updated in each statement
      * @throws SQLException if there is an error accessing the db
      */
-    public int[] setOwnerOfCategory(String ownerId, String guildId, String categoryName) throws SQLException {
+    public int[] setOwnerOfCategory(String ownerId,
+                                    String ownerName,
+                                    String guildId,
+                                    String categoryName) throws SQLException {
         PreparedStatement preparedStatement = DBConnection.getConnection()
                 .prepareStatement(getIdByGuildIdAndCategoryName);
         preparedStatement.setString(1, guildId);
@@ -192,6 +195,7 @@ public class CategoryStatements {
             preparedStatement.setString(1, UUID.randomUUID().toString());
             preparedStatement.setString(2, rs.getString(1));
             preparedStatement.setString(3, ownerId);
+            preparedStatement.setString(4, ownerName);
             preparedStatement.addBatch();
         }
         return preparedStatement.executeBatch();
