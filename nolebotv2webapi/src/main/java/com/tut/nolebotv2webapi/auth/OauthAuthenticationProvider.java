@@ -1,9 +1,16 @@
 package com.tut.nolebotv2webapi.auth;
 
+import com.tut.nolebotshared.entities.BroadcastPackage;
 import com.tut.nolebotshared.entities.DiscordUser;
+import com.tut.nolebotshared.entities.GuildAuthStatus;
+import com.tut.nolebotshared.enums.BroadcastType;
+import com.tut.nolebotshared.enums.MessageType;
+import com.tut.nolebotshared.payloads.AuthStatusesPayload;
 import com.tut.nolebotv2webapi.client.DiscordApiClient;
+import com.tut.nolebotv2webapi.coreconnect.CoreWebSocketServer;
 import com.tut.nolebotv2webapi.entities.DiscordAccessToken;
 import io.micronaut.context.annotation.Property;
+import io.micronaut.core.annotation.Blocking;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.AuthenticationProvider;
 import io.micronaut.security.authentication.AuthenticationRequest;
@@ -14,6 +21,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Log4j2
 public class OauthAuthenticationProvider implements AuthenticationProvider {
@@ -29,7 +37,11 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
     @Inject
     protected DiscordApiClient discordApiClient;
 
+    @Inject
+    protected CoreWebSocketServer coreWebSocketServer;
+
     @Override
+    @Blocking
     public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
                                                           AuthenticationRequest<?, ?> authenticationRequest) {
         return Mono.create(emitter -> {
@@ -50,9 +62,19 @@ public class OauthAuthenticationProvider implements AuthenticationProvider {
                 DiscordUser user = discordApiClient.getDiscordUser(
                         token.getAccess_token()
                 );
+                AuthStatusesPayload payload = (AuthStatusesPayload) coreWebSocketServer.sendWithResponse(
+                        BroadcastPackage.builder()
+                                .broadcastType(BroadcastType.GET_GUILD_AUTH_STATUSES)
+                                .messageType(MessageType.REQUEST)
+                                .payload(new AuthStatusesPayload(null, user.id()))
+                                .build()
+                ).getPayload();
+                List<GuildAuthStatus> authStatuses = payload.authStatuses();
+
                 HashMap<String, Object> claims = new HashMap<>();
                 claims.put("discord_access_token", token.getAccess_token());
                 claims.put("discord_username", user.username());
+                claims.put("auth_statuses", authStatuses);
                 emitter.success(AuthenticationResponse.success(user.id(), claims));
             }
             catch (Exception e) {

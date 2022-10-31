@@ -1,9 +1,11 @@
 package com.tut.nolebotv2core.util.settings;
 
+import com.tut.nolebotv2core.util.NoleBotUtil;
 import com.tut.nolebotv2core.util.permissions.GenericPermission;
 import com.tut.nolebotv2core.util.social.SocialMediaEnum;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.Member;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -36,7 +38,6 @@ public class Settings {
     private Set<String> lockedRoles;
     private String adminRole;
     private String gameManagerRole;
-    private int protectedOperationPermissionLevel;
 
     // TODO: Name Verification
     //Initializes defaults that don't need to read anything from the server
@@ -54,7 +55,6 @@ public class Settings {
         twitterAccessSecret = "";
         adminRole = "";
         gameManagerRole = "";
-        protectedOperationPermissionLevel = 10000;
     }
 
     public Settings() {
@@ -87,5 +87,13 @@ public class Settings {
 
     public void addPermission(GenericPermission p) {
         permissionList.add(p);
+    }
+    public boolean isUserAdmin(String userId) {
+        Member m = NoleBotUtil.getJda().getGuildById(guildId).retrieveMemberById(userId).complete();
+        return m.getRoles().stream().anyMatch((role -> role.getId().equals(adminRole)));
+    }
+    public boolean isUserGameManager(String userId) {
+        Member m = NoleBotUtil.getJda().getGuildById(guildId).retrieveMemberById(userId).complete();
+        return m.getRoles().stream().anyMatch((role -> role.getId().equals(gameManagerRole)));
     }
 }

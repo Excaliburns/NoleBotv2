@@ -1,17 +1,13 @@
 package com.tut.nolebotv2core.apiconnect;
 
 import com.tut.nolebotshared.entities.BroadcastPackage;
+import com.tut.nolebotshared.entities.GuildAuthStatus;
 import com.tut.nolebotshared.entities.GuildRole;
 import com.tut.nolebotshared.entities.GuildUser;
 import com.tut.nolebotshared.enums.MessageType;
 import com.tut.nolebotshared.exceptions.GuildNotFoundException;
 import com.tut.nolebotshared.exceptions.NoleBotException;
-import com.tut.nolebotshared.payloads.AssignRolePayload;
-import com.tut.nolebotshared.payloads.GetMembersPayload;
-import com.tut.nolebotshared.payloads.GetRolesPayload;
-import com.tut.nolebotshared.payloads.MemberAndGuildPayload;
-import com.tut.nolebotshared.payloads.MembersPayload;
-import com.tut.nolebotshared.payloads.RolesPayload;
+import com.tut.nolebotshared.payloads.*;
 import com.tut.nolebotv2core.util.permissions.GenericPermission;
 import com.tut.nolebotv2core.util.permissions.PermissionCache;
 import com.tut.nolebotv2core.util.settings.Settings;
@@ -21,6 +17,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.RoleIcon;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,11 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static com.tut.nolebotshared.enums.BroadcastType.ACK;
-import static com.tut.nolebotshared.enums.BroadcastType.EXCEPTION;
-import static com.tut.nolebotshared.enums.BroadcastType.GET_FSU_USER;
-import static com.tut.nolebotshared.enums.BroadcastType.GET_GUILD_ROLES;
-import static com.tut.nolebotshared.enums.BroadcastType.GET_GUILD_USERS;
+import static com.tut.nolebotshared.enums.BroadcastType.*;
 
 @AllArgsConstructor
 public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
@@ -86,6 +79,11 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                     sendRoles(payload.guildId(), payload.requesterUserId(), broadcastPackageBuilder);
                     break;
                 }
+                case GET_GUILD_AUTH_STATUSES: {
+                    AuthStatusesPayload payload = (AuthStatusesPayload) message.getPayload();
+                    sendGuildAuthStatuses(payload.userId(), broadcastPackageBuilder);
+                    break;
+                }
                 case ASSIGN_ROLES: {
                     final AssignRolePayload payload = (AssignRolePayload) message.getPayload();
                     assignRoles(payload.roleIds(), payload.userIds(), payload.guildId());
@@ -128,7 +126,7 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
      * Get details of a member of a guild.
      *
      * @param memberSnowflakeId member's snowflake ID
-     * @param guildSnowflakeId  guild's snowflake Id
+     * @param guildSnowflakeId  guild's snowflake ID
      * @return GuildUser
      */
     private GuildUser getMemberDetails(
@@ -188,31 +186,23 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 .orElseThrow(() -> new GuildNotFoundException(
                         String.format(guildNotFound, guildSnowflakeId)
                 ));
-        GenericPermission permission = PermissionCache.getPermissionForUser(requesterSnowflakeId, guildSnowflakeId);
-        int permLevel = permission.getPermissionLevel();
-        if (permLevel >= SettingsCache.settingsCache.get(guildSnowflakeId).getProtectedOperationPermissionLevel()) {
-            guild.retrieveMembersByPrefix(search, 100).onSuccess((m) -> {
-                List<GuildUser> users = m.stream().map((u) -> new GuildUser(
-                        u.getId(),
-                        u.getEffectiveName(),
-                        null,
-                        null,
-                        u.getEffectiveAvatarUrl(),
-                        false,
-                        false
-                )).toList();
-                webSocketConnector.sendMessage(
-                        broadcastPackageBuilder
-                                .payload(new MembersPayload(new ArrayList<>(users)))
-                                .broadcastType(GET_GUILD_USERS)
-                                .build()
-                );
-            });
-        }
-        else {
-            throw new NoleBotException(String.format("Guild user with id %s tried to retrieve list of members" +
-                    " in guild %s with insufficient permission", requesterSnowflakeId, guildSnowflakeId));
-        }
+        guild.retrieveMembersByPrefix(search, 100).onSuccess((m) -> {
+            List<GuildUser> users = m.stream().map((u) -> new GuildUser(
+                    u.getId(),
+                    u.getEffectiveName(),
+                    null,
+                    null,
+                    u.getEffectiveAvatarUrl(),
+                    false,
+                    false
+            )).toList();
+            webSocketConnector.sendMessage(
+                    broadcastPackageBuilder
+                            .payload(new MembersPayload(new ArrayList<>(users)))
+                            .broadcastType(GET_GUILD_USERS)
+                            .build()
+            );
+        });
     }
 
     private void sendRoles(
@@ -224,31 +214,52 @@ public class ApiMessageHandler implements ApiWebSocketConnector.MessageHandler {
                 .orElseThrow(() -> new GuildNotFoundException(
                         String.format(guildNotFound, guildSnowflakeId)
                 ));
-        GenericPermission permission = PermissionCache.getPermissionForUser(requesterSnowflakeId, guildSnowflakeId);
-        int permLevel = permission.getPermissionLevel();
-        if (permLevel >= SettingsCache.settingsCache.get(guildSnowflakeId).getProtectedOperationPermissionLevel()) {
-            List<GuildRole> roles = guild.getRoles().stream().map((jdaRole) -> {
-                RoleIcon icon = jdaRole.getIcon();
-                String iconLink = icon != null ? icon.getIconUrl() : null;
 
-                return new GuildRole(
-                        jdaRole.getId(),
-                        jdaRole.getName(),
-                        null,
-                        iconLink,
-                        jdaRole.isPublicRole());
-            }).toList();
-            webSocketConnector.sendMessage(
-                    broadcastPackageBuilder
-                            .payload(new RolesPayload(new ArrayList<GuildRole>(roles)))
-                            .broadcastType(GET_GUILD_ROLES)
-                            .build()
-            );
-        }
-        else {
-            throw new NoleBotException(String.format("Guild user with id %s tried to list all roles in guild %s" +
-                    " with insufficient permission", requesterSnowflakeId, guildSnowflakeId));
-        }
+        List<GuildRole> roles = guild.getRoles().stream().map((jdaRole) -> {
+            RoleIcon icon = jdaRole.getIcon();
+            String iconLink = icon != null ? icon.getIconUrl() : null;
 
+            return new GuildRole(
+                    jdaRole.getId(),
+                    jdaRole.getName(),
+                    null,
+                    iconLink,
+                    jdaRole.isPublicRole());
+        }).toList();
+        webSocketConnector.sendMessage(
+                broadcastPackageBuilder
+                        .payload(new RolesPayload(new ArrayList<>(roles)))
+                        .broadcastType(GET_GUILD_ROLES)
+                        .build()
+        );
+    }
+    private void sendGuildAuthStatuses(String userId,
+                                       BroadcastPackage.BroadcastPackageBuilder builder
+    ) throws RuntimeException {
+        User requestingUser = jda.getUserById(userId);
+        List<Guild> mutualGuilds = jda.getMutualGuilds(requestingUser);
+        List<GuildAuthStatus> authStatuses = new ArrayList<>();
+
+        mutualGuilds.forEach((guild -> {
+            String guildId = guild.getId();
+            Settings s = null;
+            try {
+                s = SettingsCache.settingsCache.get(guildId);
+            }
+            catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            authStatuses.add(new GuildAuthStatus(
+                guildId,
+                s.isUserAdmin(userId),
+                s.isUserGameManager(userId)
+            ));
+        }));
+        webSocketConnector.sendMessage(
+                builder.broadcastType(GET_GUILD_AUTH_STATUSES)
+                        .messageType(MessageType.RESPONSE)
+                        .payload(new AuthStatusesPayload(authStatuses, userId))
+                        .build()
+        );
     }
 }
