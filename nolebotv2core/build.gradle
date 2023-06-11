@@ -20,13 +20,6 @@ pmd {
 version 'a0.1'
 group = 'com.tut.nolebotv2core'
 
-repositories {
-    maven {
-        name 'm2-dv8tion'
-        url 'https://m2.dv8tion.net/releases'
-    }
-}
-
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
@@ -34,7 +27,7 @@ dependencies {
     implementation project(':shared')
 
     // JDA
-    implementation 'net.dv8tion:JDA:4.4.0_350'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.10'
 
     // Guava
     implementation "com.google.guava:guava:31.0.1-jre"

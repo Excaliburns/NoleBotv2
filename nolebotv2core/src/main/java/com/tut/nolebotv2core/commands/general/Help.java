@@ -1,19 +1,18 @@
 package com.tut.nolebotv2core.commands.general;
 
-import com.google.common.primitives.Ints;
 import com.tut.nolebotv2core.commands.util.Command;
 import com.tut.nolebotv2core.commands.util.CommandEvent;
 import com.tut.nolebotv2core.commands.util.CommandUtil;
 import com.tut.nolebotv2core.commands.util.ReactionCommand;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import com.tut.nolebotv2core.util.chat.EmbedHelper;
 import com.tut.nolebotv2core.util.reactions.ReactionMessage;
 import com.tut.nolebotv2core.util.reactions.ReactionMessageType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class Help extends ReactionCommand {
     /**
@@ -25,89 +24,20 @@ public class Help extends ReactionCommand {
         helpDescription         = "I'm sorry, I can't help you with help!";
         requiredPermissionLevel = 0;
         usages.add("help");
-        usages.add("help [command]");
-        usages.add("help [1-100]");
     }
 
-    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public void registerCommand(JDA jda) {
+        jda.upsertCommand(Commands.slash(name, description)).queue();
+    }
     @Override
     public void onCommandReceived(CommandEvent event) {
-        // Whether to execute the generic help command or to get a specific help page
-        final boolean isGenericHelpCommand = event.getMessageContent().size() == 1 ||
-                                             //If the 2nd word can be parsed to an int
-                                             Objects.nonNull(Ints.tryParse(event.getMessageContent().get(1)));
-
-        if (isGenericHelpCommand) {
-            try {
-                displayGenericHelpMenu(event);
-            }
-            catch (IndexOutOfBoundsException e) {
-                //Not sure if It's necessary to make this error message into a MessageEmbed
-                event.sendErrorResponseToOriginatingChannel("That help page doesn't exist!");
-            }
-        }
-        else if (event.getMessageContent().size() == 2) {
-            event.getChannel().sendMessageEmbeds(sendSpecificCommandHelp(event)).queue();
-        }
+        event.getOriginatingJDAEvent().deferReply(true);
     }
 
-    //CHECKSTYLE:OFF
-    private MessageEmbed sendSpecificCommandHelp(CommandEvent event) {
-        // Uses the map of commands in CommandUtil to match the second word of the message to a command
-        // event.getCommand() doesn't work here
-        final String calledCommandName          = event.getMessageContent().get(1);
-        final Optional<Command> commandOptional = CommandUtil.getCommandFromMap(calledCommandName);
-        //If the command exists
-        if (commandOptional.isPresent()) {
-            final Command calledCommand = commandOptional.get();
-            final String prefix         = event.getSettings().getPrefix();
-            //The exact string that would be entered to call the command
-            final String commandString  = prefix + calledCommand.getName();
-
-            //Make a string of usages, with each usage on its own line
-            final StringBuilder usages = new StringBuilder();
-            calledCommand.getUsages().forEach(usage -> usages.append(prefix).append(usage).append("\n"));
-
-            List<MessageEmbed.Field> fieldList = new ArrayList<>();
-            fieldList.add(
-                    new MessageEmbed.Field(
-                            "Command Name: ",
-                            commandString,
-                            true
-                    )
-            );
-            fieldList.add(
-                    new MessageEmbed.Field(
-                            "Permission Level Required: ",
-                            String.valueOf(calledCommand.getRequiredPermissionLevel()),
-                            true
-                    )
-            );
-            fieldList.add(
-                    new MessageEmbed.Field(
-                            "Description: ",
-                            calledCommand.getHelpDescription(),
-                            false
-                    )
-            );
-            fieldList.add(
-                    new MessageEmbed.Field(
-                            "Usages <required> [optional]: ",
-                            usages.toString(),
-                            false
-                    )
-            );
-
-            return EmbedHelper.buildDefaultMessageEmbed(fieldList);
-        }
-        else {
-            final MessageEmbed.Field field = new MessageEmbed.Field(
-                    "Error!",
-                    "No command with that name found!",
-                    false
-            );
-            return EmbedHelper.buildDefaultMessageEmbed(field);
-        }
+    @Override
+    public void executeCommand(CommandEvent event) {
+        displayGenericHelpMenu(event);
     }
 
     private void displayGenericHelpMenu(CommandEvent event) {
@@ -143,8 +73,8 @@ public class Help extends ReactionCommand {
         final ReactionMessage reactionMessage = new ReactionMessage(
                 ReactionMessageType.HELP_COMMAND,
                 event.getChannel(),
-                event.getOriginatingJDAEvent().getAuthor().getId(),
-                event.getOriginatingJDAEvent().getMessageId(),
+                event.getOriginatingJDAEvent().getUser().getId(),
+                event.getOriginatingJDAEvent().getId(),
                 0,
                 commandHelpPages,
                 defaultEmojiCodeList

@@ -74,7 +74,7 @@ public class Attendance extends ReactionCommand {
     }
 
     @Override
-    public void onCommandReceived(CommandEvent event) {
+    public void executeCommand(CommandEvent event) {
         final List<String> messages = event.getMessageContent();
         final Settings guildSettings = event.getSettings();
 

@@ -8,7 +8,9 @@ import com.tut.nolebotv2core.util.permissions.PermissionType;
 import com.tut.nolebotv2core.util.reactions.ReactionMessage;
 import com.tut.nolebotv2core.util.reactions.ReactionMessageType;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.ArrayList;
 import java.util.NavigableSet;
@@ -28,7 +30,14 @@ public class ListGuildPermissions extends ReactionCommand {
     }
 
     @Override
-    public void onCommandReceived(CommandEvent event) {
+    public void registerCommand(JDA jda) {
+        jda.upsertCommand(
+                Commands.slash(name, description)
+        ).queue();
+    }
+
+    @Override
+    public void executeCommand(CommandEvent event) {
         final ArrayList<MessageEmbed> permissionPages = new ArrayList<>();
         final TreeSet<GenericPermission> permissionList = new TreeSet<>(event.getSettings().getPermissionList());
         //Maps permissionLevels to a Set that is in descending order
@@ -70,8 +79,8 @@ public class ListGuildPermissions extends ReactionCommand {
         final ReactionMessage reactionMessage = new ReactionMessage(
                 ReactionMessageType.PERMISSION_COMMAND,
                 event.getChannel(),
-                event.getOriginatingJDAEvent().getAuthor().getId(),
-                event.getOriginatingJDAEvent().getMessageId(),
+                event.getOriginatingJDAEvent().getUser().getId(),
+                event.getOriginatingJDAEvent().getId(),
                 0,
                 permissionPages,
                 defaultEmojiCodeList

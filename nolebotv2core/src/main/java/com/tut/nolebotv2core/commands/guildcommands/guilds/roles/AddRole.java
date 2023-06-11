@@ -68,7 +68,7 @@ public class AddRole extends Command {
     }
 
     @Override
-    public void onCommandReceived(CommandEvent event) throws Exception {
+    public void executeCommand(CommandEvent event) throws Exception {
         final List<Role> mentionedRoles = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final List<Member> mentionedMembers = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
         final int mentionedRolesSize = mentionedRoles.size();

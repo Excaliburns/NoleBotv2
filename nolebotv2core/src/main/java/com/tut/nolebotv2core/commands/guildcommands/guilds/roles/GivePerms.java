@@ -25,7 +25,7 @@ public class GivePerms extends Command {
 
     //TODO: Check if role/user already has a lower permission, delete if so.
     @Override
-    public void onCommandReceived(final CommandEvent event) throws Exception {
+    public void executeCommand(final CommandEvent event) throws Exception {
         final List<Role> rolesMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedRoles();
         final List<Member> membersMentioned = event.getOriginatingJDAEvent().getMessage().getMentionedMembers();
         final List<String> message = event.getMessageContent();

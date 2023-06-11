@@ -2,6 +2,7 @@ package com.tut.nolebotv2core.commands.util;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.JDA;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,9 @@ public abstract class Command {
         }
     }
 
-    public abstract void onCommandReceived(CommandEvent event) throws Exception;
+    public abstract void registerCommand(JDA jda);
+    public abstract void executeCommand(CommandEvent event) throws Exception;
+    public abstract void onCommandReceived(CommandEvent event);
 
     /**
      * Returns if a user has permission to execute an event.
@@ -51,9 +54,9 @@ public abstract class Command {
      * @param event Originating event.
      * @throws Exception if there was an error in the event.
      */
-    public final void executeCommand(CommandEvent event) throws Exception {
+    public final void checkPermsAndRunCommand(CommandEvent event) throws Exception {
         if (doesUserHavePermission(event)) {
-            onCommandReceived(event);
+            executeCommand(event);
         }
         else {
             event.sendErrorResponseToOriginatingChannel(

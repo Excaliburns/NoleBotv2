@@ -6,8 +6,11 @@ import com.tut.nolebotv2core.util.NoleBotUtil;
 import com.tut.nolebotv2core.util.permissions.GenericPermission;
 import com.tut.nolebotv2core.util.settings.Settings;
 import com.tut.nolebotv2core.util.settings.SettingsCache;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +37,16 @@ public class AddAssignableRole extends Command {
     }
 
     @Override
-    public void onCommandReceived(final CommandEvent event) throws Exception {
+    public void registerCommand(JDA jda) {
+        jda.upsertCommand(
+                Commands.slash(name, description)
+                        .addOption(OptionType.ROLE, "role", "The role that should be assignable")
+                        .addOption(OptionType.INTEGER, "permission", "The permission required to assign the role")
+        ).queue();
+    }
+
+    @Override
+    public void executeCommand(final CommandEvent event) throws Exception {
         final Settings settings = event.getSettings();
         final TreeSet<GenericPermission> permissionList = new TreeSet<>(settings.getPermissionList());
         final List<Role> roles = event.getMentionedRoles();

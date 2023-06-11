@@ -3,13 +3,14 @@ package com.tut.nolebotv2core.listeners;
 import com.tut.nolebotv2core.util.chat.EmbedHelper;
 import com.tut.nolebotv2core.util.settings.SettingsCache;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 //Checks whether a member is shadow-banned when members try to join a voice channel or send a message
@@ -28,19 +29,20 @@ public class BanListListener extends ListenerAdapter {
      * @param event Originating JDA event
      */
     @Override
-    public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-        final Guild guild = event.getGuild();
-        try {
-            if (SettingsCache.settingsCache.get(guild.getId()).getBannedUserIds().contains(event.getMember().getId())) {
-                guild.kickVoiceMember(event.getMember()).queue(callback ->
-                        event.getEntity().getUser().openPrivateChannel().queue(messageChannelCallback ->
-                                messageChannelCallback.sendMessage(shadowBanJoinVoiceText).queue()
-                        )
-                );
+    public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
+        if (event.getChannelJoined() != null) {
+            final Guild guild = event.getGuild();
+            try {
+                if (SettingsCache.settingsCache.get(guild.getId()).getBannedUserIds().contains(event.getMember().getId())) {
+                    guild.kickVoiceMember(event.getMember()).queue(callback ->
+                            event.getEntity().getUser().openPrivateChannel().queue(messageChannelCallback ->
+                                    messageChannelCallback.sendMessage(shadowBanJoinVoiceText).queue()
+                            )
+                    );
+                }
+            } catch (ExecutionException e) {
+                sendErrorMessage(e, guild);
             }
-        }
-        catch (ExecutionException e) {
-            sendErrorMessage(e, guild);
         }
     }
 
@@ -50,7 +52,7 @@ public class BanListListener extends ListenerAdapter {
      * @param event Originating JDA event
      */
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         final Guild guild = event.getGuild();
         try {
             if (SettingsCache.settingsCache.get(guild.getId()).getBannedUserIds().contains(event.getAuthor().getId())) {
@@ -81,14 +83,14 @@ public class BanListListener extends ListenerAdapter {
             guild.getSystemChannel().sendMessageEmbeds(embed).queue();
         }
         else {
-            final MessageChannel channel = guild.getDefaultChannel();
-            if (channel != null) {
-                channel.sendMessage(
-                        "Your guild didn't have a system channel to send this error message, please set one up!"
-                ).queue(callback ->
-                        callback.getChannel().sendMessageEmbeds(embed).queue()
-                );
-            }
+            final MessageChannel channel = Optional.ofNullable(guild.getDefaultChannel())
+                    .orElseThrow(() -> new IllegalStateException("Guild has no default channel"))
+                    .asTextChannel();
+            channel.sendMessage(
+            "Your guild didn't have a system channel to send this error message, please set one up!"
+            ).queue(callback ->
+                callback.getChannel().sendMessageEmbeds(embed).queue()
+            );
         }
     }
 }

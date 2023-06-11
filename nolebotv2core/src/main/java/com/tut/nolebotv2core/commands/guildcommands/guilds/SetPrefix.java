@@ -21,7 +21,7 @@ public class SetPrefix extends Command {
     }
 
     @Override
-    public void onCommandReceived(CommandEvent event) {
+    public void executeCommand(CommandEvent event) {
         final String oldPrefix       = event.getSettings().getPrefix();
         final String newPrefix       = event.getMessageContent().get(1);
         if (oldPrefix.equals(newPrefix)) {

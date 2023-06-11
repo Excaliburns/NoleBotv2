@@ -5,7 +5,7 @@ import com.tut.nolebotv2core.util.settings.SettingsFactory;
 import com.tut.nolebotv2core.util.social.SocialMediaEvent;
 import com.tut.nolebotv2core.util.social.SocialMediaManager;
 import lombok.AllArgsConstructor;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +14,7 @@ public class SocialMediaEventListener extends ListenerAdapter {
     private SocialMediaManager socialMediaManager;
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
             return;
         }

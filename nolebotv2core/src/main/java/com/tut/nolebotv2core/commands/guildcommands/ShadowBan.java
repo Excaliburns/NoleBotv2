@@ -26,7 +26,7 @@ public class ShadowBan extends Command {
     }
 
     @Override
-    public void onCommandReceived(CommandEvent event) throws Exception {
+    public void executeCommand(CommandEvent event) throws Exception {
         final Settings settings = event.getSettings();
 
         if (event.getMessageContent().contains("list")) {

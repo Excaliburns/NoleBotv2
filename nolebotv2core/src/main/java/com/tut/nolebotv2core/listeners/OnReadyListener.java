@@ -5,7 +5,7 @@ import com.tut.nolebotv2core.util.settings.Settings;
 import com.tut.nolebotv2core.util.settings.SettingsFactory;
 import com.tut.nolebotv2core.util.settings.SettingsManager;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

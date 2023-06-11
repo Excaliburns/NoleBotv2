@@ -1,22 +1,16 @@
 package com.tut.nolebotv2core.listeners;
 
-import com.tut.nolebotv2core.util.chat.EmbedHelper;
-import com.tut.nolebotv2core.util.reactions.ReactionMessage;
-import com.tut.nolebotv2core.util.reactions.ReactionMessageCache;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 public class GuildMessageReactionListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageReactionListener.class);
 
     //Fire when someone reacts to a message
+    /**
     @Override
-    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         //If the user reacting is a bot, do nothing
         if (event.getUser().isBot()) {
             return;
@@ -50,4 +44,5 @@ public class GuildMessageReactionListener extends ListenerAdapter {
         });
 
     }
+    **/
 }

@@ -1,31 +1,25 @@
 package com.tut.nolebotv2core.listeners;
 
-import com.tut.nolebotv2core.commands.util.Command;
-import com.tut.nolebotv2core.commands.util.CommandEvent;
-import com.tut.nolebotv2core.commands.util.CommandUtil;
-import com.tut.nolebotv2core.util.settings.Settings;
-import com.tut.nolebotv2core.util.settings.SettingsFactory;
 import lombok.Getter;
 import lombok.Setter;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Getter
 @Setter
 public class GuildMessageCommandListener extends ListenerAdapter {
     private static final Logger logger = LogManager.getLogger(GuildMessageCommandListener.class);
 
+
     @Override
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        String commandName = event.getName();
+    }
+    /**
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
 
 
         List<String> commandMessage;
@@ -77,4 +71,5 @@ public class GuildMessageCommandListener extends ListenerAdapter {
             }
         }
     }
+    **/
 }

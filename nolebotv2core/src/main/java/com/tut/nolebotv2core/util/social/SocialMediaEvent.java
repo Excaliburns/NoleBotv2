@@ -5,12 +5,12 @@ import com.tut.nolebotv2core.util.settings.SettingsFactory;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @Getter
 @Setter
 public class SocialMediaEvent {
-    private GuildMessageReceivedEvent origEvent;
+    private MessageReceivedEvent origEvent;
     private Message message;
     private Settings guildSettings;
 
@@ -19,7 +19,7 @@ public class SocialMediaEvent {
      *
      * @param event The message to convert into a post
      */
-    public SocialMediaEvent(GuildMessageReceivedEvent event) {
+    public SocialMediaEvent(MessageReceivedEvent event) {
         origEvent = event;
         message = event.getMessage();
         guildSettings = SettingsFactory.getSettings(event.getGuild());

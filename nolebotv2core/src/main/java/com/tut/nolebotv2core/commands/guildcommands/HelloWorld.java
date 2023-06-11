@@ -17,7 +17,7 @@ public class HelloWorld extends Command {
     }
 
     @Override
-    public void onCommandReceived(CommandEvent event) {
+    public void executeCommand(CommandEvent event) {
         final MessageChannel channel = event.getChannel();
 
         channel.sendMessage("World!").queue();

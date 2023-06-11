@@ -1,16 +1,14 @@
 package com.tut.nolebotv2core.commands.util;
 
+import com.tut.nolebotv2core.util.permissions.PermissionCache;
+import com.tut.nolebotv2core.util.settings.Settings;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import com.tut.nolebotv2core.util.permissions.PermissionCache;
-import com.tut.nolebotv2core.util.settings.Settings;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,19 +17,11 @@ import java.util.Queue;
 @Getter
 @Setter
 public class CommandEvent {
-    private GuildMessageReceivedEvent originatingJDAEvent;
+    private SlashCommandInteractionEvent originatingJDAEvent;
     private Command                   command;
-
-    // Message content with no separation
-    private String         rawMessageContent;
-
-    // Message content, index is position after first space, separated by spaces + 1
-    // !command arg arg
-    //  0       1   2
-    private List<String>   messageContent;
     private Guild          guild;
     private String         guildId;
-    private MessageChannel channel;
+    private MessageChannelUnion channel;
     private Settings       settings;
 
     private int            userInitiatedPermissionLevel;
@@ -40,28 +30,22 @@ public class CommandEvent {
      * Default constructor.
      *
      * @param event Originating JDA event
-     * @param rawMessage Raw text of the sent message, with no formatting applied.
-     * @param message A list of each string separated by spaces in the message.
      * @param settings Settings of the guild that sent the command
      * @param command The command used.
      */
     public CommandEvent(
-            final GuildMessageReceivedEvent event,
-            final String rawMessage,
-            final List<String> message,
+            final SlashCommandInteractionEvent event,
             final Settings settings,
             final Command command
     ) {
         this.originatingJDAEvent          = event;
         this.command                      = command;
-        this.rawMessageContent            = rawMessage;
-        this.messageContent               = message;
         this.guild                        = event.getGuild();
         this.guildId                      = event.getGuild().getId();
         this.channel                      = event.getChannel();
         this.settings                     = settings;
         this.userInitiatedPermissionLevel = PermissionCache.getPermissionForUser(
-                event.getAuthor().getId(),
+                event.getUser().getId(),
                 event.getGuild().getId()
         ).getPermissionLevel();
     }
@@ -90,15 +74,15 @@ public class CommandEvent {
         MessageUtil.sendSuccessResponseToChannel(this.channel, successMessageContent);
     }
 
-    public void printStackTraceToChannelFromThrowable(final MessageChannel channel, final Throwable e) {
+    public void printStackTraceToChannelFromThrowable(final MessageChannelUnion channel, final Throwable e) {
         MessageUtil.printStackTraceToChannelFromThrowable(channel, e);
     }
 
-    public void sendMessageToOriginatingChannel(final Queue<Message> message) {
+    public void sendMessageToOriginatingChannel(final Queue<MessageCreateData> message) {
         MessageUtil.sendMessageToChannel(message, this.channel);
     }
 
-    public void sendMessageToOriginatingChannel(final Message message) {
+    public void sendMessageToOriginatingChannel(final MessageCreateData message) {
         MessageUtil.sendMessageToChannel(message, this.channel);
     }
 
@@ -110,11 +94,4 @@ public class CommandEvent {
         MessageUtil.sendMessageToChannel(embed, this.channel);
     }
 
-    public List<User> getMentionedUsers() {
-        return this.originatingJDAEvent.getMessage().getMentionedUsers();
-    }
-
-    public List<Role> getMentionedRoles() {
-        return this.originatingJDAEvent.getMessage().getMentionedRoles();
-    }
 }

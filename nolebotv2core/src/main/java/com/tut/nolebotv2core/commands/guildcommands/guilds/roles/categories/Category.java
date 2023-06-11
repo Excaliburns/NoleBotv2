@@ -3,10 +3,14 @@ package com.tut.nolebotv2core.commands.guildcommands.guilds.roles.categories;
 import com.tut.nolebotv2core.commands.util.Command;
 import com.tut.nolebotv2core.commands.util.CommandEvent;
 import lombok.extern.log4j.Log4j2;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Role;
 import com.tut.nolebotv2core.util.db.entities.CategoryEntity;
 import com.tut.nolebotv2core.util.db.statements.CategoryStatements;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -33,9 +37,29 @@ public class Category extends Command {
     }
 
     @Override
+    public void registerCommand(JDA jda) {
+        jda.upsertCommand(
+                Commands.slash(name, description)
+                        .addSubcommands(
+                                new SubcommandData("create", "Creates a category")
+                                        .addOption(OptionType.STRING, "name", "The name of the category", true),
+                                new SubcommandData("delete", "Deletes a category")
+                                        .addOption(OptionType.STRING, "category", "The name of the category to delete", true),
+                                new SubcommandData("assign", "Adds a role to a category")
+                                        .addOption(OptionType.STRING, "category", "The name of the category the role is being added to", true)
+                                        .addOption(OptionType.ROLE, "role", "The role being added to the category", true),
+                                new SubcommandData("setowner", "Sets the owner of a category")
+                                        .addOption(OptionType.STRING, "category", "The name of the category the owner is being assigned to", true)
+                                        .addOption(OptionType.USER, "owner", "The owner of the category", true),
+                                new SubcommandData("list", "Lists the categories in the current server")
+                        )
+        ).queue();
+    }
+
+    @Override
     @SuppressWarnings("PMD.SwitchStmtsShouldHaveDefault")
-    public void onCommandReceived(CommandEvent event) throws Exception {
-        switch (event.getMessageContent().get(1)) {
+    public void executeCommand(CommandEvent event) throws Exception {
+        switch (event.getOriginatingJDAEvent().getSubcommandName()) {
             case ("create") -> {
                 createCategory(event);
             }
@@ -58,8 +82,7 @@ public class Category extends Command {
     }
 
     private void createCategory(CommandEvent event) throws SQLException {
-        final List<String> msg = event.getMessageContent();
-        String name = String.join(" ", msg.subList(2, msg.size()));
+        String name = event.getOriginatingJDAEvent().getOption("name").getAsString();
         CategoryEntity newCategory = new CategoryEntity(name, event.getGuildId());
         if (statements.checkExists(newCategory)) {
             event.sendErrorResponseToOriginatingChannel("Category exists");
@@ -76,8 +99,7 @@ public class Category extends Command {
     }
 
     private void deleteCategory(CommandEvent event) throws SQLException {
-        final List<String> msg = event.getMessageContent();
-        String name = String.join(" ", msg.subList(2, msg.size()));
+        String name = event.getOriginatingJDAEvent().getOption("name").getAsString();
         CategoryEntity newCategory = new CategoryEntity(name, event.getGuildId());
         if (!statements.checkExists(newCategory)) {
             event.sendErrorResponseToOriginatingChannel("Category doesn't exist");
@@ -94,21 +116,15 @@ public class Category extends Command {
     }
 
     private void assignRoleToCategory(CommandEvent event) throws SQLException {
-        List<Role> roleList = event.getMentionedRoles();
-        String origMsg = event.getRawMessageContent();
-        String roleName = origMsg.substring(
-                event.getSettings().getPrefix().length() + "category".length() + "assign".length(),
-                origMsg.indexOf("<")
-        ).trim();
-        if (statements.checkExists(new CategoryEntity(roleName, event.getGuildId()))) {
-            for (Role r : roleList) {
-                try {
-                    statements.insertRoleByNameAndId(event.getGuildId(), roleName, r.getId(), r.getName());
-                }
-                catch (SQLException e) {
-                    event.sendErrorResponseToOriginatingChannel("Role " + r.getName()
-                            + " already assigned to category");
-                }
+        Role role = event.getOriginatingJDAEvent().getOption("role").getAsRole();
+        String name = event.getOriginatingJDAEvent().getOption("category").getAsString();
+        if (statements.checkExists(new CategoryEntity(name, event.getGuildId()))) {
+            try {
+                statements.insertRoleByNameAndId(event.getGuildId(), name, role.getId(), role.getName());
+            }
+            catch (SQLException e) {
+                event.sendErrorResponseToOriginatingChannel("Role " + role.getName()
+                        + " already assigned to category");
             }
             event.sendSuccessResponseToOriginatingChannel("Roles added to category!");
         }
@@ -128,26 +144,19 @@ public class Category extends Command {
 
     private void setOwner(CommandEvent event) throws SQLException {
         boolean success = true;
-        List<User> userList = event.getMentionedUsers();
-        String origMsg = event.getRawMessageContent();
-        String prefix = event.getSettings().getPrefix();
-        String catName = origMsg.substring(
-                prefix.length() + "category".length() + "setowner".length(),
-                origMsg.indexOf("<")
-        ).trim();
-        for (User u : userList) {
-            try {
-                success = Arrays.stream(
-                        statements.setOwnerOfCategory(u.getId(), u.getName(),
-                                event.getGuildId(),
-                                catName))
-                        .anyMatch((i) -> {
-                            return i >= 0;
-                        });
-            }
-            catch (SQLException e) {
-                event.printStackTraceToChannelFromThrowable(event.getChannel(), e);
-            }
+        User user = event.getOriginatingJDAEvent().getOption("owner").getAsUser();
+        String catName = event.getOriginatingJDAEvent().getOption("category").getAsString();
+        try {
+            success = Arrays.stream(
+                            statements.setOwnerOfCategory(user.getId(), user.getName(),
+                                    event.getGuildId(),
+                                    catName))
+                    .anyMatch((i) -> {
+                        return i >= 0;
+                    });
+        }
+        catch (SQLException e) {
+            event.printStackTraceToChannelFromThrowable(event.getChannel(), e);
         }
         if (success) {
             event.sendSuccessResponseToOriginatingChannel("Successfully set owner");

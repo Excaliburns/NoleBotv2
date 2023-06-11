@@ -1,5 +1,6 @@
 package com.tut.nolebotv2core.commands.util;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,11 +18,11 @@ public class CommandUtil extends ListenerAdapter {
     public static final Map<String, Integer> commandIndex = new HashMap<>();
 
     /**
-    * Adds a command to the command list.
+    * Adds a command to the command list and registers it with Discord
     *
     * @param command the command to add
     */
-    public void addCommand(final Command command) {
+    public void addCommand(final Command command, final JDA jda) {
         String name = command.getName();
 
         synchronized (commandIndex) {
@@ -30,6 +31,7 @@ public class CommandUtil extends ListenerAdapter {
         }
 
         commands.add(command);
+        command.registerCommand(jda);
     }
 
     /**
